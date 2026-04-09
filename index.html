@@ -1,0 +1,1911 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>もぐサポ君</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f3eee6;
+      --surface: rgba(255, 251, 246, 0.92);
+      --surface-strong: #fffdf9;
+      --line: rgba(56, 43, 28, 0.12);
+      --ink: #1e1914;
+      --muted: #6c6256;
+      --accent: #c96429;
+      --accent-deep: #913e10;
+      --accent-soft: rgba(201, 100, 41, 0.12);
+      --success: #1f8b62;
+      --success-soft: rgba(31, 139, 98, 0.12);
+      --warning: #966816;
+      --warning-soft: rgba(150, 104, 22, 0.12);
+      --danger: #b33f3f;
+      --danger-soft: rgba(179, 63, 63, 0.12);
+      --shadow: 0 18px 46px rgba(90, 58, 27, 0.12);
+      --radius-xl: 28px;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Yu Gothic UI", "Meiryo", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(201, 100, 41, 0.15), transparent 28%),
+        radial-gradient(circle at bottom right, rgba(31, 139, 98, 0.1), transparent 30%),
+        linear-gradient(160deg, #f7f2ea 0%, #ece2d3 100%);
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    p {
+      margin-top: 0;
+    }
+
+    .app-shell {
+      width: min(1380px, calc(100% - 20px));
+      margin: 0 auto;
+      padding: 18px 0 40px;
+    }
+
+    .hero,
+    .panel {
+      border-radius: var(--radius-xl);
+      background: var(--surface);
+      border: 1px solid rgba(255, 255, 255, 0.58);
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 6px;
+      padding: 16px 24px 14px;
+      margin-bottom: 18px;
+      position: relative;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at top right, rgba(201, 100, 41, 0.06), transparent 24%),
+        linear-gradient(180deg, rgba(255, 251, 246, 0.97), rgba(255, 249, 244, 0.92));
+    }
+
+    .hero-main {
+      max-width: 620px;
+      padding-right: 120px;
+      display: grid;
+      gap: 0;
+    }
+
+    .eyebrow,
+    .section-kicker {
+      margin: 0 0 8px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      font-size: 0.66rem;
+      font-weight: 600;
+      color: var(--accent-deep);
+    }
+
+    .hero-title {
+      margin-bottom: 9px;
+      font-size: clamp(1.55rem, 2.7vw, 2.45rem);
+      line-height: 1.14;
+      letter-spacing: -0.018em;
+      font-family: "Hiragino Maru Gothic ProN", "Yu Gothic UI", "Meiryo", sans-serif;
+      font-weight: 700;
+      color: #6a564b;
+      max-width: 520px;
+    }
+
+    .hero-copy {
+      max-width: 540px;
+      line-height: 1.76;
+      font-size: 0.94rem;
+      color: #6f6458;
+      margin-bottom: 0;
+    }
+
+    .hero-sprig {
+      position: absolute;
+      right: 14px;
+      bottom: 10px;
+      width: 70px;
+      opacity: 0.46;
+      pointer-events: none;
+    }
+
+    .hero-sprig svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .muted,
+    .status-line,
+    .hint {
+      color: var(--muted);
+    }
+
+    .page-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 18px;
+      position: relative;
+      z-index: 5;
+    }
+
+    .nav-button,
+    .button {
+      border: 0;
+      border-radius: 999px;
+      padding: 12px 18px;
+      cursor: pointer;
+      transition: transform 140ms ease, opacity 140ms ease;
+    }
+
+    .nav-button:hover,
+    .button:hover {
+      transform: translateY(-1px);
+    }
+
+    .nav-button {
+      background: rgba(29, 24, 18, 0.08);
+      color: var(--ink);
+      font-weight: 700;
+      pointer-events: auto;
+    }
+
+    .nav-button.is-active,
+    .button-primary {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .button-secondary {
+      background: rgba(29, 24, 18, 0.08);
+      color: var(--ink);
+    }
+
+    .view {
+      display: none;
+    }
+
+    .view.is-active {
+      display: grid;
+      gap: 18px;
+    }
+
+    .panel {
+      padding: 22px;
+    }
+
+    .section-head,
+    .sub-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .section-note {
+      max-width: 420px;
+      color: var(--muted);
+      line-height: 1.7;
+      text-align: right;
+    }
+
+    .stack {
+      display: grid;
+      gap: 16px;
+    }
+
+    .grid-two {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .grid-three {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+    }
+
+    .field span {
+      font-size: 0.92rem;
+      font-weight: 700;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.78);
+      color: var(--ink);
+      padding: 12px 14px;
+    }
+
+    textarea {
+      min-height: 96px;
+      resize: vertical;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      outline: 2px solid rgba(201, 100, 41, 0.25);
+      border-color: rgba(201, 100, 41, 0.36);
+    }
+
+    .split-layout {
+      display: grid;
+      grid-template-columns: 380px minmax(0, 1fr);
+      gap: 18px;
+    }
+
+    .card,
+    .menu-card,
+    .recipe-card,
+    .metric-card,
+    .check-card,
+    .sheet-card {
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.74);
+    }
+
+    .card,
+    .menu-card,
+    .sheet-card {
+      padding: 18px;
+    }
+
+    .recipe-card {
+      padding: 16px;
+      cursor: pointer;
+      transition: transform 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
+    }
+
+    .recipe-card:hover {
+      transform: translateY(-1px);
+    }
+
+    .recipe-card.is-active {
+      border-color: rgba(201, 100, 41, 0.36);
+      box-shadow: inset 0 0 0 1px rgba(201, 100, 41, 0.18);
+    }
+
+    .recipe-list,
+    .food-list,
+    .ingredient-list,
+    .history-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .food-list {
+      max-height: 360px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(300px, 0.8fr);
+      gap: 16px;
+      align-items: start;
+    }
+
+    .recipe-detail {
+      padding: 20px;
+    }
+
+    .recipe-detail h3 {
+      margin-bottom: 8px;
+      font-size: 1.6rem;
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .detail-block + .detail-block {
+      margin-top: 18px;
+    }
+
+    .detail-block h4 {
+      margin-bottom: 10px;
+    }
+
+    .detail-list {
+      margin: 0;
+      padding-left: 20px;
+      line-height: 1.8;
+    }
+
+    .pill,
+    .tag {
+      display: inline-flex;
+      padding: 5px 9px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+    }
+
+    .pill {
+      background: var(--accent-soft);
+      color: var(--accent-deep);
+    }
+
+    .pill-muted {
+      background: rgba(29, 24, 18, 0.06);
+      color: var(--muted);
+    }
+
+    .tag {
+      background: var(--warning-soft);
+      color: var(--warning);
+    }
+
+    .metrics-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .metrics-grid.six {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+
+    .metric-card {
+      padding: 16px;
+      background: var(--surface-strong);
+    }
+
+    .metric-card strong {
+      display: block;
+      margin-top: 10px;
+      font-size: 1.3rem;
+    }
+
+    .metric-card small {
+      display: block;
+      margin-top: 8px;
+      color: var(--muted);
+    }
+
+    .recipe-detail .metrics-grid.six {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .weekly-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .resident-menu-table,
+    .kitchen-summary-table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    .resident-menu-table th,
+    .resident-menu-table td,
+    .kitchen-summary-table th,
+    .kitchen-summary-table td {
+      border: 1px solid rgba(56, 43, 28, 0.14);
+      padding: 10px 12px;
+      vertical-align: top;
+      text-align: left;
+    }
+
+    .resident-menu-table th,
+    .kitchen-summary-table th {
+      background: rgba(201, 100, 41, 0.08);
+      font-weight: 700;
+    }
+
+    .resident-menu-table {
+      font-size: 1.08rem;
+    }
+
+    .resident-menu-table tbody th {
+      width: 132px;
+      background: rgba(29, 24, 18, 0.04);
+    }
+
+    .resident-page-note {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .kitchen-day-sheet {
+      display: grid;
+      gap: 14px;
+    }
+
+    .kitchen-day-meta {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 12px;
+      align-items: start;
+    }
+
+    .kitchen-day-meta .metrics-grid.six {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .kitchen-recipes-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .kitchen-summary-table td:first-child,
+    .kitchen-summary-table th:first-child {
+      width: 112px;
+    }
+
+    .page-print-break {
+      break-after: page;
+      page-break-after: always;
+    }
+
+    .day-board {
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.76);
+      padding: 18px;
+      min-height: 100%;
+    }
+
+    .day-board.large-text {
+      font-size: 1.12rem;
+      line-height: 1.8;
+    }
+
+    .day-board h3 {
+      margin-bottom: 10px;
+      font-size: 1.4rem;
+    }
+
+    .resident-meal-list,
+    .saved-menu-list,
+    .kitchen-step-list {
+      margin: 0;
+      padding-left: 20px;
+      line-height: 1.8;
+    }
+
+    .check-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .check-card {
+      padding: 16px;
+    }
+
+    .check-card.pass {
+      background: rgba(245, 255, 251, 0.84);
+      border-color: rgba(31, 139, 98, 0.34);
+    }
+
+    .check-card.fail {
+      background: rgba(255, 246, 246, 0.84);
+      border-color: rgba(179, 63, 63, 0.34);
+    }
+
+    .check-card strong {
+      display: block;
+      margin-top: 8px;
+      font-size: 1.05rem;
+    }
+
+    .print-note {
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .kitchen-week-grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .sheet-card h3 {
+      margin-bottom: 10px;
+    }
+
+    .ingredient-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+    }
+
+    .ingredient-table th,
+    .ingredient-table td {
+      border-bottom: 1px solid rgba(56, 43, 28, 0.1);
+      padding: 8px;
+      text-align: left;
+      vertical-align: top;
+      font-size: 0.94rem;
+    }
+
+    .ingredient-table th {
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .empty-state {
+      padding: 22px;
+      border-radius: var(--radius-lg);
+      text-align: center;
+      color: var(--muted);
+      border: 1px dashed rgba(29, 24, 18, 0.18);
+      background: rgba(255, 255, 255, 0.48);
+    }
+
+    @media (max-width: 1120px) {
+      .hero,
+      .split-layout,
+      .detail-grid,
+      .weekly-grid,
+      .kitchen-day-meta,
+      .kitchen-recipes-grid,
+      .check-grid,
+      .metrics-grid.six,
+      .grid-three {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .app-shell {
+        width: min(100% - 12px, 1380px);
+      }
+
+      .hero,
+      .panel {
+        padding: 18px;
+      }
+
+      .hero-main {
+        max-width: none;
+        padding-right: 0;
+      }
+
+      .hero-title {
+        font-size: clamp(1.65rem, 7vw, 2.1rem);
+      }
+
+      .hero-copy {
+        max-width: none;
+      }
+
+      .hero-sprig {
+        width: 54px;
+        right: 10px;
+        bottom: 8px;
+      }
+
+      .grid-two {
+        grid-template-columns: 1fr;
+      }
+
+      .section-head,
+      .sub-head {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .section-note {
+        text-align: left;
+        max-width: none;
+      }
+
+      .page-nav,
+      .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .button,
+      .nav-button {
+        width: 100%;
+      }
+    }
+
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 10mm;
+      }
+
+      html,
+      body {
+        width: 210mm;
+      }
+
+      body {
+        background: #fff;
+        color: #111;
+        font-size: 10.5pt;
+      }
+
+      .hero,
+      .page-nav,
+      .admin-only,
+      .no-print {
+        display: none !important;
+      }
+
+      .view {
+        display: none !important;
+      }
+
+      .view.is-print-target {
+        display: grid !important;
+      }
+
+      .panel,
+      .day-board,
+      .sheet-card,
+      .card {
+        box-shadow: none;
+        border: 1px solid #bbb;
+        background: #fff;
+      }
+
+      .app-shell {
+        width: 100%;
+        padding: 0;
+      }
+
+      #resident-view {
+        gap: 0;
+      }
+
+      #resident-view .panel {
+        border: 0;
+        padding: 0;
+      }
+
+      .resident-menu-table {
+        font-size: 13pt;
+      }
+
+      .resident-menu-table th,
+      .resident-menu-table td {
+        padding: 8px 9px;
+      }
+
+      .resident-page-note {
+        margin-top: 6px;
+        font-size: 9pt;
+      }
+
+      #kitchen-view {
+        gap: 0;
+      }
+
+      .kitchen-intro {
+        display: none !important;
+      }
+
+      .kitchen-day-sheet {
+        min-height: 276mm;
+        align-content: start;
+      }
+
+      .kitchen-day-sheet.panel {
+        padding: 8mm 7mm;
+        border: 0;
+      }
+
+      .page-print-break {
+        break-after: page;
+        page-break-after: always;
+      }
+
+      #kitchen-view > .page-print-break:last-child {
+        break-after: auto;
+        page-break-after: auto;
+      }
+
+      .kitchen-day-meta,
+      .kitchen-recipes-grid,
+      .check-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .kitchen-summary-table,
+      .ingredient-table {
+        font-size: 9pt;
+      }
+
+      .kitchen-summary-table th,
+      .kitchen-summary-table td,
+      .ingredient-table th,
+      .ingredient-table td {
+        padding: 5px 6px;
+      }
+
+      .sheet-card,
+      .check-card,
+      .metric-card {
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+
+      .sheet-card {
+        padding: 10px;
+      }
+
+      .sheet-card h3,
+      .kitchen-day-sheet h2 {
+        margin-bottom: 6px;
+      }
+
+      .kitchen-step-list,
+      .detail-list,
+      .resident-meal-list {
+        line-height: 1.45;
+      }
+
+      .metric-card strong {
+        font-size: 1.05rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="hero">
+      <div class="hero-main">
+        <p class="eyebrow">MOGU SUPPORT PLANNER</p>
+        <h1 class="hero-title">もぐサポ君</h1>
+        <p class="hero-copy">
+          もぐもぐ食べる毎日の昼食を、やさしくサポートするアプリです。
+          利用者向けの献立表や、調理室向けの指示書を見やすくまとめて、
+          毎週の昼食づくりに役立てます。
+        </p>
+      </div>
+      <div class="hero-sprig" aria-hidden="true">
+        <svg viewBox="0 0 128 92" role="img">
+          <g fill="none" fill-rule="evenodd">
+            <path d="M16 74c15-21 30-38 46-50 15-12 31-19 49-23" stroke="#9bbd98" stroke-width="3.2" stroke-linecap="round"></path>
+            <path d="M44 54c-8-11-8-23 0-33 12 4 18 14 17 28-4 4-9 6-17 5z" fill="#d9e9ce"></path>
+            <path d="M69 41c-7-10-7-20 0-29 10 3 16 11 16 24-4 4-9 6-16 5z" fill="#c8dfbf"></path>
+            <path d="M92 27c-6-8-6-17 0-25 9 3 13 10 13 20-3 3-7 5-13 5z" fill="#b6d2af"></path>
+            <g transform="translate(8 54)">
+              <circle cx="16" cy="16" r="5" fill="#f0c0cb"></circle>
+              <ellipse cx="16" cy="7.5" rx="6.4" ry="8.2" fill="#f8d9e1"></ellipse>
+              <ellipse cx="24.5" cy="16" rx="8.2" ry="6.4" fill="#f8d9e1"></ellipse>
+              <ellipse cx="16" cy="24.5" rx="6.4" ry="8.2" fill="#f8d9e1"></ellipse>
+              <ellipse cx="7.5" cy="16" rx="8.2" ry="6.4" fill="#f8d9e1"></ellipse>
+              <circle cx="16" cy="16" r="2.8" fill="#efb15f"></circle>
+            </g>
+            <g transform="translate(92 48) scale(.82)">
+              <circle cx="16" cy="16" r="5" fill="#f0c0cb"></circle>
+              <ellipse cx="16" cy="7.5" rx="6.4" ry="8.2" fill="#f8d9e1"></ellipse>
+              <ellipse cx="24.5" cy="16" rx="8.2" ry="6.4" fill="#f8d9e1"></ellipse>
+              <ellipse cx="16" cy="24.5" rx="6.4" ry="8.2" fill="#f8d9e1"></ellipse>
+              <ellipse cx="7.5" cy="16" rx="8.2" ry="6.4" fill="#f8d9e1"></ellipse>
+              <circle cx="16" cy="16" r="2.8" fill="#efb15f"></circle>
+            </g>
+          </g>
+        </svg>
+      </div>
+    </header>
+
+    <nav class="page-nav no-print" aria-label="画面の切り替え">
+      <button type="button" class="nav-button is-active" data-view="resident-view">利用者向け献立表</button>
+      <button type="button" class="nav-button" data-view="kitchen-view">調理室向け指示書</button>
+      <button type="button" class="nav-button admin-only" data-view="admin-view">管理画面</button>
+      <button type="button" class="nav-button no-print" id="print-resident-button">利用者向けを印刷</button>
+      <button type="button" class="nav-button no-print" id="print-kitchen-button">調理室向けを印刷</button>
+    </nav>
+
+    <section id="resident-view" class="view is-active is-print-target"></section>
+    <section id="kitchen-view" class="view"></section>
+    <section id="admin-view" class="view admin-only"></section>
+  </div>
+
+  <script>
+    const STORAGE_KEYS = {
+      customFoods: "nutrition-kun::custom-foods",
+      customRecipes: "nutrition-kun::custom-recipes",
+      weeklyMenus: "nutrition-kun::weekly-menus",
+      goals: "nutrition-kun::goals",
+      settings: "nutrition-kun::settings",
+    };
+
+    const WEEKDAY_KEYS = ["mon", "tue", "wed", "thu", "fri"];
+    const WEEKDAY_LABELS = {
+      mon: "月",
+      tue: "火",
+      wed: "水",
+      thu: "木",
+      fri: "金",
+    };
+    const CATEGORY_OPTIONS = ["主食", "汁物", "主菜", "副菜", "デザート", "単品料理"];
+    const BASIC_SLOTS = ["主食", "汁物", "主菜", "副菜1", "副菜2", "デザート"];
+    const EXCEPTION_SLOTS = ["単品料理", "追加汁物", "追加副菜", "追加デザート"];
+    const NUTRIENT_META = [
+      { key: "energy", label: "エネルギー", unit: "kcal", digits: 0 },
+      { key: "protein", label: "たんぱく質", unit: "g", digits: 1 },
+      { key: "fat", label: "脂質", unit: "g", digits: 1 },
+      { key: "carbs", label: "炭水化物", unit: "g", digits: 1 },
+      { key: "salt", label: "塩分", unit: "g", digits: 1 },
+      { key: "fiber", label: "食物繊維", unit: "g", digits: 1 },
+    ];
+    const DEFAULT_GOALS = {
+      energy: 550,
+      protein: 22,
+      fat: 18,
+      carbs: 75,
+      salt: 3.0,
+      fiber: 6,
+    };
+    const DEFAULT_SETTINGS = {
+      weekStart: mondayString(new Date()),
+      kitchenServings: 25,
+    };
+    const SEASONING_FOOD_IDS = new Set(["miso", "broth", "soy_sauce", "mirin", "sugar", "curry_roux", "tomato_sauce"]);
+
+    const DEFAULT_FOODS = [
+      { id: "rice", name: "ごはん", nutrients: { energy: 156, protein: 2.5, fat: 0.3, carbs: 37.1, salt: 0.0, fiber: 0.3 } },
+      { id: "soft_rice", name: "軟飯", nutrients: { energy: 120, protein: 2.0, fat: 0.2, carbs: 28.5, salt: 0.0, fiber: 0.2 } },
+      { id: "miso", name: "味噌", nutrients: { energy: 183, protein: 12.5, fat: 6.0, carbs: 25.6, salt: 12.4, fiber: 5.5 } },
+      { id: "broth", name: "だし汁", nutrients: { energy: 4, protein: 0.6, fat: 0.0, carbs: 0.2, salt: 0.2, fiber: 0.0 } },
+      { id: "white_fish", name: "白身魚", nutrients: { energy: 108, protein: 22.3, fat: 1.2, carbs: 0.1, salt: 0.1, fiber: 0.0 } },
+      { id: "chicken_thigh", name: "鶏もも肉", nutrients: { energy: 190, protein: 16.6, fat: 14.2, carbs: 0.0, salt: 0.1, fiber: 0.0 } },
+      { id: "minced_chicken", name: "鶏ひき肉", nutrients: { energy: 166, protein: 18.8, fat: 10.2, carbs: 0.0, salt: 0.1, fiber: 0.0 } },
+      { id: "tofu", name: "豆腐", nutrients: { energy: 72, protein: 6.6, fat: 4.2, carbs: 1.6, salt: 0.0, fiber: 0.4 } },
+      { id: "spinach", name: "ほうれん草", nutrients: { energy: 20, protein: 2.2, fat: 0.4, carbs: 3.1, salt: 0.1, fiber: 2.8 } },
+      { id: "pumpkin", name: "かぼちゃ", nutrients: { energy: 78, protein: 1.9, fat: 0.3, carbs: 17.1, salt: 0.0, fiber: 3.5 } },
+      { id: "potato_salad_base", name: "ポテトサラダベース", nutrients: { energy: 145, protein: 2.4, fat: 8.2, carbs: 16.2, salt: 0.7, fiber: 1.4 } },
+      { id: "fruit_jelly", name: "フルーツゼリー", nutrients: { energy: 85, protein: 0.2, fat: 0.0, carbs: 21.0, salt: 0.0, fiber: 0.5 } },
+      { id: "yogurt", name: "ヨーグルト", nutrients: { energy: 62, protein: 3.6, fat: 3.0, carbs: 5.3, salt: 0.1, fiber: 0.0 } },
+      { id: "pudding", name: "プリン", nutrients: { energy: 126, protein: 4.6, fat: 5.8, carbs: 13.8, salt: 0.1, fiber: 0.0 } },
+      { id: "soy_sauce", name: "しょうゆ", nutrients: { energy: 71, protein: 7.7, fat: 0.0, carbs: 10.1, salt: 14.5, fiber: 0.8 } },
+      { id: "mirin", name: "みりん", nutrients: { energy: 241, protein: 0.3, fat: 0.0, carbs: 54.9, salt: 0.0, fiber: 0.0 } },
+      { id: "sugar", name: "砂糖", nutrients: { energy: 391, protein: 0.0, fat: 0.0, carbs: 99.2, salt: 0.0, fiber: 0.0 } },
+      { id: "egg", name: "卵", nutrients: { energy: 142, protein: 12.3, fat: 10.3, carbs: 0.3, salt: 0.4, fiber: 0.0 } },
+      { id: "milk", name: "牛乳", nutrients: { energy: 61, protein: 3.3, fat: 3.8, carbs: 4.8, salt: 0.1, fiber: 0.0 } },
+      { id: "curry_roux", name: "カレールウ", nutrients: { energy: 512, protein: 7.0, fat: 32.3, carbs: 48.9, salt: 7.8, fiber: 3.2 } },
+      { id: "ramen_noodles", name: "中華めん", nutrients: { energy: 149, protein: 4.9, fat: 0.7, carbs: 31.3, salt: 0.2, fiber: 1.3 } },
+      { id: "pasta_boiled", name: "ゆでパスタ", nutrients: { energy: 150, protein: 5.8, fat: 0.9, carbs: 29.8, salt: 0.0, fiber: 1.8 } },
+      { id: "tomato_sauce", name: "トマトソース", nutrients: { energy: 68, protein: 1.7, fat: 2.1, carbs: 11.0, salt: 0.9, fiber: 1.8 } },
+    ];
+
+    const DEFAULT_RECIPES = [
+      { id: "rice_menu", name: "ごはん", category: "主食", servings: 1, servingWeight: 150, rotationKey: "主食", tags: ["基本"], description: "施設の基本となる主食です。", ingredients: [{ foodId: "rice", grams: 150 }], steps: ["温かく盛り付けます。"] },
+      { id: "soft_rice_menu", name: "軟飯", category: "主食", servings: 1, servingWeight: 150, rotationKey: "主食", tags: ["やわらか"], description: "やわらかめに仕上げた主食です。", ingredients: [{ foodId: "soft_rice", grams: 150 }], steps: ["温かく盛り付けます。"] },
+      { id: "miso_soup", name: "味噌汁", category: "汁物", servings: 2, servingWeight: 150, rotationKey: "汁物", tags: ["基本"], description: "豆腐入りの味噌汁です。", ingredients: [{ foodId: "broth", grams: 220 }, { foodId: "miso", grams: 16 }, { foodId: "tofu", grams: 60 }], steps: ["だし汁を温めます。", "豆腐を加え、味噌を溶いて仕上げます。"] },
+      { id: "clear_soup", name: "すまし汁", category: "汁物", servings: 2, servingWeight: 150, rotationKey: "汁物", tags: ["あっさり"], description: "しょうゆで整えたすまし汁です。", ingredients: [{ foodId: "broth", grams: 260 }, { foodId: "soy_sauce", grams: 4 }], steps: ["だし汁を温めます。", "しょうゆで味を整えます。"] },
+      { id: "fish_simmered", name: "白身魚の煮付け", category: "主菜", servings: 2, servingWeight: 90, rotationKey: "魚", tags: ["やわらか"], description: "白身魚をやさしい味で煮付けた主菜です。", ingredients: [{ foodId: "white_fish", grams: 160 }, { foodId: "soy_sauce", grams: 10 }, { foodId: "mirin", grams: 8 }, { foodId: "sugar", grams: 4 }], steps: ["調味料を煮立てます。", "白身魚を入れてやわらかく煮ます。"] },
+      { id: "chicken_teriyaki", name: "鶏の照り焼き", category: "主菜", servings: 2, servingWeight: 90, rotationKey: "鶏", tags: ["人気"], description: "食べやすい照り焼きの主菜です。", ingredients: [{ foodId: "chicken_thigh", grams: 170 }, { foodId: "soy_sauce", grams: 10 }, { foodId: "mirin", grams: 10 }, { foodId: "sugar", grams: 4 }], steps: ["鶏肉をやわらかく焼きます。", "調味料を加えて照りよく仕上げます。"] },
+      { id: "tofu_hamburg", name: "豆腐ハンバーグ", category: "主菜", servings: 2, servingWeight: 100, rotationKey: "豆腐", tags: ["やわらか"], description: "豆腐を使った軽めの主菜です。", ingredients: [{ foodId: "tofu", grams: 140 }, { foodId: "minced_chicken", grams: 120 }, { foodId: "egg", grams: 30 }], steps: ["材料を混ぜて成形します。", "中まで火を通して仕上げます。"] },
+      { id: "pumpkin_simmered", name: "かぼちゃ煮", category: "副菜", servings: 2, servingWeight: 70, rotationKey: "かぼちゃ", tags: ["煮物"], description: "やわらかく煮た副菜です。", ingredients: [{ foodId: "pumpkin", grams: 120 }, { foodId: "soy_sauce", grams: 4 }, { foodId: "mirin", grams: 4 }, { foodId: "sugar", grams: 3 }], steps: ["かぼちゃをやわらかく煮ます。", "調味料で味を含ませます。"] },
+      { id: "spinach_ohitashi", name: "ほうれん草のおひたし", category: "副菜", servings: 2, servingWeight: 50, rotationKey: "青菜", tags: ["さっぱり"], description: "青菜を使った副菜です。", ingredients: [{ foodId: "spinach", grams: 100 }, { foodId: "soy_sauce", grams: 4 }], steps: ["ほうれん草をゆでます。", "しょうゆで和えます。"] },
+      { id: "potato_salad", name: "ポテトサラダ", category: "副菜", servings: 2, servingWeight: 70, rotationKey: "サラダ", tags: ["人気"], description: "食べやすいポテトサラダです。", ingredients: [{ foodId: "potato_salad_base", grams: 140 }], steps: ["人数分に取り分けて盛り付けます。"] },
+      { id: "fruit_jelly_menu", name: "フルーツゼリー", category: "デザート", servings: 1, servingWeight: 80, rotationKey: "デザート", tags: ["冷たい"], description: "さっぱりしたゼリーです。", ingredients: [{ foodId: "fruit_jelly", grams: 80 }], steps: ["冷やして提供します。"] },
+      { id: "yogurt_menu", name: "ヨーグルト", category: "デザート", servings: 1, servingWeight: 80, rotationKey: "デザート", tags: ["乳製品"], description: "プレーンヨーグルトです。", ingredients: [{ foodId: "yogurt", grams: 80 }], steps: ["冷やして提供します。"] },
+      { id: "pudding_menu", name: "プリン", category: "デザート", servings: 1, servingWeight: 70, rotationKey: "デザート", tags: ["人気"], description: "やわらかいプリンです。", ingredients: [{ foodId: "pudding", grams: 70 }], steps: ["冷やして提供します。"] },
+      { id: "curry_rice", name: "カレーライス", category: "単品料理", servings: 2, servingWeight: 330, rotationKey: "カレー", tags: ["単品"], description: "食べやすい単品献立です。", ingredients: [{ foodId: "rice", grams: 260 }, { foodId: "chicken_thigh", grams: 120 }, { foodId: "curry_roux", grams: 40 }], steps: ["具材を煮ます。", "ルウを溶かし、ごはんにかけます。"] },
+      { id: "japanese_pasta", name: "和風パスタ", category: "単品料理", servings: 2, servingWeight: 260, rotationKey: "パスタ", tags: ["単品"], description: "食べやすい和風パスタです。", ingredients: [{ foodId: "pasta_boiled", grams: 280 }, { foodId: "chicken_thigh", grams: 80 }, { foodId: "tomato_sauce", grams: 80 }], steps: ["具材を加熱します。", "パスタと合わせて仕上げます。"] },
+      { id: "ramen_bowl", name: "やわらか醤油ラーメン", category: "単品料理", servings: 2, servingWeight: 300, rotationKey: "ラーメン", tags: ["単品"], description: "やわらかめに仕上げたラーメンです。", ingredients: [{ foodId: "ramen_noodles", grams: 220 }, { foodId: "broth", grams: 250 }, { foodId: "soy_sauce", grams: 10 }, { foodId: "chicken_thigh", grams: 60 }], steps: ["スープを温めます。", "めんと具材を合わせて提供します。"] },
+    ];
+
+    const state = {
+      customFoods: loadStorage(STORAGE_KEYS.customFoods, []),
+      customRecipes: loadStorage(STORAGE_KEYS.customRecipes, []),
+      weeklyMenus: loadStorage(STORAGE_KEYS.weeklyMenus, {}),
+      goals: { ...DEFAULT_GOALS, ...loadStorage(STORAGE_KEYS.goals, {}) },
+      settings: { ...DEFAULT_SETTINGS, ...loadStorage(STORAGE_KEYS.settings, {}) },
+      selectedView: "resident-view",
+      selectedRecipeId: null,
+      ingredientDrafts: [],
+      printTarget: "resident-view",
+    };
+    globalThis.state = state;
+
+    const elements = {
+      heroWeekLabel: document.querySelector("#hero-week-label"),
+      heroEnergy: document.querySelector("#hero-energy"),
+      residentView: document.querySelector("#resident-view"),
+      kitchenView: document.querySelector("#kitchen-view"),
+      adminView: document.querySelector("#admin-view"),
+      navButtons: Array.from(document.querySelectorAll(".nav-button[data-view]")),
+      printResidentButton: document.querySelector("#print-resident-button"),
+      printKitchenButton: document.querySelector("#print-kitchen-button"),
+    };
+    globalThis.elements = elements;
+
+    init();
+
+    function init() {
+      syncSelectedRecipe();
+      bindEvents();
+      renderAll();
+    }
+
+    function bindEvents() {
+      elements.navButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          state.selectedView = button.dataset.view;
+          renderViews();
+        });
+      });
+
+      elements.printResidentButton.addEventListener("click", () => {
+        state.printTarget = "resident-view";
+        renderViews();
+        window.print();
+      });
+
+      elements.printKitchenButton.addEventListener("click", () => {
+        state.printTarget = "kitchen-view";
+        renderViews();
+        window.print();
+      });
+    }
+
+    function renderAll() {
+      if (elements.heroWeekLabel) {
+        elements.heroWeekLabel.textContent = `蟇ｾ雎｡騾ｱ ${formatWeekLabel(state.settings.weekStart)}`;
+      }
+      updateHeroSummary();
+      renderViews();
+      renderResidentView();
+      renderKitchenView();
+      renderAdminView();
+    }
+
+    function renderViews() {
+      [elements.residentView, elements.kitchenView, elements.adminView].forEach((view) => {
+        view.classList.toggle("is-active", view.id === state.selectedView);
+        view.classList.toggle("is-print-target", view.id === state.printTarget);
+      });
+
+      elements.navButtons.forEach((button) => {
+        button.classList.toggle("is-active", button.dataset.view === state.selectedView);
+      });
+    }
+
+    function updateHeroSummary() {
+      const weekMenus = getWeekMenus(state.settings.weekStart);
+      const firstMenu = weekMenus[WEEKDAY_KEYS[0]];
+      const totals = evaluateDayMenu(firstMenu).totals;
+      if (elements.heroEnergy) {
+        elements.heroEnergy.textContent = `${formatNumber(totals.energy, 0)} kcal`;
+      }
+    }
+
+    function getAllFoods() {
+      return [...DEFAULT_FOODS, ...state.customFoods];
+    }
+
+    function getAllRecipes() {
+      return [...DEFAULT_RECIPES, ...state.customRecipes];
+    }
+
+    function getFoodMap() {
+      return new Map(getAllFoods().map((food) => [food.id, food]));
+    }
+
+    function getRecipeMap() {
+      return new Map(getAllRecipes().map((recipe) => [recipe.id, recipe]));
+    }
+
+    function isSeasoningIngredient(ingredient) {
+      if (ingredient.label) {
+        return ingredient.kind === "seasoning";
+      }
+      return SEASONING_FOOD_IDS.has(ingredient.foodId);
+    }
+
+    function renderIngredientRows(recipe, servings = state.settings.kitchenServings) {
+      const foodMap = getFoodMap();
+      return recipe.ingredients.map((ingredient) => {
+        const food = ingredient.foodId ? foodMap.get(ingredient.foodId) : null;
+        const label = food ? food.name : ingredient.label;
+        const totalGrams = ingredient.grams * servings / recipe.servings;
+        const kind = isSeasoningIngredient(ingredient) ? "調味料" : "材料";
+        return `
+          <tr>
+            <td>${escapeHtml(kind)}</td>
+            <td>${escapeHtml(label ?? "未設定")}</td>
+            <td>${formatNumber(ingredient.grams, 0)} g</td>
+            <td>${formatNumber(totalGrams, 0)} g</td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    function renderIngredientTable(recipe, servings = state.settings.kitchenServings) {
+      return `
+        <table class="ingredient-table">
+          <thead>
+            <tr>
+              <th>区分</th>
+              <th>材料・調味料</th>
+              <th>1人前</th>
+              <th>${servings}食分</th>
+            </tr>
+          </thead>
+          <tbody>${renderIngredientRows(recipe, servings)}</tbody>
+        </table>
+      `;
+    }
+
+    function syncSelectedRecipe() {
+      const recipes = getAllRecipes();
+      if (!state.selectedRecipeId || !recipes.find((recipe) => recipe.id === state.selectedRecipeId)) {
+        state.selectedRecipeId = recipes[0]?.id ?? null;
+      }
+    }
+
+    function getWeekMenus(weekStart) {
+      return state.weeklyMenus[weekStart] ?? createEmptyWeekMenu(weekStart);
+    }
+
+    function createEmptyWeekMenu(weekStart) {
+      const week = {};
+      WEEKDAY_KEYS.forEach((dayKey, index) => {
+        week[dayKey] = {
+          date: addDays(weekStart, index),
+          mode: "basic",
+          basic: {
+            staple: null,
+            soup: null,
+            main: null,
+            side1: null,
+            side2: null,
+            dessert: null,
+          },
+          exception: {
+            singleDish: null,
+            extraSoup: null,
+            extraSide: null,
+            extraDessert: null,
+          },
+          memo: "",
+        };
+      });
+      return week;
+    }
+
+    function computeRecipeNutrition(recipe) {
+      const foodMap = getFoodMap();
+      const total = recipe.ingredients.reduce((acc, ingredient) => {
+        if (!ingredient.foodId) {
+          return acc;
+        }
+        const food = foodMap.get(ingredient.foodId);
+        if (!food) {
+          return acc;
+        }
+        return sumNutrients(acc, scaleNutrients(food.nutrients, ingredient.grams / 100));
+      }, emptyNutrients());
+
+      return {
+        total,
+        perServing: scaleNutrients(total, 1 / recipe.servings),
+      };
+    }
+
+    function getMenuRecipeIds(dayMenu) {
+      const source = dayMenu.mode === "basic"
+        ? Object.values(dayMenu.basic)
+        : [dayMenu.exception.singleDish, dayMenu.exception.extraSoup, dayMenu.exception.extraSide, dayMenu.exception.extraDessert];
+      return source.filter(Boolean);
+    }
+
+    function evaluateDayMenu(dayMenu) {
+      const recipeMap = getRecipeMap();
+      const recipes = getMenuRecipeIds(dayMenu)
+        .map((recipeId) => recipeMap.get(recipeId))
+        .filter(Boolean);
+
+      const totals = recipes.reduce((acc, recipe) => (
+        sumNutrients(acc, computeRecipeNutrition(recipe).perServing)
+      ), emptyNutrients());
+
+      const structurePass = dayMenu.mode === "basic"
+        ? ["staple", "soup", "main", "side1", "side2", "dessert"].every((key) => Boolean(dayMenu.basic[key]))
+        : Boolean(dayMenu.exception.singleDish);
+
+      return {
+        recipes,
+        totals,
+        structurePass,
+        energyPass: totals.energy >= 500 && totals.energy <= 600,
+        saltPass: totals.salt <= 3.0,
+      };
+    }
+
+    function renderMetricCards(nutrients, note) {
+      return `
+        <div class="metrics-grid six">
+          ${NUTRIENT_META.map((item) => `
+            <article class="metric-card">
+              <span>${item.label}</span>
+              <strong>${formatNumber(nutrients[item.key], item.digits)} ${item.unit}</strong>
+              <small>${note}</small>
+            </article>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    function renderConditionCards(evaluation) {
+      const cards = [
+        {
+          label: "構成",
+          pass: evaluation.structurePass,
+          detail: evaluation.structurePass ? "必要な構成がそろっています。" : "必要な構成が不足しています。",
+        },
+        {
+          label: "エネルギー",
+          pass: evaluation.energyPass,
+          detail: `${formatNumber(evaluation.totals.energy, 0)} kcal / 逶ｮ讓・500縲・00 kcal`,
+        },
+        {
+          label: "塩分",
+          pass: evaluation.saltPass,
+          detail: `${formatNumber(evaluation.totals.salt, 1)} g / 目標 3.0 g 以下`,
+        },
+      ];
+
+      return cards.map((card) => `
+        <article class="check-card ${card.pass ? "pass" : "fail"}">
+          <span>${card.label}</span>
+          <strong>${card.pass ? "適合" : "要調整"}</strong>
+          <p class="muted">${card.detail}</p>
+        </article>
+      `).join("");
+    }
+
+    function renderAchievementRows(nutrients) {
+      return NUTRIENT_META.map((item) => {
+        const goal = state.goals[item.key] || 0;
+        const ratio = goal > 0 ? Math.min((nutrients[item.key] / goal) * 100, 100) : 0;
+        return `
+          <div class="achievement-row">
+            <span>${item.label}</span>
+            <div class="track"><div style="width:${ratio}%"></div></div>
+            <strong>${formatNumber(nutrients[item.key], item.digits)} / ${formatNumber(goal, item.digits)} ${item.unit}</strong>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function menuSlotsForDisplay(dayMenu) {
+      return dayMenu.mode === "basic"
+        ? [
+          ["主食", dayMenu.basic.staple],
+          ["汁物", dayMenu.basic.soup],
+          ["主菜", dayMenu.basic.main],
+          ["副菜1", dayMenu.basic.side1],
+          ["副菜2", dayMenu.basic.side2],
+          ["デザート", dayMenu.basic.dessert],
+        ]
+        : [
+          ["単品料理", dayMenu.exception.singleDish],
+          ["追加汁物", dayMenu.exception.extraSoup],
+          ["追加副菜", dayMenu.exception.extraSide],
+          ["追加デザート", dayMenu.exception.extraDessert],
+        ].filter(([, value]) => value);
+    }
+
+    function sumNutrients(left, right) {
+      return {
+        energy: left.energy + right.energy,
+        protein: left.protein + right.protein,
+        fat: left.fat + right.fat,
+        carbs: left.carbs + right.carbs,
+        salt: left.salt + right.salt,
+        fiber: left.fiber + right.fiber,
+      };
+    }
+
+    function scaleNutrients(nutrients, ratio) {
+      return {
+        energy: nutrients.energy * ratio,
+        protein: nutrients.protein * ratio,
+        fat: nutrients.fat * ratio,
+        carbs: nutrients.carbs * ratio,
+        salt: nutrients.salt * ratio,
+        fiber: nutrients.fiber * ratio,
+      };
+    }
+
+    function emptyNutrients() {
+      return { energy: 0, protein: 0, fat: 0, carbs: 0, salt: 0, fiber: 0 };
+    }
+
+    function loadStorage(key, fallback) {
+      try {
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : fallback;
+      } catch {
+        return fallback;
+      }
+    }
+
+    function saveStorage(key, value) {
+      localStorage.setItem(key, JSON.stringify(value));
+    }
+
+    function mondayString(date) {
+      const copy = new Date(date);
+      const day = copy.getDay();
+      const diff = day === 0 ? -6 : 1 - day;
+      copy.setDate(copy.getDate() + diff);
+      return `${copy.getFullYear()}-${String(copy.getMonth() + 1).padStart(2, "0")}-${String(copy.getDate()).padStart(2, "0")}`;
+    }
+
+    function addDays(dateString, days) {
+      const date = new Date(dateString);
+      date.setDate(date.getDate() + days);
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+    }
+
+    function formatDate(dateString) {
+      return new Intl.DateTimeFormat("ja-JP", { month: "numeric", day: "numeric" }).format(new Date(dateString));
+    }
+
+    function formatWeekLabel(weekStart) {
+      return `${formatDate(weekStart)} - ${formatDate(addDays(weekStart, 4))}`;
+    }
+
+    function formatNumber(value, digits) {
+      return Number(value || 0).toFixed(digits);
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function renderResidentView() {
+      const weekMenus = getWeekMenus(state.settings.weekStart);
+      const recipeMap = getRecipeMap();
+      const residentCards = WEEKDAY_KEYS.map((dayKey) => {
+        const dayMenu = weekMenus[dayKey];
+        const evaluation = evaluateDayMenu(dayMenu);
+        const slotItems = menuSlotsForDisplay(dayMenu)
+          .map(([label, recipeId]) => {
+            const recipe = recipeMap.get(recipeId);
+            return `<li>${label}: ${escapeHtml(recipe?.name ?? "未設定")}</li>`;
+          })
+          .join("");
+
+        return `
+          <article class="day-board large-text">
+            <p class="section-kicker">${WEEKDAY_LABELS[dayKey]}曜日</p>
+            <h3>${formatDate(dayMenu.date)}</h3>
+            <ul class="resident-meal-list">${slotItems}</ul>
+            <p class="muted">エネルギー ${formatNumber(evaluation.totals.energy, 0)} kcal / 塩分 ${formatNumber(evaluation.totals.salt, 1)} g</p>
+          </article>
+        `;
+      }).join("");
+
+      elements.residentView.innerHTML = `
+        <article class="panel">
+          <div class="section-head">
+            <div>
+              <p class="section-kicker">Resident Menu</p>
+              <h2>利用者向け 5日分献立表</h2>
+            </div>
+            <p class="section-note">大きい文字で、月曜から金曜までの昼食献立を見やすく表示します。</p>
+          </div>
+          <div class="weekly-grid">${residentCards}</div>
+        </article>
+      `;
+    }
+
+    function renderKitchenView() {
+      const weekMenus = getWeekMenus(state.settings.weekStart);
+      const recipeMap = getRecipeMap();
+
+      const sheets = WEEKDAY_KEYS.map((dayKey) => {
+        const dayMenu = weekMenus[dayKey];
+        const evaluation = evaluateDayMenu(dayMenu);
+        const recipes = getMenuRecipeIds(dayMenu).map((recipeId) => recipeMap.get(recipeId)).filter(Boolean);
+
+        const recipeSheets = recipes.map((recipe) => {
+          const nutrition = computeRecipeNutrition(recipe);
+
+          return `
+            <article class="sheet-card">
+              <div class="sub-head">
+                <div>
+                  <p class="section-kicker">${recipe.category}</p>
+                  <h3>${escapeHtml(recipe.name)}</h3>
+                </div>
+                <span class="pill">${formatNumber(nutrition.perServing.energy, 0)} kcal</span>
+              </div>
+              <p class="muted">1人前量 ${formatNumber(recipe.servingWeight, 0)} g / 食数分 ${formatNumber(recipe.servingWeight * state.settings.kitchenServings, 0)} g / rotation ${escapeHtml(recipe.rotationKey || "未設定")}</p>
+              ${renderIngredientTable(recipe, state.settings.kitchenServings)}
+              <h4>作り方</h4>
+              <ol class="kitchen-step-list">${recipe.steps.map((step) => `<li>${escapeHtml(step)}</li>`).join("")}</ol>
+            </article>
+          `;
+        }).join("");
+
+        return `
+          <article class="panel">
+            <div class="section-head">
+              <div>
+                <p class="section-kicker">${WEEKDAY_LABELS[dayKey]}曜日</p>
+                <h2>${formatDate(dayMenu.date)} 調理室向け指示書</h2>
+              </div>
+              <p class="section-note">エネルギー ${formatNumber(evaluation.totals.energy, 0)} kcal / 塩分 ${formatNumber(evaluation.totals.salt, 1)} g / ${state.settings.kitchenServings}食</p>
+            </div>
+            <div class="check-grid">${renderConditionCards(evaluation)}</div>
+            <div class="kitchen-week-grid">${recipeSheets || '<div class="empty-state">献立が未設定です。</div>'}</div>
+          </article>
+        `;
+      }).join("");
+
+      elements.kitchenView.innerHTML = `
+        <article class="panel">
+          <div class="section-head">
+            <div>
+              <p class="section-kicker">Kitchen Sheets</p>
+              <h2>調理室向け 5日分指示書</h2>
+            </div>
+            <p class="section-note">材料、調味料、1人前量、作業指示を日ごとに確認できます。</p>
+          </div>
+          <p class="print-note">印刷時はこの画面だけを出力できます。</p>
+        </article>
+        ${sheets}
+      `;
+    }
+
+    function getResidentSlotValue(dayMenu, slotKey) {
+      if (dayMenu.mode === "basic") {
+        return dayMenu.basic[slotKey] ?? null;
+      }
+
+      const exceptionMap = {
+        staple: null,
+        soup: dayMenu.exception.extraSoup,
+        main: dayMenu.exception.singleDish,
+        side1: dayMenu.exception.extraSide,
+        side2: null,
+        dessert: dayMenu.exception.extraDessert,
+      };
+
+      return exceptionMap[slotKey] ?? null;
+    }
+
+    function renderResidentView() {
+      const weekMenus = getWeekMenus(state.settings.weekStart);
+      const recipeMap = getRecipeMap();
+      const headers = WEEKDAY_KEYS.map((dayKey) => {
+        const dayMenu = weekMenus[dayKey];
+        return `<th>${formatDate(dayMenu.date)}<br>${WEEKDAY_LABELS[dayKey]}曜日</th>`;
+      }).join("");
+
+      const rows = [
+        ["主食", "staple"],
+        ["汁物", "soup"],
+        ["主菜", "main"],
+        ["副菜1", "side1"],
+        ["副菜2", "side2"],
+        ["デザート", "dessert"],
+      ].map(([label, key]) => {
+        const cells = WEEKDAY_KEYS.map((dayKey) => {
+          const recipeId = getResidentSlotValue(weekMenus[dayKey], key);
+          const recipe = recipeMap.get(recipeId);
+          return `<td>${escapeHtml(recipe?.name ?? "")}</td>`;
+        }).join("");
+        return `<tr><th scope="row">${label}</th>${cells}</tr>`;
+      }).join("");
+
+      elements.residentView.innerHTML = `
+        <article class="panel">
+          <div class="section-head">
+            <div>
+              <p class="section-kicker">Resident Menu</p>
+              <h2>利用者向け 5日分献立表</h2>
+            </div>
+            <p class="section-note">A4 1枚で、月曜から金曜までの昼食献立を見やすく印刷できます。</p>
+          </div>
+          <table class="resident-menu-table">
+            <thead>
+              <tr>
+                <th>区分</th>
+                ${headers}
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+          <p class="resident-page-note">印刷時は日付、曜日、主食、汁物、主菜、副菜1、副菜2、デザートのみを表示します。</p>
+        </article>
+      `;
+    }
+
+    function renderKitchenView() {
+      const weekMenus = getWeekMenus(state.settings.weekStart);
+      const recipeMap = getRecipeMap();
+
+      const sheets = WEEKDAY_KEYS.map((dayKey) => {
+        const dayMenu = weekMenus[dayKey];
+        const evaluation = evaluateDayMenu(dayMenu);
+        const recipes = getMenuRecipeIds(dayMenu).map((recipeId) => recipeMap.get(recipeId)).filter(Boolean);
+        const summaryRows = [
+          ["主食", dayMenu.mode === "basic" ? dayMenu.basic.staple : null],
+          ["汁物", dayMenu.mode === "basic" ? dayMenu.basic.soup : dayMenu.exception.extraSoup],
+          ["主菜", dayMenu.mode === "basic" ? dayMenu.basic.main : dayMenu.exception.singleDish],
+          ["副菜1", dayMenu.mode === "basic" ? dayMenu.basic.side1 : dayMenu.exception.extraSide],
+          ["副菜2", dayMenu.mode === "basic" ? dayMenu.basic.side2 : null],
+          ["デザート", dayMenu.mode === "basic" ? dayMenu.basic.dessert : dayMenu.exception.extraDessert],
+        ].map(([label, recipeId]) => {
+          const recipe = recipeMap.get(recipeId);
+          return `
+            <tr>
+              <th scope="row">${label}</th>
+              <td>${escapeHtml(recipe?.name ?? "")}</td>
+            </tr>
+          `;
+        }).join("");
+
+        const recipeSheets = recipes.map((recipe) => {
+          const nutrition = computeRecipeNutrition(recipe);
+          return `
+            <article class="sheet-card">
+              <div class="sub-head">
+                <div>
+                  <p class="section-kicker">${escapeHtml(recipe.category)}</p>
+                  <h3>${escapeHtml(recipe.name)}</h3>
+                </div>
+                <span class="pill">${formatNumber(nutrition.perServing.energy, 0)} kcal</span>
+              </div>
+              <p class="muted">1人前量 ${formatNumber(recipe.servingWeight, 0)} g / 食数分 ${formatNumber(recipe.servingWeight * state.settings.kitchenServings, 0)} g / rotation ${escapeHtml(recipe.rotationKey || "未設定")}</p>
+              ${renderIngredientTable(recipe, state.settings.kitchenServings)}
+              <h4>作業指示</h4>
+              <ol class="kitchen-step-list">${recipe.steps.map((step) => `<li>${escapeHtml(step)}</li>`).join("")}</ol>
+            </article>
+          `;
+        }).join("");
+
+        return `
+          <article class="panel kitchen-day-sheet page-print-break">
+            <div class="section-head">
+              <div>
+                <p class="section-kicker">${WEEKDAY_LABELS[dayKey]}曜日</p>
+                <h2>${formatDate(dayMenu.date)} 調理室向け指示書</h2>
+              </div>
+              <p class="section-note">食数 ${state.settings.kitchenServings}食 / エネルギー ${formatNumber(evaluation.totals.energy, 0)} kcal / 塩分 ${formatNumber(evaluation.totals.salt, 1)} g</p>
+            </div>
+            <div class="kitchen-day-meta">
+              <table class="kitchen-summary-table">
+                <tbody>${summaryRows}</tbody>
+              </table>
+              ${renderMetricCards(evaluation.totals, "昼食全体")}
+            </div>
+            <div class="check-grid">${renderConditionCards(evaluation)}</div>
+            <div class="kitchen-recipes-grid">${recipeSheets || '<div class="empty-state">献立が未設定です。</div>'}</div>
+          </article>
+        `;
+      }).join("");
+
+      elements.kitchenView.innerHTML = `
+        <article class="panel kitchen-intro">
+          <div class="section-head">
+            <div>
+              <p class="section-kicker">Kitchen Sheets</p>
+              <h2>調理室向け 5日分指示書</h2>
+            </div>
+            <p class="section-note">印刷時は1日ごとにA4 1ページで出力します。</p>
+          </div>
+          <p class="print-note">調理室向けを印刷すると、月曜から金曜までが1日1ページで出力されます。</p>
+        </article>
+        ${sheets}
+      `;
+    }
+
+    function renderRecipeDetailPanel(recipe) {
+      if (!recipe) {
+        return `
+          <article class="card recipe-detail">
+            <div class="empty-state">料理を選ぶと、材料、調味料、1人前量、作り方を確認できます。</div>
+          </article>
+        `;
+      }
+
+      const nutrition = computeRecipeNutrition(recipe);
+      return `
+        <article class="card recipe-detail">
+          <div class="sub-head">
+            <div>
+              <p class="section-kicker">Selected Recipe</p>
+              <h3>${escapeHtml(recipe.name)}</h3>
+            </div>
+            <span class="pill">${escapeHtml(recipe.category)}</span>
+          </div>
+          <div class="tag-row">
+            <span class="tag">rotation ${escapeHtml(recipe.rotationKey || "未設定")}</span>
+            ${(recipe.tags || []).map((tag) => `<span class="pill-muted pill">${escapeHtml(tag)}</span>`).join("")}
+          </div>
+          <p class="muted">${escapeHtml(recipe.description || "説明未設定")}</p>
+
+          <div class="detail-grid">
+            <div class="detail-block">
+              <h4>材料・調味料</h4>
+              ${renderIngredientTable(recipe, state.settings.kitchenServings)}
+            </div>
+            <div class="detail-block">
+              <h4>1人前栄養価</h4>
+              ${renderMetricCards(nutrition.perServing, "食品成分表ベース")}
+            </div>
+          </div>
+
+          <div class="detail-block">
+            <h4>量の目安</h4>
+            <p class="muted">1人前 ${formatNumber(recipe.servingWeight, 0)} g / レシピ総量 ${formatNumber(recipe.servingWeight * recipe.servings, 0)} g / ${state.settings.kitchenServings}食分 ${formatNumber(recipe.servingWeight * state.settings.kitchenServings, 0)} g</p>
+          </div>
+
+          <div class="detail-block">
+            <h4>作り方</h4>
+            <ol class="detail-list">${recipe.steps.map((step) => `<li>${escapeHtml(step)}</li>`).join("")}</ol>
+          </div>
+        </article>
+      `;
+    }
+
+    function renderAdminView() {
+      const weekMenus = getWeekMenus(state.settings.weekStart);
+      const recipes = getAllRecipes();
+      const foods = getAllFoods();
+      const recipeOptionsByCategory = (category) => recipes.filter((recipe) => recipe.category === category);
+      const selectedRecipe = recipes.find((recipe) => recipe.id === state.selectedRecipeId) ?? null;
+
+      const editorCards = WEEKDAY_KEYS.map((dayKey) => {
+        const dayMenu = weekMenus[dayKey];
+        const evaluation = evaluateDayMenu(dayMenu);
+        return `
+          <article class="menu-card">
+            <div class="sub-head">
+              <div>
+                <p class="section-kicker">${WEEKDAY_LABELS[dayKey]}曜日</p>
+                <h3>${formatDate(dayMenu.date)}</h3>
+              </div>
+              <span class="pill-muted pill">${dayMenu.mode === "basic" ? "基本献立" : "例外献立"}</span>
+            </div>
+            <div class="stack">
+              <label class="field">
+                <span>献立タイプ</span>
+                <select data-menu-day="${dayKey}" data-menu-field="mode">
+                  <option value="basic" ${dayMenu.mode === "basic" ? "selected" : ""}>基本献立</option>
+                  <option value="exception" ${dayMenu.mode === "exception" ? "selected" : ""}>例外献立</option>
+                </select>
+              </label>
+              <div class="grid-two">
+                ${renderSlotSelect(dayKey, "basic", "staple", "主食", dayMenu.basic.staple, recipeOptionsByCategory("主食"))}
+                ${renderSlotSelect(dayKey, "basic", "soup", "汁物", dayMenu.basic.soup, recipeOptionsByCategory("汁物"))}
+                ${renderSlotSelect(dayKey, "basic", "main", "主菜", dayMenu.basic.main, recipeOptionsByCategory("主菜"))}
+                ${renderSlotSelect(dayKey, "basic", "side1", "副菜1", dayMenu.basic.side1, recipeOptionsByCategory("副菜"))}
+                ${renderSlotSelect(dayKey, "basic", "side2", "副菜2", dayMenu.basic.side2, recipeOptionsByCategory("副菜"))}
+                ${renderSlotSelect(dayKey, "basic", "dessert", "デザート", dayMenu.basic.dessert, recipeOptionsByCategory("デザート"))}
+              </div>
+              <div class="grid-two">
+                ${renderSlotSelect(dayKey, "exception", "singleDish", "単品料理", dayMenu.exception.singleDish, recipeOptionsByCategory("単品料理"))}
+                ${renderSlotSelect(dayKey, "exception", "extraSoup", "追加汁物", dayMenu.exception.extraSoup, recipeOptionsByCategory("汁物"), true)}
+                ${renderSlotSelect(dayKey, "exception", "extraSide", "追加副菜", dayMenu.exception.extraSide, recipeOptionsByCategory("副菜"), true)}
+                ${renderSlotSelect(dayKey, "exception", "extraDessert", "追加デザート", dayMenu.exception.extraDessert, recipeOptionsByCategory("デザート"), true)}
+              </div>
+              <label class="field">
+                <span>メモ</span>
+                <textarea data-menu-day="${dayKey}" data-menu-field="memo">${escapeHtml(dayMenu.memo)}</textarea>
+              </label>
+              <div class="check-grid">${renderConditionCards(evaluation)}</div>
+            </div>
+          </article>
+        `;
+      }).join("");
+
+      elements.adminView.innerHTML = `
+        <article class="panel">
+          <div class="section-head">
+            <div>
+              <p class="section-kicker">Admin</p>
+              <h2>管理画面</h2>
+            </div>
+            <p class="section-note">5日分の献立を確認し、食数や内容を編集できます。</p>
+          </div>
+          <div class="toolbar">
+            <label class="field">
+              <span>週の開始日</span>
+              <input id="admin-week-start" type="date" value="${escapeHtml(state.settings.weekStart)}">
+            </label>
+            <label class="field">
+              <span>調理人数</span>
+              <input id="admin-kitchen-servings" type="number" min="1" step="1" value="${escapeHtml(state.settings.kitchenServings)}">
+            </label>
+            <button type="button" class="button button-primary" id="save-week-button">この週を保存</button>
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="section-head">
+            <div>
+              <p class="section-kicker">Weekly Editor</p>
+              <h2>5日分献立編集</h2>
+            </div>
+            <p class="section-note">月曜から金曜までの献立内容を個別に編集できます。</p>
+          </div>
+          <div class="weekly-grid">${editorCards}</div>
+        </article>
+
+        <article class="panel">
+          <div class="section-head">
+            <div>
+              <p class="section-kicker">Recipe Master</p>
+              <h2>料理一覧</h2>
+            </div>
+            <p class="section-note">料理を選ぶと、材料、調味料、1人前量、作り方を確認できます。</p>
+          </div>
+          <div class="detail-grid">
+            <div class="recipe-list">
+              ${recipes.map((recipe) => {
+                const nutrition = computeRecipeNutrition(recipe);
+                return `
+                  <article class="recipe-card ${recipe.id === state.selectedRecipeId ? "is-active" : ""}" data-recipe-card="${recipe.id}">
+                    <div class="sub-head">
+                      <div>
+                        <h3>${escapeHtml(recipe.name)}</h3>
+                        <span class="tag">${escapeHtml(recipe.category)}</span>
+                      </div>
+                      <span class="pill">${formatNumber(nutrition.perServing.energy, 0)} kcal</span>
+                    </div>
+                    <p class="muted">${escapeHtml(recipe.description)}</p>
+                  </article>
+                `;
+              }).join("")}
+            </div>
+            ${renderRecipeDetailPanel(selectedRecipe)}
+          </div>
+        </article>
+
+        <article class="panel">
+          <div class="section-head">
+            <div>
+              <p class="section-kicker">Food Master</p>
+              <h2>食品マスタ一覧</h2>
+            </div>
+            <p class="section-note">100gあたりの栄養価を表示します。</p>
+          </div>
+          <div class="food-list">
+            ${foods.map((food) => `
+              <article class="card">
+                <div class="sub-head">
+                  <strong>${escapeHtml(food.name)}</strong>
+                  <span class="pill-muted pill">100g</span>
+                </div>
+                <p class="muted">エネルギー ${formatNumber(food.nutrients.energy, 0)} kcal / たんぱく質 ${formatNumber(food.nutrients.protein, 1)} g / 脂質 ${formatNumber(food.nutrients.fat, 1)} g / 炭水化物 ${formatNumber(food.nutrients.carbs, 1)} g / 塩分 ${formatNumber(food.nutrients.salt, 1)} g</p>
+              </article>
+            `).join("")}
+          </div>
+        </article>
+      `;
+
+      bindAdminViewEvents();
+    }
+
+    function renderSlotSelect(dayKey, mode, field, label, currentValue, recipes, optional = false) {
+      return `
+        <label class="field">
+          <span>${label}</span>
+          <select data-menu-day="${dayKey}" data-menu-mode="${mode}" data-menu-field="${field}">
+            <option value="">${optional ? "追加しない" : "選択してください"}</option>
+            ${recipes.map((recipe) => `<option value="${recipe.id}" ${recipe.id === currentValue ? "selected" : ""}>${escapeHtml(recipe.name)}</option>`).join("")}
+          </select>
+        </label>
+      `;
+    }
+
+    function bindAdminViewEvents() {
+      const weekStartInput = document.querySelector("#admin-week-start");
+      const kitchenServingsInput = document.querySelector("#admin-kitchen-servings");
+      const saveWeekButton = document.querySelector("#save-week-button");
+      const menuInputs = Array.from(document.querySelectorAll("[data-menu-day]"));
+      const recipeCards = Array.from(document.querySelectorAll("[data-recipe-card]"));
+
+      weekStartInput?.addEventListener("change", () => {
+        state.settings.weekStart = weekStartInput.value || mondayString(new Date());
+        saveStorage(STORAGE_KEYS.settings, state.settings);
+        renderAll();
+      });
+
+      kitchenServingsInput?.addEventListener("change", () => {
+        state.settings.kitchenServings = Math.max(1, Number(kitchenServingsInput.value || 1));
+        saveStorage(STORAGE_KEYS.settings, state.settings);
+        renderAll();
+      });
+
+      recipeCards.forEach((card) => {
+        card.addEventListener("click", () => {
+          state.selectedRecipeId = card.dataset.recipeCard;
+          renderAdminView();
+        });
+      });
+
+      menuInputs.forEach((input) => {
+        input.addEventListener("change", () => {
+          const draft = collectWeekDraftFromDom();
+          const previewMenu = draft[input.dataset.menuDay];
+          if (previewMenu) {
+            if (elements.heroEnergy) {
+              elements.heroEnergy.textContent = `${formatNumber(evaluateDayMenu(previewMenu).totals.energy, 0)} kcal`;
+            }
+          }
+        });
+      });
+
+      saveWeekButton?.addEventListener("click", () => {
+        const nextWeek = collectWeekDraftFromDom();
+        state.weeklyMenus[state.settings.weekStart] = nextWeek;
+        saveStorage(STORAGE_KEYS.weeklyMenus, state.weeklyMenus);
+        renderAll();
+      });
+    }
+
+    function collectWeekDraftFromDom() {
+      const draft = createEmptyWeekMenu(state.settings.weekStart);
+      const inputs = Array.from(document.querySelectorAll("[data-menu-day]"));
+
+      inputs.forEach((input) => {
+        const dayKey = input.dataset.menuDay;
+        const field = input.dataset.menuField;
+        const mode = input.dataset.menuMode;
+        if (!draft[dayKey]) {
+          return;
+        }
+        if (field === "memo") {
+          draft[dayKey].memo = input.value;
+          return;
+        }
+        if (field === "mode") {
+          draft[dayKey].mode = input.value;
+          return;
+        }
+        if (mode === "basic") {
+          draft[dayKey].basic[field] = input.value || null;
+        }
+        if (mode === "exception") {
+          draft[dayKey].exception[field] = input.value || null;
+        }
+      });
+
+      return draft;
+    }
+  </script>
+  <script src="./enhancements.js?v=20260409-statefix2"></script>
+  <script>
+    (function () {
+      const viewIds = ["resident-view", "kitchen-view", "admin-view"];
+
+      function setActiveView(viewId, logLabel) {
+        viewIds.forEach((id) => {
+          const section = document.getElementById(id);
+          if (!section) {
+            return;
+          }
+          const isActive = id === viewId;
+          section.classList.toggle("is-active", isActive);
+          section.style.display = isActive ? "grid" : "none";
+        });
+
+        document.querySelectorAll(".nav-button[data-view]").forEach((button) => {
+          button.classList.toggle("is-active", button.dataset.view === viewId);
+        });
+
+        console.log("[nav-fallback]", logLabel, viewId);
+      }
+
+      function bindTopButtons() {
+        const residentButton = document.querySelector('.nav-button[data-view="resident-view"]');
+        const kitchenButton = document.querySelector('.nav-button[data-view="kitchen-view"]');
+        const adminButton = document.querySelector('.nav-button[data-view="admin-view"]');
+        const residentPrintButton = document.getElementById("print-resident-button");
+        const kitchenPrintButton = document.getElementById("print-kitchen-button");
+
+        if (residentButton) {
+          residentButton.onclick = function () {
+            setActiveView("resident-view", "利用者向け献立表 clicked");
+          };
+        }
+        if (kitchenButton) {
+          kitchenButton.onclick = function () {
+            setActiveView("kitchen-view", "調理室向け指示書 clicked");
+          };
+        }
+        if (adminButton) {
+          adminButton.onclick = function () {
+            setActiveView("admin-view", "管理画面 clicked");
+          };
+        }
+        if (residentPrintButton) {
+          residentPrintButton.onclick = function () {
+            setActiveView("resident-view", "利用者向けを印刷 clicked");
+            window.setTimeout(function () {
+              window.print();
+            }, 0);
+          };
+        }
+        if (kitchenPrintButton) {
+          kitchenPrintButton.onclick = function () {
+            setActiveView("kitchen-view", "調理室向けを印刷 clicked");
+            window.setTimeout(function () {
+              window.print();
+            }, 0);
+          };
+        }
+      }
+
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", function () {
+          bindTopButtons();
+          setActiveView("resident-view", "初期表示");
+        });
+      } else {
+        bindTopButtons();
+        setActiveView("resident-view", "初期表示");
+      }
+    })();
+  </script>
+</body>
+</html>
+
+
