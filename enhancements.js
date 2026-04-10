@@ -1029,20 +1029,20 @@
       instructions: template.instructions
     })));
     const simpleSnacks = [
-      createRecipe({ id: "snack-simple-yogurt", name: "ヨーグルト", category: "おやつ", cuisine: "洋食", servingSize: 80, rotationKey: "乳製品", tags: ["おやつ", "乳製品", "安価"], ingredients: [part("yogurt", 80)], seasonings: [], instructions: ["器に盛り付けて提供する。"] }),
-      createRecipe({ id: "snack-simple-steamed", name: "蒸しパン", category: "おやつ", cuisine: "和食", servingSize: 72, rotationKey: "蒸しパン", tags: ["おやつ", "焼き菓子", "安価"], ingredients: [part("flour", 22), part("egg", 10), part("milk", 18)], seasonings: [part("sugar", 8), part("baking_powder", 1.5)], instructions: ["生地をよく混ぜる。", "やわらかく蒸して食べやすく切る。"] }),
-      createRecipe({ id: "snack-simple-pudding", name: "プリン", category: "おやつ", cuisine: "洋食", servingSize: 85, rotationKey: "プリン", tags: ["おやつ", "プリン", "安価"], ingredients: [part("milk", 58), part("egg", 18)], seasonings: [part("sugar", 9)], instructions: ["牛乳、卵、砂糖を合わせる。", "やさしく加熱して冷やし固める。"] }),
-      createRecipe({ id: "snack-simple-castella", name: "カステラ", category: "おやつ", cuisine: "和食", servingSize: 70, rotationKey: "焼き菓子", tags: ["おやつ", "和菓子", "焼き菓子", "安価"], ingredients: [part("flour", 24), part("egg", 20), part("milk", 8)], seasonings: [part("sugar", 12)], instructions: ["卵と砂糖を泡立てて生地を作る。", "しっとり焼いて食べやすく切る。"] }),
-      createRecipe({ id: "snack-simple-dorayaki", name: "どら焼き", category: "おやつ", cuisine: "和食", servingSize: 74, rotationKey: "和菓子", tags: ["おやつ", "和菓子", "安価"], ingredients: [part("flour", 18), part("egg", 12), part("milk", 6), part("azuki_paste", 24)], seasonings: [part("sugar", 6), part("baking_powder", 1)], instructions: ["生地を焼き、こしあんをはさむ。", "食べやすいサイズで提供する。"] }),
-      createRecipe({ id: "snack-simple-yokan", name: "水ようかん", category: "おやつ", cuisine: "和食", servingSize: 72, rotationKey: "和菓子", tags: ["おやつ", "和菓子", "やわらかい", "安価"], ingredients: [part("azuki_paste", 42)], seasonings: [part("sugar", 8), part("gelatin_powder", 1.5)], instructions: ["こしあんに甘みを整える。", "やわらかく冷やし固める。"] }),
-      createRecipe({ id: "snack-simple-baum", name: "バウムクーヘン", category: "おやつ", cuisine: "洋食", servingSize: 68, rotationKey: "焼き菓子", tags: ["おやつ", "洋菓子", "焼き菓子"], ingredients: [part("flour", 24), part("egg", 16), part("milk", 10)], seasonings: [part("sugar", 8), part("butter", 2)], instructions: ["生地を薄く重ねて焼く。", "食べやすい厚さに切って提供する。"] }),
-      createRecipe({ id: "snack-simple-rollcake", name: "ロールケーキ", category: "おやつ", cuisine: "洋食", servingSize: 76, rotationKey: "洋菓子", tags: ["おやつ", "洋菓子", "やわらかい"], ingredients: [part("flour", 18), part("egg", 16), part("milk", 14)], seasonings: [part("sugar", 8)], instructions: ["スポンジ生地を焼く。", "やわらかく巻いて切り分ける。"] }),
-      createRecipe({ id: "snack-simple-chiffon", name: "シフォンケーキ", category: "おやつ", cuisine: "洋食", servingSize: 72, rotationKey: "洋菓子", tags: ["おやつ", "洋菓子", "やわらかい"], ingredients: [part("flour", 20), part("egg", 16), part("milk", 16)], seasonings: [part("sugar", 8), part("baking_powder", 1)], instructions: ["ふんわりした生地を作る。", "やわらかく焼いて提供する。"] }),
-      createRecipe({ id: "snack-simple-amashoku", name: "甘食", category: "おやつ", cuisine: "和食", servingSize: 68, rotationKey: "焼き菓子", tags: ["おやつ", "焼き菓子", "安価"], ingredients: [part("flour", 24), part("egg", 10), part("milk", 14)], seasonings: [part("sugar", 9), part("baking_powder", 1)], instructions: ["甘めの生地を作る。", "やわらかく焼いて整える。"] }),
-      createRecipe({ id: "snack-simple-waffle", name: "ワッフル", category: "おやつ", cuisine: "洋食", servingSize: 70, rotationKey: "焼き菓子", tags: ["おやつ", "洋菓子", "焼き菓子"], ingredients: [part("flour", 22), part("egg", 14), part("milk", 16)], seasonings: [part("sugar", 6), part("butter", 2), part("baking_powder", 1)], instructions: ["生地を混ぜる。", "やわらかめに焼いて提供する。"] }),
-      createRecipe({ id: "snack-simple-minicake", name: "ミニケーキ", category: "おやつ", cuisine: "洋食", servingSize: 70, rotationKey: "洋菓子", tags: ["おやつ", "洋菓子"], ingredients: [part("flour", 18), part("egg", 14), part("milk", 16)], seasonings: [part("sugar", 8), part("baking_powder", 1)], instructions: ["小さめの生地を作る。", "しっとり焼いて切り分ける。"] })
+      createRecipe({ id: "snack-simple-yogurt", name: "ヨーグルト", category: "おやつ", cuisine: "洋食", servingSize: 80, rotationKey: "乳製品", tags: ["おやつ", "乳製品", "安価"], notes: "市販の個食ヨーグルトを使用する。", ingredients: [part("yogurt", 80, { label: "ヨーグルト 1個", prep: "冷蔵保管する" })], seasonings: [], instructions: ["冷蔵保管し、提供前に人数分を配る。"] }),
+      createRecipe({ id: "snack-simple-jelly", name: "ゼリー", category: "おやつ", cuisine: "洋食", servingSize: 85, rotationKey: "ゼリー", tags: ["おやつ", "ゼリー", "安価"], notes: "市販のカップゼリーを使用する。", ingredients: [part("jelly_base", 85, { label: "市販ゼリー 1個", prep: "冷蔵保管する" })], seasonings: [], instructions: ["冷蔵保管し、提供前に人数分を配る。"] }),
+      createRecipe({ id: "snack-simple-pudding", name: "プリン", category: "おやつ", cuisine: "洋食", servingSize: 85, rotationKey: "プリン", tags: ["おやつ", "プリン", "安価"], notes: "市販の個食プリンを使用する。", ingredients: [part("pudding_base", 85, { label: "市販プリン 1個", prep: "冷蔵保管する" })], seasonings: [], instructions: ["冷蔵保管し、提供前に人数分を配る。"] }),
+      createRecipe({ id: "snack-simple-castella", name: "カステラ", category: "おやつ", cuisine: "和食", servingSize: 70, rotationKey: "焼き菓子", tags: ["おやつ", "和菓子", "焼き菓子", "安価"], notes: "市販のカステラを食べやすい大きさで提供する。", ingredients: [part("bread", 70, { label: "市販カステラ 1切", prep: "乾燥しないよう保管する" })], seasonings: [], instructions: ["乾燥しないよう保管し、提供前に皿へ盛り付ける。"], nutrition: { energy: 155, protein: 3.9, fat: 2.9, carbs: 32.0, fiber: 0.5, salt: 0.2 } }),
+      createRecipe({ id: "snack-simple-dorayaki", name: "どら焼き", category: "おやつ", cuisine: "和食", servingSize: 74, rotationKey: "和菓子", tags: ["おやつ", "和菓子", "安価"], notes: "通常のあん入り市販どら焼きを使用する。", ingredients: [part("azuki_paste", 74, { label: "市販どら焼き 1個", prep: "個包装のまま、または皿にのせて提供できるよう準備する" })], seasonings: [], instructions: ["個包装のまま、または皿にのせて提供する。"], nutrition: { energy: 156, protein: 3.9, fat: 2.1, carbs: 31.2, fiber: 1.8, salt: 0.2 } }),
+      createRecipe({ id: "snack-simple-yokan", name: "水ようかん", category: "おやつ", cuisine: "和食", servingSize: 72, rotationKey: "和菓子", tags: ["おやつ", "和菓子", "やわらかい", "安価"], notes: "市販の水ようかんを冷やして提供する。", ingredients: [part("azuki_paste", 72, { label: "市販水ようかん 1個", prep: "冷蔵保管し、よく冷やす" })], seasonings: [], instructions: ["冷蔵保管し、提供前に人数分を配る。"], nutrition: { energy: 132, protein: 2.8, fat: 0.1, carbs: 30.5, fiber: 2.2, salt: 0.1 } }),
+      createRecipe({ id: "snack-simple-baum", name: "バウムクーヘン", category: "おやつ", cuisine: "洋食", servingSize: 68, rotationKey: "焼き菓子", tags: ["おやつ", "洋菓子", "焼き菓子"], notes: "市販のバウムクーヘンを食べやすい量で提供する。", ingredients: [part("bread", 68, { label: "市販バウムクーヘン 1切", prep: "食べやすい厚さを確認する" })], seasonings: [], instructions: ["個包装のまま、または皿にのせて提供する。"], nutrition: { energy: 150, protein: 3.1, fat: 7.0, carbs: 19.8, fiber: 0.4, salt: 0.2 } }),
+      createRecipe({ id: "snack-simple-rollcake", name: "ロールケーキ", category: "おやつ", cuisine: "洋食", servingSize: 76, rotationKey: "洋菓子", tags: ["おやつ", "洋菓子", "やわらかい"], notes: "市販のロールケーキを崩れないよう提供する。", ingredients: [part("bread", 76, { label: "市販ロールケーキ 1切", prep: "形崩れしないよう冷蔵保管する" })], seasonings: [], instructions: ["冷蔵保管し、提供前に皿へ盛り付ける。"], nutrition: { energy: 148, protein: 3.8, fat: 7.3, carbs: 16.9, fiber: 0.3, salt: 0.2 } }),
+      createRecipe({ id: "snack-simple-chiffon", name: "シフォンケーキ", category: "おやつ", cuisine: "洋食", servingSize: 72, rotationKey: "洋菓子", tags: ["おやつ", "洋菓子", "やわらかい"], notes: "市販のシフォンケーキをやわらかい状態で提供する。", ingredients: [part("bread", 72, { label: "市販シフォンケーキ 1切", prep: "つぶれや乾燥がないか確認する" })], seasonings: [], instructions: ["乾燥しないよう保管し、提供前に皿へ盛り付ける。"], nutrition: { energy: 142, protein: 3.7, fat: 4.8, carbs: 21.4, fiber: 0.4, salt: 0.2 } }),
+      createRecipe({ id: "snack-simple-amashoku", name: "甘食", category: "おやつ", cuisine: "和食", servingSize: 68, rotationKey: "焼き菓子", tags: ["おやつ", "焼き菓子", "安価"], notes: "市販の甘食を食べやすい状態で提供する。", ingredients: [part("bread", 68, { label: "市販甘食 1個", prep: "硬すぎない製品を使用する" })], seasonings: [], instructions: ["個包装のまま、または皿にのせて提供する。"], nutrition: { energy: 150, protein: 3.4, fat: 4.6, carbs: 23.7, fiber: 0.4, salt: 0.2 } }),
+      createRecipe({ id: "snack-simple-waffle", name: "ワッフル", category: "おやつ", cuisine: "洋食", servingSize: 70, rotationKey: "焼き菓子", tags: ["おやつ", "洋菓子", "焼き菓子"], notes: "市販のワッフルを食べやすい状態で提供する。", ingredients: [part("bread", 70, { label: "市販ワッフル 1個", prep: "食べやすい大きさを確認する" })], seasonings: [], instructions: ["個包装のまま、または皿にのせて提供する。"], nutrition: { energy: 156, protein: 3.5, fat: 5.8, carbs: 22.8, fiber: 0.4, salt: 0.2 } }),
+      createRecipe({ id: "snack-simple-minicake", name: "ミニケーキ", category: "おやつ", cuisine: "洋食", servingSize: 70, rotationKey: "洋菓子", tags: ["おやつ", "洋菓子"], notes: "市販のミニケーキを人数分配りやすい形で使用する。", ingredients: [part("bread", 70, { label: "市販ミニケーキ 1個", prep: "個包装または皿で提供できるよう準備する" })], seasonings: [], instructions: ["個包装のまま、または皿にのせて提供する。"], nutrition: { energy: 152, protein: 3.2, fat: 6.1, carbs: 21.6, fiber: 0.4, salt: 0.2 } })
     ];
-    return [...simpleSnacks, ...generated];
+    return simpleSnacks;
   }
 
   const SPECIAL_MENU_RECIPES = [
@@ -1052,16 +1052,29 @@
   function buildRecipeDictionary() {
     const entry = (notes, servingSize, ingredients, seasonings, steps) => ({ notes, servingSize, ingredients, seasonings, steps });
     return {
-      "west-staple-bread": entry("耳までやわらかく食べやすいサイズに整える。", 70,
-        [part("bread", 70, { prep: "耳まで食べやすい大きさに切る" })], [],
-        ["食べやすい大きさに切る。", "乾燥しないように配膳直前に盛り付ける。"]),
-      "jp-staple-soft-rice": entry("水分を含ませ、まとまりやすい軟飯にする。", 150,
-        [part("soft_rice", 150, { prep: "温かくほぐし、まとまりを確認する" })], [],
-        ["だまをほぐして口当たりを整える。", "温かいうちに茶碗へ盛り付ける。"]),
-      "cn-staple-porridge": entry("だしでやわらかく炊いた中華粥にする。", 170,
-        [part("soft_rice", 140, { prep: "米粒をつぶしすぎないようにほぐす" })],
-        [part("broth", 35, { step: "粥をのばすとき" }), part("salt", 0.2, { step: "仕上げ" })],
-        ["軟飯にだしを加えてやわらかくのばす。", "塩で薄く味を整えて温かく盛り付ける。"]),
+      "jp-staple-rice": entry("乾燥、べたつき、かたまりを避ける。提供直前に盛り付ける。", 150,
+        [part("rice", 150, { prep: "温かいごはんをほぐし、かたまりをなくす" })], [],
+        ["温かいごはんをほぐし、かたまりをなくす。", "水分量と硬さを確認する。", "茶碗に150g盛り付ける。"]),
+      "jp-staple-soft-rice": entry("硬すぎ、べたつきすぎに注意。利用者の食形態に合わせて状態を確認する。", 150,
+        [part("soft_rice", 150, { prep: "温かい軟飯をやさしくほぐす" })], [],
+        ["温かい軟飯をやさしくほぐす。", "水分量、まとまり、硬さを確認する。", "茶碗に150g盛り付ける。"]),
+      "west-staple-bread": entry("パサつきに注意し、個別対応が必要なら半分切りや耳調整を行う。", 70,
+        [part("bread", 70, { prep: "必要に応じて耳を含め食べやすい大きさに切る" })], [],
+        ["必要に応じて耳を含め食べやすい大きさに切る。", "乾燥しないよう提供直前に皿へ盛り付ける。"]),
+      "west-staple-roll": entry("乾燥防止のため提供直前に配膳し、固さが強い製品は避ける。", 70,
+        [part("roll_bread", 70, { prep: "形崩れがないか確認する" })], [],
+        ["形崩れがないか確認する。", "必要に応じて食べやすい向きに整えて皿へ盛り付ける。"]),
+      "west-staple-milk-bread": entry("やわらかさを優先し、提供直前に配膳する。", 70,
+        [part("milk_bread", 70, { prep: "表面の乾燥やつぶれを確認する" })], [],
+        ["表面の乾燥やつぶれを確認する。", "必要に応じて食べやすい形に整えて皿へ盛り付ける。"]),
+      "cn-staple-porridge": entry("水分量が少なすぎないよう確認し、熱すぎない状態で提供する。", 170,
+        [part("soft_rice", 140, { prep: "温かい軟飯を用意する" }), part("broth", 35, { prep: "粥をのばすために温める" })],
+        [part("salt", 0.2, { step: "仕上げに薄く味を整える" })],
+        ["軟飯にだし汁を加えて温める。", "米粒をつぶしすぎないように、やわらかくのばす。", "塩で薄く味を整える。", "器に170g盛り付ける。"]),
+      "special-sekihan": entry("行事食として提供し、ごま塩のかけすぎに注意する。", 150,
+        [part("rice", 150, { label: "お赤飯", prep: "温かいお赤飯をほぐし、かたまりをなくす" })],
+        [part("sesame", 2, { label: "ごま塩", step: "必要量を添える、または上からかける" })],
+        ["温かいお赤飯をほぐし、かたまりをなくす。", "茶碗に150g盛り付ける。", "必要量のごま塩を添える、または上からかける。"]),
       "cn-staple-green-porridge": entry("青菜を細かく刻んで混ぜる中華風のがゆ。", 175,
         [part("soft_rice", 140, { prep: "米粒をつぶしすぎないようにほぐす" }), part("komatsuna", 18, { prep: "やわらかくゆでて細かく刻む" })],
         [part("broth", 35, { step: "粥をのばすとき" }), part("salt", 0.2, { step: "仕上げ" })],
@@ -1203,26 +1216,21 @@
         [part("mandarin", 28, { prep: "薄皮を確認し、刻む" }), part("azuki_paste", 22, { prep: "なめらかにしておく" })],
         [part("sugar", 4, { step: "あんに加える" }), part("gelatin_powder", 1.5, { step: "温めた液に溶かす" })],
         ["あんとみかんを合わせる。", "砂糖とゼラチンを加えて型に流し、冷やし固める。"]),
-      "snack-simple-pudding": entry("卵と牛乳で作る基本のやわらかいプリン。", 85,
-        [part("milk", 58, { prep: "冷たすぎない温度にする" }), part("egg", 18, { prep: "よく溶きほぐす" })],
-        [part("sugar", 9, { step: "卵液に溶かす" })],
-        ["牛乳、卵、砂糖を合わせてこす。", "弱火または湯せんでやさしく加熱し、冷やし固める。"]),
-      "snack-simple-steamed": entry("しっとりやわらかく仕上げる基本の蒸しパン。", 72,
-        [part("flour", 22, { prep: "ふるう" }), part("egg", 10, { prep: "よく溶きほぐす" }), part("milk", 18, { prep: "常温に戻す" })],
-        [part("sugar", 8, { step: "生地に加える" }), part("baking_powder", 1.5, { step: "粉に混ぜる" })],
-        ["粉類を合わせる。", "卵、牛乳、砂糖を加えて混ぜる。", "型に流し、やわらかく蒸し上げる。"]),
-      "snack-simple-dorayaki": entry("しっとりした生地でこしあんをはさむ。", 74,
-        [part("flour", 18, { prep: "ふるう" }), part("egg", 12, { prep: "よく溶きほぐす" }), part("milk", 6, { prep: "常温に戻す" }), part("azuki_paste", 24, { prep: "食べやすい量に分ける" })],
-        [part("sugar", 6, { step: "生地に加える" }), part("baking_powder", 1, { step: "粉に混ぜる" })],
-        ["粉類と卵、牛乳、砂糖を合わせて生地を作る。", "小さく焼いて冷ます。", "こしあんをはさんで提供する。"]),
-      "snack-simple-castella": entry("卵の風味を生かしたしっとりしたカステラ。", 70,
-        [part("flour", 24, { prep: "ふるう" }), part("egg", 20, { prep: "泡立てやすい温度にする" }), part("milk", 8, { prep: "常温に戻す" })],
-        [part("sugar", 12, { step: "卵に加えて泡立てる" })],
-        ["卵と砂糖を泡立てる。", "小麦粉と牛乳を加えて生地をまとめる。", "しっとり焼いて食べやすく切る。"]),
-      "snack-simple-yokan": entry("口どけの良い水ようかんに仕上げる。", 72,
-        [part("azuki_paste", 42, { prep: "なめらかにしておく" })],
-        [part("sugar", 8, { step: "あんに加える" }), part("gelatin_powder", 1.5, { step: "温めた液に溶かす" })],
-        ["こしあんに砂糖を加えてのばす。", "ゼラチンを加えて型に流し、やわらかく冷やし固める。"])
+      "snack-simple-pudding": entry("市販の個食プリンを冷やして提供する。", 85,
+        [part("pudding_base", 85, { label: "市販プリン 1個", prep: "冷蔵保管する" })], [],
+        ["冷蔵保管し、提供前に人数分を配る。"]),
+      "snack-simple-jelly": entry("市販のカップゼリーを冷やして提供する。", 85,
+        [part("jelly_base", 85, { label: "市販ゼリー 1個", prep: "冷蔵保管する" })], [],
+        ["冷蔵保管し、提供前に人数分を配る。"]),
+      "snack-simple-dorayaki": entry("通常のあん入り市販どら焼きを使用する。", 74,
+        [part("azuki_paste", 74, { label: "市販どら焼き 1個", prep: "個包装のまま、または皿にのせて提供できるよう準備する" })], [],
+        ["個包装のまま、または皿にのせて提供する。"]),
+      "snack-simple-castella": entry("市販のカステラを食べやすい大きさで提供する。", 70,
+        [part("bread", 70, { label: "市販カステラ 1切", prep: "乾燥しないよう保管する" })], [],
+        ["乾燥しないよう保管し、提供前に皿へ盛り付ける。"]),
+      "snack-simple-yokan": entry("市販の水ようかんを冷やして提供する。", 72,
+        [part("azuki_paste", 72, { label: "市販水ようかん 1個", prep: "冷蔵保管し、よく冷やす" })], [],
+        ["冷蔵保管し、提供前に人数分を配る。"])
     };
   }
   const RECIPE_DICTIONARY = buildRecipeDictionary();
@@ -1241,7 +1249,7 @@
       description: override.description || recipe.description
     });
   }
-  const DEFAULT_WEEKLY_SNACK_IDS = ["snack-simple-pudding", "snack-simple-steamed", "snack-simple-castella", "snack-simple-dorayaki", "snack-simple-yokan"];
+  const DEFAULT_WEEKLY_SNACK_IDS = ["snack-simple-pudding", "snack-simple-jelly", "snack-simple-castella", "snack-simple-dorayaki", "snack-simple-yokan"];
   const FORCED_SIDE_REPLACEMENT_IDS = {
     "2026-04-21": ["west-side-broccoli-salad", "west-side-cabbage-coleslaw", "west-side-carrot-glace"],
     "2026-04-24": ["cn-side-komatsuna-chinese", "cn-side-cabbage-vinegar", "cn-side-carrot-sweet"]
@@ -1250,7 +1258,7 @@
     "2026-04-21": "west-side-broccoli-salad",
     "2026-04-24": "cn-side-komatsuna-chinese"
   };
-  const BIRTHDAY_SNACK_ID = "snack-cake-peach";
+  const BIRTHDAY_SNACK_ID = "snack-simple-minicake";
   const SEKIHAN_ID = "special-sekihan";
 
   const previousRenderAll = renderAll;
@@ -1683,15 +1691,15 @@
         if (!recipe) return "";
         return `<tr><td>${escapeHtml(slotLabels.join(" / "))}</td><td>${escapeHtml(recipe.name)}</td><td>${formatNumber(recipe.servingSize, 0)} g</td><td>${formatPartLines(recipe.ingredients, state.settings.kitchenServings, "ingredient")}</td><td>${formatPartLines(recipe.seasonings, state.settings.kitchenServings, "seasoning")}</td><td>${escapeHtml(recipe.instructions.join(" / "))}</td><td>${formatNumber(recipe.nutrition.energy, 0)} kcal<br>塩分 ${formatNumber(recipe.nutrition.salt, 1)} g</td></tr>`;
       }).join("") || '<tr><td colspan="7">献立が未設定です。</td></tr>';
-      return `<article class="panel kitchen-day-sheet page-print-break"><div class="section-head"><div><p class="section-kicker">${WEEKDAY_LABELS[dayKey]}曜日</p><h2>${formatDate(dayMenu.date)} 調理室向け指示書</h2></div><p class="section-note">食数 ${state.settings.kitchenServings}食 / 昼食エネルギー ${formatNumber(evaluation.totals.energy, 0)} kcal / 塩分 ${formatNumber(evaluation.totals.salt, 1)} g</p></div><div class="kitchen-page-stack"><div class="kitchen-day-meta"><table class="kitchen-summary-table"><tbody>${summaryRows}</tbody></table>${renderMetricCards(evaluation.totals, "昼食全体")}</div><div class="check-grid">${renderConditionCards(evaluation)}</div><table class="kitchen-day-table"><thead><tr><th>献立枠</th><th>料理名</th><th>1人前量</th><th>材料</th><th>調味料</th><th>作業指示</th><th>栄養価</th></tr></thead><tbody>${recipeRows}</tbody></table></div></article>`;
+      return `<article class="panel kitchen-day-sheet page-print-break"><div class="section-head"><div><p class="section-kicker">${WEEKDAY_LABELS[dayKey]}曜日</p><h2>${formatDate(dayMenu.date)} 調理室向け指示書</h2></div></div><div class="kitchen-page-stack"><div class="kitchen-day-meta"><table class="kitchen-summary-table"><tbody>${summaryRows}</tbody></table>${renderMetricCards(evaluation.totals, "昼食全体")}</div><table class="kitchen-day-table"><thead><tr><th>献立枠</th><th>料理名</th><th>1人前量</th><th>材料</th><th>調味料</th><th>作業指示</th><th>栄養価</th></tr></thead><tbody>${recipeRows}</tbody></table></div></article>`;
     }).join("");
-    elements.kitchenView.innerHTML = `<article class="panel kitchen-intro"><div class="section-head"><div><p class="section-kicker">Kitchen Sheets</p><h2>調理師向け 5日分指示書</h2></div><p class="section-note">印刷時は1日ごとにA4 1ページで改ページし、昼食全体と3時のおやつを1枚にまとめます。</p></div><p class="print-note">1ページの中に、主食、汁物、主菜、副菜1、副菜2、デザート、3時のおやつ、材料、調味料、1人前量、作業指示、栄養価、塩分、条件判定を表示します。</p></article>${sheets}`;
+    elements.kitchenView.innerHTML = `<article class="panel kitchen-intro"><div class="section-head"><div><p class="section-kicker">Kitchen Sheets</p><h2>調理師向け 5日分指示書</h2></div></div></article>${sheets}`;
   };
   renderAdminView = function () {
     const week = getWeekMenus(state.settings.weekStart); const recipes = getAllRecipes(); const foods = getAllFoods(); const selectedRecipe = recipes.find((recipe) => recipe.id === state.selectedRecipeId) || null; const catalog = summarizeCatalog(recipes); const byCategory = (category) => recipes.filter((recipe) => recipe.category === category).sort((a, b) => a.name.localeCompare(b.name, 'ja'));
     const historyCount = Object.keys(state.menuHistory || {}).length;
     const editorCards = WEEKDAY_KEYS.map((dayKey) => { const dayMenu = week[dayKey]; const evaluation = evaluateDayMenu(dayMenu); return `<article class="menu-card"><div class="sub-head"><div><p class="section-kicker">${WEEKDAY_LABELS[dayKey]}曜日</p><h3>${formatDate(dayMenu.date)}</h3></div><span class="pill">${dayMenu.mode === "basic" ? "通常献立" : "例外献立"}</span></div><div class="stack"><label class="field"><span>献立タイプ</span><select data-menu-day="${dayKey}" data-menu-field="mode"><option value="basic" ${dayMenu.mode === "basic" ? "selected" : ""}>通常献立</option><option value="exception" ${dayMenu.mode === "exception" ? "selected" : ""}>例外献立</option></select></label><div class="grid-two">${renderSlotSelect(dayKey, "basic", "staple", "主食", dayMenu.basic.staple, byCategory("主食"))}${renderSlotSelect(dayKey, "basic", "soup", "汁物", dayMenu.basic.soup, byCategory("汁物"))}${renderSlotSelect(dayKey, "basic", "main", "主菜", dayMenu.basic.main, byCategory("主菜"))}${renderSlotSelect(dayKey, "basic", "side1", "副菜1", dayMenu.basic.side1, byCategory("副菜"))}${renderSlotSelect(dayKey, "basic", "side2", "副菜2", dayMenu.basic.side2, byCategory("副菜"))}${renderSlotSelect(dayKey, "basic", "dessert", "デザート", dayMenu.basic.dessert, byCategory("デザート"))}</div><div class="grid-two">${renderSlotSelect(dayKey, "exception", "singleDish", "単品料理", dayMenu.exception.singleDish, byCategory("単品料理"))}${renderSlotSelect(dayKey, "exception", "extraSoup", "追加汁物", dayMenu.exception.extraSoup, byCategory("汁物"), true)}${renderSlotSelect(dayKey, "exception", "extraSide", "追加副菜", dayMenu.exception.extraSide, byCategory("副菜"), true)}${renderSlotSelect(dayKey, "exception", "extraDessert", "追加デザート", dayMenu.exception.extraDessert, byCategory("デザート"), true)}</div><div class="grid-two">${renderSlotSelect(dayKey, "snack", "snack", "3時のおやつ", dayMenu.snack, byCategory("おやつ"))}</div><label class="field"><span>メモ</span><textarea data-menu-day="${dayKey}" data-menu-field="memo">${escapeHtml(dayMenu.memo || "")}</textarea></label><div class="check-grid">${renderConditionCards(evaluation)}</div></div></article>`; }).join("");
-    elements.adminView.innerHTML = `<article class="panel"><div class="section-head"><div><p class="section-kicker">Admin</p><h2>管理画面</h2></div><p class="section-note">3週間重複禁止、毎月3週目のお赤飯、誕生日週ルール、3時のおやつを含めて自動生成します。履歴参照件数 ${historyCount} 件 / repeatBlockDays ${state.settings.repeatBlockDays} 日です。</p></div><div class="toolbar"><label class="field"><span>週の開始日</span><input id="admin-week-start" type="date" value="${escapeHtml(state.settings.weekStart)}"></label><label class="field"><span>調理人数</span><input id="admin-kitchen-servings" type="number" min="1" step="1" value="${escapeHtml(state.settings.kitchenServings)}"></label><label class="field"><span>誕生日週ルールを第3週に適用</span><input id="admin-birthday-week" type="checkbox" ${isBirthdayRuleEnabled() ? "checked" : ""}></label><button type="button" class="button button-primary" id="auto-generate-button">自動で5日分の献立を作成</button><button type="button" class="button button-secondary" id="regenerate-week-button">5日分を再生成</button><button type="button" class="button button-secondary" id="save-week-button">この週を保存</button></div><p class="print-note">3週目ルール ${isThirdWeekRuleWeek(state.settings.weekStart) ? "適用中: 主食はお赤飯固定" : "対象外"} / 誕生日週ルール ${!isBirthdayRuleEnabled() ? "OFF" : (isThirdWeekRuleWeek(state.settings.weekStart) ? "適用中: 第3週のため お赤飯 + ケーキ" : "待機中: 第3週のみ適用")}</p></article><article class="panel"><div class="section-head"><div><p class="section-kicker">Catalog</p><h2>料理マスタ概要</h2></div><p class="section-note">和食・洋食・中華に加え、おやつ約100種類を追加し、履歴を見ながら重複を抑えます。</p></div><div class="catalog-stats"><article class="metric-card"><span>総料理数</span><strong>${catalog.total}</strong><small>自動献立対象</small></article><article class="metric-card"><span>和食 / 洋食 / 中華</span><strong>${catalog.byCuisine["和食"]} / ${catalog.byCuisine["洋食"]} / ${catalog.byCuisine["中華"]}</strong><small>料理候補数</small></article><article class="metric-card"><span>副菜数</span><strong>${catalog.byCategory["副菜"]}</strong><small>偏り回避に使用</small></article><article class="metric-card"><span>デザート / おやつ</span><strong>${catalog.byCategory["デザート"]} / ${catalog.byCategory["おやつ"]}</strong><small>3週間重複禁止対象</small></article></div></article><article class="panel"><div class="section-head"><div><p class="section-kicker">Weekly Editor</p><h2>5日分献立編集</h2></div><p class="section-note">自動生成後も、月曜から金曜までと3時のおやつを個別に上書きできます。</p></div><div class="weekly-grid">${editorCards}</div></article><article class="panel"><div class="section-head"><div><p class="section-kicker">Recipe Master</p><h2>料理一覧</h2></div><p class="section-note">料理を選ぶと、cuisine、材料、調味料、1人前量、総量、作業指示、栄養価を確認できます。</p></div><div class="detail-grid"><div class="recipe-list">${recipes.map((recipe) => `<article class="recipe-card ${recipe.id === state.selectedRecipeId ? "is-active" : ""}" data-recipe-card="${recipe.id}"><div class="sub-head"><div><h3>${escapeHtml(recipe.name)}</h3><span class="tag">${escapeHtml(recipe.cuisine)} / ${escapeHtml(recipe.category)}</span></div><span class="pill">${formatNumber(recipe.nutrition.energy, 0)} kcal</span></div><p class="muted">rotation ${escapeHtml(recipe.rotationKey)} / ${escapeHtml(recipe.tags.join("・"))}</p></article>`).join("")}</div>${renderRecipeDetailPanel(selectedRecipe)}</div></article><article class="panel"><div class="section-head"><div><p class="section-kicker">Food Master</p><h2>食品マスタ</h2></div><p class="section-note">食品成分表ベースの100gあたり栄養価です。</p></div><div class="food-list">${foods.map((food) => `<article class="card"><div class="sub-head"><strong>${escapeHtml(food.name)}</strong><span class="pill">100g</span></div><p class="muted">エネルギー ${formatNumber(food.nutrients.energy, 0)} kcal / たんぱく質 ${formatNumber(food.nutrients.protein, 1)} g / 脂質 ${formatNumber(food.nutrients.fat, 1)} g / 炭水化物 ${formatNumber(food.nutrients.carbs, 1)} g / 食物繊維 ${formatNumber(food.nutrients.fiber, 1)} g / 塩分 ${formatNumber(food.nutrients.salt, 1)} g</p></article>`).join("")}</div></article>`;
+    elements.adminView.innerHTML = `<article class="panel"><div class="section-head"><div><p class="section-kicker">Admin</p><h2>管理画面</h2></div></div><div class="toolbar"><label class="field"><span>週の開始日</span><input id="admin-week-start" type="date" value="${escapeHtml(state.settings.weekStart)}"></label><label class="field"><span>調理人数</span><input id="admin-kitchen-servings" type="number" min="1" step="1" value="${escapeHtml(state.settings.kitchenServings)}"></label><label class="field"><span>誕生日週ルールを第3週に適用</span><input id="admin-birthday-week" type="checkbox" ${isBirthdayRuleEnabled() ? "checked" : ""}></label><button type="button" class="button button-primary" id="auto-generate-button">自動で5日分の献立を作成</button><button type="button" class="button button-secondary" id="regenerate-week-button">5日分を再生成</button><button type="button" class="button button-secondary" id="save-week-button">この週を保存</button></div><p class="print-note">3週目ルール ${isThirdWeekRuleWeek(state.settings.weekStart) ? "適用中: 主食はお赤飯固定" : "対象外"} / 誕生日週ルール ${!isBirthdayRuleEnabled() ? "OFF" : (isThirdWeekRuleWeek(state.settings.weekStart) ? "適用中: 第3週のため お赤飯 + ケーキ" : "待機中: 第3週のみ適用")}</p></article><article class="panel"><div class="section-head"><div><p class="section-kicker">Catalog</p><h2>料理マスタ概要</h2></div></div><div class="catalog-stats"><article class="metric-card"><span>総料理数</span><strong>${catalog.total}</strong><small>自動献立対象</small></article><article class="metric-card"><span>和食 / 洋食 / 中華</span><strong>${catalog.byCuisine["和食"]} / ${catalog.byCuisine["洋食"]} / ${catalog.byCuisine["中華"]}</strong><small>料理候補数</small></article><article class="metric-card"><span>副菜数</span><strong>${catalog.byCategory["副菜"]}</strong><small>偏り回避に使用</small></article><article class="metric-card"><span>デザート / おやつ</span><strong>${catalog.byCategory["デザート"]} / ${catalog.byCategory["おやつ"]}</strong><small>3週間重複禁止対象</small></article></div></article><article class="panel"><div class="section-head"><div><p class="section-kicker">Weekly Editor</p><h2>5日分献立編集</h2></div></div><div class="weekly-grid">${editorCards}</div></article><article class="panel"><div class="section-head"><div><p class="section-kicker">Recipe Master</p><h2>料理一覧</h2></div></div><div class="detail-grid"><div class="recipe-list">${recipes.map((recipe) => `<article class="recipe-card ${recipe.id === state.selectedRecipeId ? "is-active" : ""}" data-recipe-card="${recipe.id}"><div class="sub-head"><div><h3>${escapeHtml(recipe.name)}</h3><span class="tag">${escapeHtml(recipe.cuisine)} / ${escapeHtml(recipe.category)}</span></div><span class="pill">${formatNumber(recipe.nutrition.energy, 0)} kcal</span></div><p class="muted">rotation ${escapeHtml(recipe.rotationKey)} / ${escapeHtml(recipe.tags.join("・"))}</p></article>`).join("")}</div>${renderRecipeDetailPanel(selectedRecipe)}</div></article><article class="panel"><div class="section-head"><div><p class="section-kicker">Food Master</p><h2>食品マスタ</h2></div><p class="section-note">食品成分表ベースの100gあたり栄養価です。</p></div><div class="food-list">${foods.map((food) => `<article class="card"><div class="sub-head"><strong>${escapeHtml(food.name)}</strong><span class="pill">100g</span></div><p class="muted">エネルギー ${formatNumber(food.nutrients.energy, 0)} kcal / たんぱく質 ${formatNumber(food.nutrients.protein, 1)} g / 脂質 ${formatNumber(food.nutrients.fat, 1)} g / 炭水化物 ${formatNumber(food.nutrients.carbs, 1)} g / 食物繊維 ${formatNumber(food.nutrients.fiber, 1)} g / 塩分 ${formatNumber(food.nutrients.salt, 1)} g</p></article>`).join("")}</div></article>`;
     bindAdminViewEvents();
   };
   collectWeekDraftFromDom = function () {
@@ -1739,6 +1747,604 @@
       renderAll();
     });
     Array.from(document.querySelectorAll('[data-recipe-card]')).forEach((card) => { card.addEventListener('click', () => { state.selectedRecipeId = card.dataset.recipeCard; renderAdminView(); }); });
+  };
+  const RESTORED_RESIDENT_CARD_STYLE = `
+    .resident-friendly-panel { padding:18px; }
+    .resident-board-shell {
+      position:relative;
+      overflow:hidden;
+      border-radius:32px;
+      border:4px solid rgba(236, 191, 145, 0.88);
+      background:
+        radial-gradient(circle at top left, rgba(255, 223, 182, 0.35), transparent 26%),
+        linear-gradient(180deg, rgba(255, 252, 247, 0.98), rgba(255, 247, 240, 0.96));
+      padding:18px 18px 14px;
+    }
+    .resident-board-shell::before {
+      content:"";
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      background:
+        radial-gradient(circle at 8% 14%, rgba(255, 224, 198, 0.22), transparent 14%),
+        radial-gradient(circle at 92% 84%, rgba(202, 224, 198, 0.2), transparent 15%);
+    }
+    .resident-board-header {
+      position:relative;
+      z-index:1;
+      display:grid;
+      justify-items:center;
+      gap:10px;
+      margin-bottom:14px;
+      text-align:center;
+    }
+    .resident-board-kicker {
+      margin:0;
+      font-size:0.74rem;
+      letter-spacing:0.24em;
+      text-transform:uppercase;
+      color:#a96a43;
+      font-weight:700;
+    }
+    .resident-board-titleline {
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    .resident-board-title {
+      margin:0;
+      font-size:clamp(2rem, 3vw, 2.8rem);
+      line-height:1.08;
+      letter-spacing:-0.03em;
+      font-weight:800;
+      color:#d1733f;
+    }
+    .resident-board-icon {
+      width:28px;
+      height:28px;
+      color:#e6a047;
+      opacity:0.9;
+      flex:0 0 auto;
+    }
+    .resident-board-range {
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:42px;
+      padding:8px 18px;
+      border-radius:999px;
+      background:#dc7e42;
+      color:#fff8f2;
+      font-size:1.02rem;
+      font-weight:800;
+      letter-spacing:0.01em;
+      box-shadow:0 10px 24px rgba(182, 112, 59, 0.16);
+    }
+    .resident-cards-stack {
+      position:relative;
+      z-index:1;
+      display:grid;
+      gap:10px;
+    }
+    .resident-day-card {
+      display:grid;
+      grid-template-columns:108px 94px minmax(0, 1fr);
+      align-items:stretch;
+      min-height:132px;
+      border-radius:28px;
+      border:2px solid var(--resident-card-border, rgba(222, 175, 131, 0.88));
+      background:var(--resident-card-bg, rgba(255, 248, 241, 0.96));
+      overflow:hidden;
+      box-shadow:0 8px 18px rgba(118, 77, 43, 0.06);
+    }
+    .resident-card-date {
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:4px;
+      padding:14px 10px;
+      background:rgba(255, 255, 255, 0.35);
+      border-right:2px solid rgba(255, 255, 255, 0.72);
+    }
+    .resident-card-date .resident-day-date {
+      display:block;
+      font-size:0.95rem;
+      font-weight:700;
+      color:#6d5d51;
+      line-height:1;
+    }
+    .resident-card-date .resident-day-weekday {
+      display:block;
+      font-size:3.2rem;
+      font-weight:900;
+      line-height:0.94;
+      letter-spacing:-0.05em;
+      color:var(--resident-accent, #b5614c);
+    }
+    .resident-card-metrics {
+      display:grid;
+      align-content:center;
+      justify-items:center;
+      gap:10px;
+      padding:12px 8px;
+      background:rgba(255, 255, 255, 0.42);
+      border-right:2px dashed rgba(130, 110, 91, 0.18);
+      text-align:center;
+    }
+    .resident-metric {
+      display:grid;
+      gap:2px;
+      justify-items:center;
+    }
+    .resident-metric-value {
+      font-size:1.05rem;
+      line-height:1;
+      font-weight:900;
+      color:var(--resident-accent, #b5614c);
+    }
+    .resident-metric-label {
+      font-size:0.68rem;
+      line-height:1.1;
+      font-weight:700;
+      color:#6f6358;
+      letter-spacing:0.06em;
+    }
+    .resident-metric-divider {
+      width:34px;
+      border-top:1px solid rgba(125, 108, 93, 0.28);
+    }
+    .resident-card-menu {
+      display:grid;
+      align-content:center;
+      gap:10px;
+      padding:16px 18px;
+      min-width:0;
+    }
+    .resident-card-lunch {
+      min-width:0;
+    }
+    .resident-card-items {
+      display:flex;
+      flex-wrap:wrap;
+      align-items:center;
+      gap:12px 16px;
+      width:100%;
+    }
+    .resident-card-item {
+      position:relative;
+      padding-right:16px;
+      font-size:1.22rem;
+      line-height:1.32;
+      font-weight:800;
+      color:#3a2f28;
+      letter-spacing:-0.02em;
+      word-break:keep-all;
+    }
+    .resident-card-item:not(:last-child)::after {
+      content:"";
+      position:absolute;
+      right:0;
+      top:50%;
+      transform:translateY(-50%);
+      height:1.5em;
+      border-right:2px solid rgba(136, 118, 101, 0.2);
+    }
+    .resident-card-snack {
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width:0;
+      padding:8px 12px;
+      border-radius:14px;
+      background:rgba(255, 255, 255, 0.54);
+      border:1px solid rgba(160, 132, 103, 0.18);
+    }
+    .resident-card-snack-label {
+      flex:0 0 auto;
+      font-size:0.84rem;
+      line-height:1.2;
+      font-weight:800;
+      color:#8d674f;
+      letter-spacing:0.04em;
+      white-space:nowrap;
+    }
+    .resident-card-snack-text {
+      min-width:0;
+      font-size:1rem;
+      line-height:1.35;
+      font-weight:700;
+      color:#4c3d33;
+      word-break:keep-all;
+    }
+    .resident-board-footer {
+      position:relative;
+      z-index:1;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      margin-top:10px;
+      padding-top:10px;
+      border-top:1px solid rgba(153, 124, 98, 0.16);
+    }
+    .resident-footer-mark {
+      display:flex;
+      align-items:center;
+      gap:10px;
+      color:#7e6b5b;
+    }
+    .resident-footer-mark svg {
+      width:28px;
+      height:28px;
+      flex:0 0 auto;
+      color:#e19a62;
+    }
+    .resident-footer-text {
+      font-size:0.88rem;
+      font-weight:700;
+      color:#7a6758;
+    }
+    .resident-weekly-message {
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width:0;
+      flex:1 1 auto;
+      margin-left:8px;
+    }
+    .resident-weekly-message-label {
+      flex:0 0 auto;
+      margin:0;
+      font-size:1rem;
+      font-weight:900;
+      color:#8e6349;
+      letter-spacing:0.04em;
+      white-space:nowrap;
+    }
+    .resident-weekly-message-text {
+      margin:0;
+      min-width:0;
+      font-size:1.06rem;
+      line-height:1.55;
+      font-weight:700;
+      color:#4a3c33;
+    }
+    .resident-footer-app {
+      font-size:0.74rem;
+      font-weight:800;
+      letter-spacing:0.14em;
+      text-transform:uppercase;
+      color:#ae876c;
+      text-align:right;
+    }
+    @media (max-width:1120px) {
+      .resident-day-card { grid-template-columns:90px 82px minmax(0, 1fr); }
+      .resident-card-item { font-size:1.05rem; }
+    }
+    @media (max-width:760px) {
+      .resident-board-shell { padding:14px 14px 12px; border-radius:24px; }
+      .resident-board-title { font-size:1.8rem; }
+      .resident-board-range { min-height:36px; padding:7px 14px; font-size:0.9rem; }
+      .resident-day-card { grid-template-columns:1fr; min-height:unset; }
+      .resident-card-date,
+      .resident-card-metrics {
+        border-right:0;
+        border-bottom:1px dashed rgba(130, 110, 91, 0.18);
+      }
+      .resident-card-date { padding:12px 10px 10px; }
+      .resident-card-date .resident-day-weekday { font-size:2.4rem; }
+      .resident-card-metrics {
+        grid-template-columns:1fr auto 1fr;
+        gap:8px;
+        padding:10px 12px;
+      }
+      .resident-metric-divider {
+        width:1px;
+        height:28px;
+        border-top:0;
+        border-left:1px solid rgba(125, 108, 93, 0.28);
+      }
+      .resident-card-menu { padding:12px 14px; }
+      .resident-card-item { font-size:1rem; padding-right:12px; }
+      .resident-card-snack {
+        gap:8px;
+        padding:7px 10px;
+      }
+      .resident-card-snack-label {
+        font-size:0.78rem;
+      }
+      .resident-card-snack-text {
+        font-size:0.92rem;
+      }
+      .resident-board-footer {
+        flex-direction:column;
+        align-items:flex-start;
+      }
+      .resident-weekly-message {
+        width:100%;
+        margin-left:0;
+        flex-wrap:wrap;
+        gap:8px;
+      }
+      .resident-weekly-message-label {
+        font-size:0.9rem;
+      }
+      .resident-weekly-message-text {
+        font-size:0.94rem;
+        line-height:1.5;
+      }
+      .resident-footer-app { text-align:left; }
+    }
+    @media print {
+      @page resident-landscape { size:A4 landscape; margin:8mm; }
+      #resident-view.is-print-target .resident-friendly-panel {
+        page:resident-landscape;
+        padding:0 !important;
+        border:0;
+        background:#fff;
+        box-shadow:none;
+      }
+      #resident-view.is-print-target .resident-board-shell {
+        border-width:2pt;
+        border-radius:18pt;
+        min-height:188mm;
+        padding:6mm 6mm 5mm;
+        background:#fffdfa;
+      }
+      #resident-view.is-print-target .resident-board-header {
+        gap:3mm;
+        margin-bottom:4mm;
+      }
+      #resident-view.is-print-target .resident-board-kicker { font-size:8pt; }
+      #resident-view.is-print-target .resident-board-title { font-size:22pt; }
+      #resident-view.is-print-target .resident-board-icon { width:18pt; height:18pt; }
+      #resident-view.is-print-target .resident-board-range {
+        min-height:0;
+        padding:2.5mm 8mm;
+        font-size:11pt;
+        box-shadow:none;
+      }
+      #resident-view.is-print-target .resident-cards-stack { gap:3mm; }
+      #resident-view.is-print-target .resident-day-card {
+        grid-template-columns:27mm 24mm minmax(0, 1fr);
+        min-height:29mm;
+        border-width:1.2pt;
+        border-radius:14pt;
+        box-shadow:none;
+      }
+      #resident-view.is-print-target .resident-card-date { padding:4mm 2mm; }
+      #resident-view.is-print-target .resident-card-date .resident-day-date { font-size:10pt; }
+      #resident-view.is-print-target .resident-card-date .resident-day-weekday { font-size:27pt; }
+      #resident-view.is-print-target .resident-card-metrics {
+        gap:2.4mm;
+        padding:3.5mm 2mm;
+      }
+      #resident-view.is-print-target .resident-metric-value { font-size:11pt; }
+      #resident-view.is-print-target .resident-metric-label { font-size:7.6pt; }
+      #resident-view.is-print-target .resident-card-menu { padding:4mm 4.5mm; gap:2.5mm; }
+      #resident-view.is-print-target .resident-card-items { gap:3mm 5mm; }
+      #resident-view.is-print-target .resident-card-item {
+        font-size:12pt;
+        padding-right:4.5mm;
+      }
+      #resident-view.is-print-target .resident-card-item:not(:last-child)::after {
+        border-right-width:1.4pt;
+      }
+      #resident-view.is-print-target .resident-card-snack {
+        gap:2.5mm;
+        padding:2.4mm 3mm;
+        border-radius:10pt;
+      }
+      #resident-view.is-print-target .resident-card-snack-label {
+        font-size:8pt;
+      }
+      #resident-view.is-print-target .resident-card-snack-text {
+        font-size:9pt;
+      }
+      #resident-view.is-print-target .resident-board-footer {
+        margin-top:4mm;
+        padding-top:3mm;
+        gap:3mm;
+      }
+      #resident-view.is-print-target .resident-footer-mark svg { width:18pt; height:18pt; }
+      #resident-view.is-print-target .resident-footer-text { font-size:7.8pt; }
+      #resident-view.is-print-target .resident-weekly-message {
+        gap:2.2mm;
+        margin-left:2mm;
+        flex:1 1 auto;
+        flex-wrap:wrap;
+      }
+      #resident-view.is-print-target .resident-weekly-message-label { font-size:8.4pt; }
+      #resident-view.is-print-target .resident-weekly-message-text {
+        font-size:9pt;
+        line-height:1.35;
+      }
+      #resident-view.is-print-target .resident-footer-app { font-size:7.2pt; }
+    }
+  `;
+  if (!document.getElementById("resident-card-restore-style")) {
+    const restoredResidentStyle = document.createElement("style");
+    restoredResidentStyle.id = "resident-card-restore-style";
+    restoredResidentStyle.textContent = RESTORED_RESIDENT_CARD_STYLE;
+    document.head.append(restoredResidentStyle);
+  }
+  STORAGE_KEYS.residentWeeklyMessages = STORAGE_KEYS.residentWeeklyMessages || "nutrition-kun::resident-weekly-messages";
+  STORAGE_KEYS.usedResidentMessages = STORAGE_KEYS.usedResidentMessages || "nutrition-kun::used-resident-messages";
+  const RESIDENT_MESSAGE_CANDIDATES = {
+    spring: [
+      "春のやわらかな空気を感じながら、今週もお食事の時間をゆっくりお楽しみください。",
+      "花の季節に心なごむひとときを添えられるよう、今週も昼食を整えました。",
+      "新しい季節の明るさとともに、毎日の昼食時間を心地よくお過ごしください。",
+      "春らしいやさしい陽気の中で、今週もお食事を楽しんでいただけましたらうれしいです。",
+      "気持ちのよい春風を感じながら、今週もほっとできる昼食時間になりますように。",
+      "やわらかな陽ざしに包まれる季節です。今週も昼食の時間を大切にお過ごしください。",
+      "春の景色を眺めるように、今週もゆったりとした気持ちでお食事をお楽しみください。",
+      "季節の移ろいを感じながら、今週もあたたかな昼食時間をお届けします。"
+    ],
+    earlySummer: [
+      "新緑のさわやかさを感じながら、今週も気持ちよく昼食時間をお過ごしください。",
+      "青葉の美しい季節です。今週もゆっくりとお食事を楽しんでいただけましたら幸いです。",
+      "少しずつ初夏の空気を感じる頃、今週も心和む昼食時間になりますように。",
+      "風の心地よい季節に合わせて、今週もやさしい昼食時間をお届けします。",
+      "新しい緑がまぶしい季節です。今週も毎日の昼食を楽しみにしていただけましたらうれしいです。",
+      "さわやかな季節の流れとともに、今週も穏やかな食事の時間をお過ごしください。",
+      "初夏の明るい空気の中で、今週もおいしい昼食時間をゆっくりお楽しみください。",
+      "みずみずしい季節の気配を感じながら、今週も心やすらぐ昼食をお届けします。"
+    ],
+    rainy: [
+      "雨の日が続く季節ですが、今週も昼食の時間がほっとするひとときになりますように。",
+      "しっとりとした季節の中でも、今週は心晴れやかにお食事を楽しんでいただけましたら幸いです。",
+      "梅雨の時期だからこそ、毎日の昼食時間をゆったり気持ちよくお過ごしください。",
+      "雨音に耳を傾けながら、今週も落ち着いた昼食時間をお楽しみください。",
+      "季節の変わり目ですが、今週も無理なく穏やかにお食事を楽しんでいただけますように。",
+      "やわらかな雨の季節に合わせて、今週も心なごむ昼食時間を整えました。",
+      "しっとりした空気の中でも、昼食の時間があたたかなひとときになりますように。",
+      "雨の多い時期ですので、今週も気持ちがやわらぐ昼食時間をお届けします。"
+    ],
+    summer: [
+      "暑さのある季節ですので、今週も無理なくゆったりと昼食の時間をお過ごしください。",
+      "日差しの強い日が続きます。今週も涼やかな気持ちでお食事を楽しんでいただけましたら幸いです。",
+      "夏の気配が深まる頃、今週も心地よい昼食時間になりますように。",
+      "暑い季節だからこそ、今週も落ち着いてお食事を楽しめる時間を大切にお届けします。",
+      "夏空の明るさとともに、今週もゆっくりと昼食をお楽しみください。",
+      "体調に気をつけたい季節です。今週も穏やかな気持ちで昼食時間をお過ごしください。",
+      "夏の日差しの中でも、昼食の時間がほっとできるひとときになりますように。",
+      "暑さを感じる毎日ですが、今週も無理なく楽しい昼食時間をお過ごしください。"
+    ],
+    autumn: [
+      "実りの季節を感じながら、今週もゆったりと昼食の時間をお楽しみください。",
+      "秋のやさしい空気の中で、今週も心なごむお食事時間をお届けします。",
+      "少しずつ深まる季節とともに、今週も穏やかな昼食時間になりますように。",
+      "秋らしい落ち着いた空気を感じながら、今週もお食事を楽しんでいただけましたら幸いです。",
+      "実りの季節ならではのあたたかさを添えて、今週も昼食時間を整えました。",
+      "過ごしやすい季節です。今週も毎日の昼食を楽しみにしていただけましたらうれしいです。",
+      "秋の彩りを感じる頃、今週もゆっくりとした昼食時間をお過ごしください。",
+      "穏やかな秋風とともに、今週もやさしい昼食時間をお届けします。"
+    ],
+    winter: [
+      "寒さの深まる季節ですので、今週もあたたかな気持ちで昼食時間をお過ごしください。",
+      "冷え込みやすい時期ですが、今週も心までほっとする昼食時間になりますように。",
+      "冬の澄んだ空気の中で、今週もゆったりとお食事を楽しんでいただけましたら幸いです。",
+      "寒い季節だからこそ、今週も落ち着いた昼食時間を大切にお届けします。",
+      "あたたかい食事の時間が楽しみになるよう、今週もやさしい昼食を整えました。",
+      "冬の日々を穏やかに過ごせるよう、今週も心なごむ昼食時間をお届けします。",
+      "寒さに気をつけたい頃です。今週も無理なく楽しいお食事時間をお過ごしください。",
+      "冬の静かな季節に寄り添いながら、今週もやさしい昼食時間になりますように。"
+    ]
+  };
+  function getResidentMessageSeasonKey(weekStart) {
+    const source = weekStart ? new Date(`${weekStart}T00:00:00`) : new Date();
+    const month = source.getMonth() + 1;
+    if (month >= 3 && month <= 4) return "spring";
+    if (month === 5) return "earlySummer";
+    if (month === 6) return "rainy";
+    if (month >= 7 && month <= 8) return "summer";
+    if (month >= 9 && month <= 11) return "autumn";
+    return "winter";
+  }
+  function getResidentMessageCandidates(weekStart) {
+    const seasonKey = getResidentMessageSeasonKey(weekStart);
+    return RESIDENT_MESSAGE_CANDIDATES[seasonKey] || RESIDENT_MESSAGE_CANDIDATES.spring;
+  }
+  function getSavedResidentWeeklyMessages() {
+    return loadStorage(STORAGE_KEYS.residentWeeklyMessages, {});
+  }
+  function saveResidentWeeklyMessages(messages) {
+    saveStorage(STORAGE_KEYS.residentWeeklyMessages, messages);
+  }
+  function getUsedResidentMessages() {
+    const list = loadStorage(STORAGE_KEYS.usedResidentMessages, []);
+    return Array.isArray(list) ? list.filter(Boolean) : [];
+  }
+  function saveUsedResidentMessages(messages) {
+    saveStorage(STORAGE_KEYS.usedResidentMessages, Array.from(new Set(messages.filter(Boolean))));
+  }
+  function buildGeneratedResidentMessage(weekStart, usedMessages) {
+    const seasonKey = getResidentMessageSeasonKey(weekStart);
+    const seasonPhrases = {
+      spring: ["春のやわらかな空気を感じながら", "花の季節の明るさに包まれて", "春の陽ざしを感じながら"],
+      earlySummer: ["新緑のさわやかさを感じながら", "初夏のやさしい風に包まれて", "青葉の季節を感じながら"],
+      rainy: ["雨の季節の落ち着きとともに", "しっとりした空気を感じながら", "梅雨の穏やかな時間の中で"],
+      summer: ["夏の明るい空気とともに", "暑さに気をつけながら", "夏の季節を感じながら"],
+      autumn: ["秋のやさしい空気を感じながら", "実りの季節に寄り添って", "秋風の心地よさとともに"],
+      winter: ["寒さの深まる季節ですので", "冬の静かな空気に包まれて", "冷え込みやすい頃ですので"]
+    };
+    const endings = [
+      "今週も昼食の時間をゆっくりお楽しみください。",
+      "今週も心なごむお食事時間をお過ごしください。",
+      "今週も穏やかな気持ちでお食事を楽しんでいただけましたら幸いです。",
+      "今週もほっとできる昼食時間になりますように。"
+    ];
+    const openings = seasonPhrases[seasonKey] || seasonPhrases.spring;
+    for (const opening of openings) {
+      for (const ending of endings) {
+        const message = `${opening}、${ending}`;
+        if (!usedMessages.includes(message)) {
+          return message;
+        }
+      }
+    }
+    return `${openings[0]}、${endings[0]}`;
+  }
+  function getOrCreateResidentWeeklyMessage(weekStart) {
+    const weeklyMessages = getSavedResidentWeeklyMessages();
+    const usedMessages = getUsedResidentMessages();
+    const existing = weeklyMessages[weekStart];
+    if (existing) {
+      if (!usedMessages.includes(existing)) {
+        usedMessages.push(existing);
+        saveUsedResidentMessages(usedMessages);
+      }
+      return existing;
+    }
+    const seasonalCandidates = getResidentMessageCandidates(weekStart);
+    const unusedSeasonal = seasonalCandidates.find((message) => !usedMessages.includes(message));
+    const globalCandidates = Object.values(RESIDENT_MESSAGE_CANDIDATES).flat();
+    const unusedGlobal = globalCandidates.find((message) => !usedMessages.includes(message));
+    const nextMessage = unusedSeasonal || unusedGlobal || buildGeneratedResidentMessage(weekStart, usedMessages);
+    weeklyMessages[weekStart] = nextMessage;
+    usedMessages.push(nextMessage);
+    saveResidentWeeklyMessages(weeklyMessages);
+    saveUsedResidentMessages(usedMessages);
+    return nextMessage;
+  }
+  renderResidentView = function () {
+    const week = getWeekMenus(state.settings.weekStart);
+    const map = getRecipeMap();
+    const weeklyMessage = getOrCreateResidentWeeklyMessage(state.settings.weekStart);
+    const dayPalettes = [
+      { bg: "rgba(255, 244, 241, 0.96)", border: "rgba(228, 158, 142, 0.88)", accent: "#ba5d4d" },
+      { bg: "rgba(255, 247, 238, 0.96)", border: "rgba(232, 179, 121, 0.88)", accent: "#bc7640" },
+      { bg: "rgba(244, 250, 239, 0.97)", border: "rgba(171, 204, 143, 0.9)", accent: "#5f8752" },
+      { bg: "rgba(241, 247, 255, 0.97)", border: "rgba(143, 182, 224, 0.9)", accent: "#567aa5" },
+      { bg: "rgba(255, 251, 233, 0.97)", border: "rgba(227, 204, 128, 0.9)", accent: "#a98a39" }
+    ];
+    const firstDay = week[WEEKDAY_KEYS[0]];
+    const lastDay = week[WEEKDAY_KEYS[WEEKDAY_KEYS.length - 1]];
+    const weekRange = `${formatDate(firstDay.date)}（${WEEKDAY_LABELS[WEEKDAY_KEYS[0]]}）〜 ${formatDate(lastDay.date)}（${WEEKDAY_LABELS[WEEKDAY_KEYS[WEEKDAY_KEYS.length - 1]]}）`;
+    const headerLeftIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 1.8v3.2M12 19v3.2M22.2 12H19M5 12H1.8M19.6 4.4l-2.2 2.2M6.6 17.4l-2.2 2.2M19.6 19.6l-2.2-2.2M6.6 6.6L4.4 4.4"/></svg>`;
+    const headerRightIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3v10"/><path d="M17 3v10"/><path d="M4.5 6.5h5M14.5 6.5h5"/><path d="M6 20c0-2.7 1.8-4.5 4-4.5h4c2.2 0 4 1.8 4 4.5"/><path d="M9.2 15.5h5.6"/></svg>`;
+    const footerIcon = `<svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><circle cx="16" cy="16" r="13" fill="#f6d7b9"/><path d="M10.5 12.5c1.2-1.3 2.5-2 3.9-2 1.5 0 2.7.8 3.7 2M10.5 19.2c1.5 1.8 3.3 2.8 5.5 2.8 2.3 0 4.1-1 5.5-2.8" stroke="#c87842" stroke-width="1.8" stroke-linecap="round"/><circle cx="12.2" cy="15.1" r="1.2" fill="#c87842"/><circle cx="19.8" cy="15.1" r="1.2" fill="#c87842"/><path d="M25.2 7.5c-1.3 2.8-3.4 4.5-6.3 5.2 1.2-2.4 3.3-4.2 6.3-5.2z" fill="#a9cd9a"/></svg>`;
+    const cards = WEEKDAY_KEYS.map((dayKey, index) => {
+      const dayMenu = week[dayKey];
+      const evaluation = evaluateDayMenu(dayMenu);
+      const palette = dayPalettes[index % dayPalettes.length];
+      const lunchItems = [
+        getResidentCellText(dayMenu, "staple", map),
+        getResidentCellText(dayMenu, "soup", map),
+        getResidentCellText(dayMenu, "main", map),
+        getResidentCellText(dayMenu, "side1", map),
+        getResidentCellText(dayMenu, "side2", map),
+        getResidentCellText(dayMenu, "dessert", map)
+      ].filter((value) => value && String(value).trim());
+      const snackText = map.get(dayMenu.snack)?.name || "調整中";
+      const safeLunchItems = lunchItems.length ? lunchItems : ["調整中"];
+      return `<article class="resident-day-card" style="--resident-card-bg:${palette.bg}; --resident-card-border:${palette.border}; --resident-accent:${palette.accent};"><div class="resident-card-date"><span class="resident-day-date">${formatDate(dayMenu.date)}</span><span class="resident-day-weekday">${WEEKDAY_LABELS[dayKey]}</span></div><div class="resident-card-metrics"><div class="resident-metric"><strong class="resident-metric-value">${formatNumber(evaluation.totals.energy, 0)}</strong><span class="resident-metric-label">kcal</span></div><div class="resident-metric-divider" aria-hidden="true"></div><div class="resident-metric"><strong class="resident-metric-value">${formatNumber(evaluation.totals.salt, 1)}g</strong><span class="resident-metric-label">塩分</span></div></div><div class="resident-card-menu"><div class="resident-card-lunch"><div class="resident-card-items">${safeLunchItems.map((item) => `<span class="resident-card-item">${escapeHtml(item)}</span>`).join("")}</div></div><div class="resident-card-snack"><span class="resident-card-snack-label">3時のおやつ</span><span class="resident-card-snack-text">${escapeHtml(snackText)}</span></div></div></article>`;
+    }).join("");
+    elements.residentView.innerHTML = `<article class="panel resident-friendly-panel"><div class="resident-board-shell"><header class="resident-board-header"><p class="resident-board-kicker">Resident Menu</p><div class="resident-board-titleline"><span class="resident-board-icon" aria-hidden="true">${headerLeftIcon}</span><h2 class="resident-board-title">今週の献立</h2><span class="resident-board-icon" aria-hidden="true">${headerRightIcon}</span></div><div class="resident-board-range">${weekRange}</div></header><div class="resident-cards-stack">${cards}</div><footer class="resident-board-footer"><div class="resident-footer-mark"><span aria-hidden="true">${footerIcon}</span><span class="resident-footer-text">もぐサポ君</span></div><div class="resident-weekly-message"><p class="resident-weekly-message-label">今週の一言</p><p class="resident-weekly-message-text">${escapeHtml(weeklyMessage)}</p></div><div class="resident-footer-app">MOGU SUPPORT PLANNER</div></footer></div></article>`;
   };
   const previousRenderViews = renderViews;
   renderViews = function () {
