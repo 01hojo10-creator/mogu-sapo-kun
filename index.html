@@ -980,17 +980,6 @@
         });
       });
 
-      elements.printResidentButton.addEventListener("click", () => {
-        state.printTarget = "resident-view";
-        renderViews();
-        window.print();
-      });
-
-      elements.printKitchenButton.addEventListener("click", () => {
-        state.printTarget = "kitchen-view";
-        renderViews();
-        window.print();
-      });
     }
 
     function renderAll() {
@@ -1831,7 +1820,7 @@
       return draft;
     }
   </script>
-  <script src="./enhancements.js?v=20260409-statefix2"></script>
+  <script src="./enhancements.js?v=20260410-printfix1"></script>
   <script>
     (function () {
       const viewIds = ["resident-view", "kitchen-view", "admin-view"];
@@ -1874,22 +1863,6 @@
         if (adminButton) {
           adminButton.onclick = function () {
             setActiveView("admin-view", "管理画面 clicked");
-          };
-        }
-        if (residentPrintButton) {
-          residentPrintButton.onclick = function () {
-            setActiveView("resident-view", "利用者向けを印刷 clicked");
-            window.setTimeout(function () {
-              window.print();
-            }, 0);
-          };
-        }
-        if (kitchenPrintButton) {
-          kitchenPrintButton.onclick = function () {
-            setActiveView("kitchen-view", "調理室向けを印刷 clicked");
-            window.setTimeout(function () {
-              window.print();
-            }, 0);
           };
         }
       }
