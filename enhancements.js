@@ -12,6 +12,217 @@
   if (!state || !elements) return;
   const EXTRA_STYLE = `
     .catalog-stats { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; }
+    .recipe-master-filter-bar { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-bottom:14px; }
+    .recipe-master-filter-button.is-active {
+      background:rgba(201, 105, 43, 0.14);
+      border-color:rgba(201, 105, 43, 0.34);
+      color:#8a4e24;
+      box-shadow:none;
+    }
+    .recipe-master-filter-search {
+      margin-left:4px;
+      flex:0 1 240px;
+      min-width:180px;
+    }
+    .recipe-master-search-input {
+      width:100%;
+      padding:9px 13px;
+      border-radius:999px;
+      border:1px solid rgba(201, 105, 43, 0.18);
+      background:rgba(255, 255, 255, 0.82);
+      color:#5a483d;
+      font:inherit;
+      line-height:1.2;
+      outline:none;
+    }
+    .recipe-master-search-input:focus {
+      border-color:rgba(201, 105, 43, 0.34);
+      box-shadow:0 0 0 3px rgba(201, 105, 43, 0.08);
+    }
+    #admin-view > .admin-settings-panel {
+      padding:18px 20px;
+    }
+    #admin-view > .admin-settings-panel .section-head {
+      gap:10px;
+      margin-bottom:8px;
+    }
+    #admin-view > .admin-settings-panel .toolbar {
+      gap:8px 10px;
+      align-items:flex-end;
+    }
+    #admin-view > .admin-settings-panel .field {
+      gap:5px;
+    }
+    #admin-view > .admin-settings-panel .field span {
+      font-size:0.88rem;
+    }
+    #admin-view > .admin-settings-panel input {
+      padding:10px 12px;
+    }
+    #admin-view > .admin-settings-panel .button {
+      padding:10px 14px;
+    }
+    #admin-view > .admin-settings-panel .print-note {
+      margin-top:8px;
+      font-size:0.88rem;
+      line-height:1.45;
+    }
+    #admin-view .weekly-editor-head {
+      align-items:flex-start;
+      flex-wrap:wrap;
+      gap:16px 20px;
+    }
+    #admin-view .weekly-editor-settings {
+      margin-left:auto;
+      flex:1 1 560px;
+      min-width:280px;
+      display:grid;
+      gap:8px;
+    }
+    #admin-view .weekly-editor-settings .toolbar {
+      gap:8px 10px;
+      align-items:flex-end;
+      justify-content:flex-end;
+    }
+    #admin-view .weekly-editor-settings .field {
+      gap:5px;
+      min-width:140px;
+    }
+    #admin-view .weekly-editor-settings .field span {
+      font-size:0.88rem;
+    }
+    #admin-view .weekly-editor-settings input {
+      padding:10px 12px;
+    }
+    #admin-view .weekly-editor-settings .button {
+      padding:10px 14px;
+    }
+    #admin-view .weekly-editor-settings .print-note {
+      margin:0;
+      font-size:0.88rem;
+      line-height:1.45;
+      text-align:right;
+    }
+    #admin-view .weekly-editor-panel {
+      padding:18px 16px;
+    }
+    #admin-view .weekly-editor-panel .section-head {
+      align-items:flex-start;
+      gap:16px 20px;
+      margin-bottom:16px;
+    }
+    #admin-view .weekly-editor-scroll {
+      overflow-x:visible;
+      padding-bottom:0;
+    }
+    #admin-view .weekly-editor-card-grid {
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+      gap:12px;
+      align-items:start;
+      width:100%;
+    }
+    #admin-view .weekly-editor-day-card {
+      display:grid;
+      gap:12px;
+      min-height:100%;
+      padding:16px;
+    }
+    #admin-view .weekly-editor-day-head {
+      display:grid;
+      gap:12px;
+    }
+    #admin-view .weekly-editor-day-meta {
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:10px;
+    }
+    #admin-view .weekly-editor-day-meta h3 {
+      margin:4px 0 0;
+      font-size:1.2rem;
+      line-height:1.2;
+    }
+    #admin-view .weekly-editor-mode-pill {
+      align-self:flex-start;
+    }
+    #admin-view .weekly-editor-mode-field {
+      gap:6px;
+    }
+    #admin-view .weekly-editor-mode-field select {
+      padding:10px 12px;
+    }
+    #admin-view .weekly-editor-card-body {
+      display:grid;
+      gap:12px;
+    }
+    #admin-view .weekly-editor-card-section {
+      display:grid;
+      gap:10px;
+      padding:12px;
+      border-radius:18px;
+      background:rgba(255,255,255,0.56);
+      border:1px solid rgba(164,124,92,0.12);
+    }
+    #admin-view .weekly-editor-card-section.is-hidden {
+      display:none;
+    }
+    #admin-view .weekly-editor-section-title {
+      margin:0;
+      font-size:0.86rem;
+      font-weight:800;
+      letter-spacing:0.06em;
+      color:#8b654c;
+    }
+    #admin-view .weekly-editor-fields {
+      display:grid;
+      gap:10px;
+    }
+    #admin-view .weekly-editor-card-section .field {
+      gap:5px;
+    }
+    #admin-view .weekly-editor-card-section .field span {
+      font-size:0.86rem;
+    }
+    #admin-view .weekly-editor-card-section select,
+    #admin-view .weekly-editor-card-section textarea {
+      padding:10px 12px;
+    }
+    #admin-view .weekly-editor-card-section textarea {
+      min-height:88px;
+    }
+    .detail-grid > .recipe-list { gap:9px; }
+    .detail-grid > .recipe-list .recipe-card {
+      padding:12px 13px;
+      min-height:0;
+    }
+    .detail-grid > .recipe-list .recipe-card .sub-head { gap:10px; }
+    .detail-grid > .recipe-list .recipe-card .sub-head > div {
+      display:flex;
+      align-items:center;
+      gap:8px;
+      min-width:0;
+      flex-wrap:wrap;
+    }
+    .detail-grid > .recipe-list .recipe-card h3 {
+      margin:0;
+      line-height:1.25;
+    }
+    .detail-grid > .recipe-list .recipe-card .tag {
+      padding:4px 8px;
+      font-size:0.76rem;
+      line-height:1.2;
+      white-space:nowrap;
+    }
+    .detail-grid > .recipe-list .recipe-card .pill {
+      padding:4px 8px;
+      font-size:0.76rem;
+      white-space:nowrap;
+    }
+    .detail-grid > .recipe-list .recipe-card .muted {
+      margin:6px 0 0;
+      line-height:1.45;
+    }
     .resident-friendly-panel .section-head { align-items:flex-start; }
     .resident-friendly-panel .section-note { max-width:36rem; }
     .resident-menu-table .resident-day-head { text-align:center; background:linear-gradient(180deg, rgba(245,226,228,0.9), rgba(255,247,238,0.92)); }
@@ -38,6 +249,39 @@
     .part-lines { display:grid; gap:4px; }
     .part-lines span { display:block; }
     .kitchen-page-stack { display:grid; gap:12px; }
+    .weekly-grid .check-grid {
+      display:none;
+      grid-template-columns:minmax(0, 1fr);
+      gap:10px;
+    }
+    .weekly-grid .check-card,
+    .weekly-grid .check-card span,
+    .weekly-grid .check-card strong,
+    .weekly-grid .check-card p {
+      writing-mode:horizontal-tb !important;
+      text-orientation:mixed !important;
+    }
+    .weekly-grid .check-card {
+      display:flex;
+      flex-direction:column;
+      align-items:flex-start;
+      justify-content:flex-start;
+      gap:4px;
+      min-height:unset;
+      padding:10px 12px;
+      line-height:1.4;
+      border-color:transparent;
+      box-shadow:none;
+    }
+    .weekly-grid .check-card span,
+    .weekly-grid .check-card strong,
+    .weekly-grid .check-card p {
+      display:block;
+      width:100%;
+      white-space:normal;
+      word-break:normal;
+      line-height:1.4;
+    }
     @media (max-width:1120px) { .catalog-stats { grid-template-columns:1fr; } }
     @media print {
       @page { size:A4 portrait; margin:7mm; }
@@ -951,6 +1195,9 @@
   renderSlotSelect = function (dayKey, mode, field, label, currentValue, recipes, optional = false) {
     return `<label class="field"><span>${label}</span><select data-menu-day="${dayKey}" data-menu-mode="${mode}" data-menu-field="${field}"><option value="">${optional ? "追加しない" : "選択してください"}</option>${recipes.map((recipe) => `<option value="${recipe.id}" ${recipe.id === currentValue ? "selected" : ""}>${escapeHtml(recipe.name)} (${escapeHtml(recipe.cuisine)})</option>`).join("")}</select></label>`;
   };
+  function renderWeeklyEditorSlotSelect(dayKey, mode, field, label, currentValue, recipes, optional = false) {
+    return `<label class="field"><span>${label}</span><select data-menu-day="${dayKey}" data-menu-mode="${mode}" data-menu-field="${field}"><option value="">${optional ? "追加しない" : "選択してください"}</option>${recipes.map((recipe) => `<option value="${recipe.id}" ${recipe.id === currentValue ? "selected" : ""}>${escapeHtml(recipe.name)}</option>`).join("")}</select></label>`;
+  }
   function summarizeCatalog(recipes) {
     const byCuisine = Object.fromEntries(CUISINES.map((item) => [item, 0]));
     const byCategory = Object.fromEntries(CATEGORY_KEYS.map((item) => [item, 0]));
@@ -1691,7 +1938,7 @@
         if (!recipe) return "";
         return `<tr><td>${escapeHtml(slotLabels.join(" / "))}</td><td>${escapeHtml(recipe.name)}</td><td>${formatNumber(recipe.servingSize, 0)} g</td><td>${formatPartLines(recipe.ingredients, state.settings.kitchenServings, "ingredient")}</td><td>${formatPartLines(recipe.seasonings, state.settings.kitchenServings, "seasoning")}</td><td>${escapeHtml(recipe.instructions.join(" / "))}</td><td>${formatNumber(recipe.nutrition.energy, 0)} kcal<br>塩分 ${formatNumber(recipe.nutrition.salt, 1)} g</td></tr>`;
       }).join("") || '<tr><td colspan="7">献立が未設定です。</td></tr>';
-      return `<article class="panel kitchen-day-sheet page-print-break"><div class="section-head"><div><p class="section-kicker">${WEEKDAY_LABELS[dayKey]}曜日</p><h2>${formatDate(dayMenu.date)} 調理室向け指示書</h2></div></div><div class="kitchen-page-stack"><div class="kitchen-day-meta"><table class="kitchen-summary-table"><tbody>${summaryRows}</tbody></table>${renderMetricCards(evaluation.totals, "昼食全体")}</div><table class="kitchen-day-table"><thead><tr><th>献立枠</th><th>料理名</th><th>1人前量</th><th>材料</th><th>調味料</th><th>作業指示</th><th>栄養価</th></tr></thead><tbody>${recipeRows}</tbody></table></div></article>`;
+      return `<article class="panel kitchen-day-sheet page-print-break"><div class="section-head"><div><p class="section-kicker">${WEEKDAY_LABELS[dayKey]}曜日</p><h2>${formatDate(dayMenu.date)} 調理士向け指示書</h2></div></div><div class="kitchen-page-stack"><div class="kitchen-day-meta"><table class="kitchen-summary-table"><tbody>${summaryRows}</tbody></table>${renderMetricCards(evaluation.totals, "昼食全体")}</div><table class="kitchen-day-table"><thead><tr><th>献立枠</th><th>料理名</th><th>1人前量</th><th>材料</th><th>調味料</th><th>作業指示</th><th>栄養価</th></tr></thead><tbody>${recipeRows}</tbody></table></div></article>`;
     }).join("");
     elements.kitchenView.innerHTML = `<article class="panel kitchen-intro"><div class="section-head"><div><p class="section-kicker">Kitchen Sheets</p><h2>調理師向け 5日分指示書</h2></div></div></article>${sheets}`;
   };
@@ -1699,7 +1946,7 @@
     const week = getWeekMenus(state.settings.weekStart); const recipes = getAllRecipes(); const foods = getAllFoods(); const selectedRecipe = recipes.find((recipe) => recipe.id === state.selectedRecipeId) || null; const catalog = summarizeCatalog(recipes); const byCategory = (category) => recipes.filter((recipe) => recipe.category === category).sort((a, b) => a.name.localeCompare(b.name, 'ja'));
     const historyCount = Object.keys(state.menuHistory || {}).length;
     const editorCards = WEEKDAY_KEYS.map((dayKey) => { const dayMenu = week[dayKey]; const evaluation = evaluateDayMenu(dayMenu); return `<article class="menu-card"><div class="sub-head"><div><p class="section-kicker">${WEEKDAY_LABELS[dayKey]}曜日</p><h3>${formatDate(dayMenu.date)}</h3></div><span class="pill">${dayMenu.mode === "basic" ? "通常献立" : "例外献立"}</span></div><div class="stack"><label class="field"><span>献立タイプ</span><select data-menu-day="${dayKey}" data-menu-field="mode"><option value="basic" ${dayMenu.mode === "basic" ? "selected" : ""}>通常献立</option><option value="exception" ${dayMenu.mode === "exception" ? "selected" : ""}>例外献立</option></select></label><div class="grid-two">${renderSlotSelect(dayKey, "basic", "staple", "主食", dayMenu.basic.staple, byCategory("主食"))}${renderSlotSelect(dayKey, "basic", "soup", "汁物", dayMenu.basic.soup, byCategory("汁物"))}${renderSlotSelect(dayKey, "basic", "main", "主菜", dayMenu.basic.main, byCategory("主菜"))}${renderSlotSelect(dayKey, "basic", "side1", "副菜1", dayMenu.basic.side1, byCategory("副菜"))}${renderSlotSelect(dayKey, "basic", "side2", "副菜2", dayMenu.basic.side2, byCategory("副菜"))}${renderSlotSelect(dayKey, "basic", "dessert", "デザート", dayMenu.basic.dessert, byCategory("デザート"))}</div><div class="grid-two">${renderSlotSelect(dayKey, "exception", "singleDish", "単品料理", dayMenu.exception.singleDish, byCategory("単品料理"))}${renderSlotSelect(dayKey, "exception", "extraSoup", "追加汁物", dayMenu.exception.extraSoup, byCategory("汁物"), true)}${renderSlotSelect(dayKey, "exception", "extraSide", "追加副菜", dayMenu.exception.extraSide, byCategory("副菜"), true)}${renderSlotSelect(dayKey, "exception", "extraDessert", "追加デザート", dayMenu.exception.extraDessert, byCategory("デザート"), true)}</div><div class="grid-two">${renderSlotSelect(dayKey, "snack", "snack", "3時のおやつ", dayMenu.snack, byCategory("おやつ"))}</div><label class="field"><span>メモ</span><textarea data-menu-day="${dayKey}" data-menu-field="memo">${escapeHtml(dayMenu.memo || "")}</textarea></label><div class="check-grid">${renderConditionCards(evaluation)}</div></div></article>`; }).join("");
-    elements.adminView.innerHTML = `<article class="panel"><div class="section-head"><div><p class="section-kicker">Admin</p><h2>管理画面</h2></div></div><div class="toolbar"><label class="field"><span>週の開始日</span><input id="admin-week-start" type="date" value="${escapeHtml(state.settings.weekStart)}"></label><label class="field"><span>調理人数</span><input id="admin-kitchen-servings" type="number" min="1" step="1" value="${escapeHtml(state.settings.kitchenServings)}"></label><label class="field"><span>誕生日週ルールを第3週に適用</span><input id="admin-birthday-week" type="checkbox" ${isBirthdayRuleEnabled() ? "checked" : ""}></label><button type="button" class="button button-primary" id="auto-generate-button">自動で5日分の献立を作成</button><button type="button" class="button button-secondary" id="regenerate-week-button">5日分を再生成</button><button type="button" class="button button-secondary" id="save-week-button">この週を保存</button></div><p class="print-note">3週目ルール ${isThirdWeekRuleWeek(state.settings.weekStart) ? "適用中: 主食はお赤飯固定" : "対象外"} / 誕生日週ルール ${!isBirthdayRuleEnabled() ? "OFF" : (isThirdWeekRuleWeek(state.settings.weekStart) ? "適用中: 第3週のため お赤飯 + ケーキ" : "待機中: 第3週のみ適用")}</p></article><article class="panel"><div class="section-head"><div><p class="section-kicker">Catalog</p><h2>料理マスタ概要</h2></div></div><div class="catalog-stats"><article class="metric-card"><span>総料理数</span><strong>${catalog.total}</strong><small>自動献立対象</small></article><article class="metric-card"><span>和食 / 洋食 / 中華</span><strong>${catalog.byCuisine["和食"]} / ${catalog.byCuisine["洋食"]} / ${catalog.byCuisine["中華"]}</strong><small>料理候補数</small></article><article class="metric-card"><span>副菜数</span><strong>${catalog.byCategory["副菜"]}</strong><small>偏り回避に使用</small></article><article class="metric-card"><span>デザート / おやつ</span><strong>${catalog.byCategory["デザート"]} / ${catalog.byCategory["おやつ"]}</strong><small>3週間重複禁止対象</small></article></div></article><article class="panel"><div class="section-head"><div><p class="section-kicker">Weekly Editor</p><h2>5日分献立編集</h2></div></div><div class="weekly-grid">${editorCards}</div></article><article class="panel"><div class="section-head"><div><p class="section-kicker">Recipe Master</p><h2>料理一覧</h2></div></div><div class="detail-grid"><div class="recipe-list">${recipes.map((recipe) => `<article class="recipe-card ${recipe.id === state.selectedRecipeId ? "is-active" : ""}" data-recipe-card="${recipe.id}"><div class="sub-head"><div><h3>${escapeHtml(recipe.name)}</h3><span class="tag">${escapeHtml(recipe.cuisine)} / ${escapeHtml(recipe.category)}</span></div><span class="pill">${formatNumber(recipe.nutrition.energy, 0)} kcal</span></div><p class="muted">rotation ${escapeHtml(recipe.rotationKey)} / ${escapeHtml(recipe.tags.join("・"))}</p></article>`).join("")}</div>${renderRecipeDetailPanel(selectedRecipe)}</div></article><article class="panel"><div class="section-head"><div><p class="section-kicker">Food Master</p><h2>食品マスタ</h2></div><p class="section-note">食品成分表ベースの100gあたり栄養価です。</p></div><div class="food-list">${foods.map((food) => `<article class="card"><div class="sub-head"><strong>${escapeHtml(food.name)}</strong><span class="pill">100g</span></div><p class="muted">エネルギー ${formatNumber(food.nutrients.energy, 0)} kcal / たんぱく質 ${formatNumber(food.nutrients.protein, 1)} g / 脂質 ${formatNumber(food.nutrients.fat, 1)} g / 炭水化物 ${formatNumber(food.nutrients.carbs, 1)} g / 食物繊維 ${formatNumber(food.nutrients.fiber, 1)} g / 塩分 ${formatNumber(food.nutrients.salt, 1)} g</p></article>`).join("")}</div></article>`;
+    elements.adminView.innerHTML = `<article class="panel"><div class="section-head"><div><p class="section-kicker">Admin</p><h2>管理画面</h2></div></div><div class="toolbar"><label class="field"><span>週の開始日</span><input id="admin-week-start" type="date" value="${escapeHtml(state.settings.weekStart)}"></label><label class="field"><span>調理人数</span><input id="admin-kitchen-servings" type="number" min="1" step="1" value="${escapeHtml(state.settings.kitchenServings)}"></label><label class="field"><span>誕生日週ルールを第3週に適用</span><input id="admin-birthday-week" type="checkbox" ${isBirthdayRuleEnabled() ? "checked" : ""}></label><button type="button" class="button button-primary" id="auto-generate-button">自動で5日分の献立を作成</button></div><p class="print-note">3週目ルール ${isThirdWeekRuleWeek(state.settings.weekStart) ? "適用中: 主食はお赤飯固定" : "対象外"} / 誕生日週ルール ${!isBirthdayRuleEnabled() ? "OFF" : (isThirdWeekRuleWeek(state.settings.weekStart) ? "適用中: 第3週のため お赤飯 + ケーキ" : "待機中: 第3週のみ適用")}</p></article><article class="panel"><div class="section-head"><div><p class="section-kicker">Catalog</p><h2>料理マスタ概要</h2></div></div><div class="catalog-stats"><article class="metric-card"><span>総料理数</span><strong>${catalog.total}</strong><small>自動献立対象</small></article><article class="metric-card"><span>和食 / 洋食 / 中華</span><strong>${catalog.byCuisine["和食"]} / ${catalog.byCuisine["洋食"]} / ${catalog.byCuisine["中華"]}</strong><small>料理候補数</small></article><article class="metric-card"><span>副菜数</span><strong>${catalog.byCategory["副菜"]}</strong><small>偏り回避に使用</small></article><article class="metric-card"><span>デザート / おやつ</span><strong>${catalog.byCategory["デザート"]} / ${catalog.byCategory["おやつ"]}</strong><small>3週間重複禁止対象</small></article></div></article><article class="panel"><div class="section-head"><div><p class="section-kicker">Weekly Editor</p><h2>5日分献立編集</h2></div></div><div class="weekly-grid">${editorCards}</div></article><article class="panel"><div class="section-head"><div><p class="section-kicker">Recipe Master</p><h2>料理一覧</h2></div></div><div class="detail-grid"><div class="recipe-list">${recipes.map((recipe) => `<article class="recipe-card ${recipe.id === state.selectedRecipeId ? "is-active" : ""}" data-recipe-card="${recipe.id}"><div class="sub-head"><div><h3>${escapeHtml(recipe.name)}</h3><span class="tag">${escapeHtml(recipe.cuisine)} / ${escapeHtml(recipe.category)}</span></div><span class="pill">${formatNumber(recipe.nutrition.energy, 0)} kcal</span></div><p class="muted">rotation ${escapeHtml(recipe.rotationKey)} / ${escapeHtml(recipe.tags.join("・"))}</p></article>`).join("")}</div>${renderRecipeDetailPanel(selectedRecipe)}</div></article><article class="panel"><div class="section-head"><div><p class="section-kicker">Food Master</p><h2>食品マスタ</h2></div><p class="section-note">食品成分表ベースの100gあたり栄養価です。</p></div><div class="food-list">${foods.map((food) => `<article class="card"><div class="sub-head"><strong>${escapeHtml(food.name)}</strong><span class="pill">100g</span></div><p class="muted">エネルギー ${formatNumber(food.nutrients.energy, 0)} kcal / たんぱく質 ${formatNumber(food.nutrients.protein, 1)} g / 脂質 ${formatNumber(food.nutrients.fat, 1)} g / 炭水化物 ${formatNumber(food.nutrients.carbs, 1)} g / 食物繊維 ${formatNumber(food.nutrients.fiber, 1)} g / 塩分 ${formatNumber(food.nutrients.salt, 1)} g</p></article>`).join("")}</div></article>`;
     bindAdminViewEvents();
   };
   collectWeekDraftFromDom = function () {
@@ -1747,6 +1994,203 @@
       renderAll();
     });
     Array.from(document.querySelectorAll('[data-recipe-card]')).forEach((card) => { card.addEventListener('click', () => { state.selectedRecipeId = card.dataset.recipeCard; renderAdminView(); }); });
+  };
+  const RECIPE_MASTER_FILTER_OPTIONS = [
+    { value: "all", label: "\u3059\u3079\u3066" },
+    { value: "\u4e3b\u98df", label: "\u4e3b\u98df" },
+    { value: "\u4e3b\u83dc", label: "\u4e3b\u83dc" },
+    { value: "\u526f\u83dc", label: "\u526f\u83dc" },
+    { value: "\u6c41\u7269", label: "\u6c41\u7269" },
+    { value: "\u30c7\u30b6\u30fc\u30c8", label: "\u30c7\u30b6\u30fc\u30c8" },
+    { value: "\u304a\u3084\u3064", label: "3\u6642\u306e\u304a\u3084\u3064" }
+  ];
+  function getRecipeMasterFilterValue() {
+    return state.adminRecipeMasterFilter || "all";
+  }
+  function getRecipeMasterSearchValue() {
+    return state.adminRecipeMasterSearch || "";
+  }
+  function getRecipeMasterSearchInputValue() {
+    return state.adminRecipeMasterSearchDraft || "";
+  }
+  function commitRecipeMasterSearchInputValue(inputValue) {
+    const nextValue = inputValue || "";
+    state.adminRecipeMasterSearch = nextValue;
+    if (!nextValue.trim()) {
+      state.adminRecipeMasterSearchDraft = "";
+      return;
+    }
+    const hasMatches = getRecipeMasterFilteredRecipes(getAllRecipes(), getRecipeMasterFilterValue(), nextValue).length > 0;
+    state.adminRecipeMasterSearchDraft = hasMatches ? "" : nextValue;
+  }
+  function rerenderAdminRecipeMasterSearch(searchInput) {
+    const scrollX = window.scrollX;
+    const scrollY = window.scrollY;
+    const selectionStart = searchInput?.selectionStart ?? null;
+    const selectionEnd = searchInput?.selectionEnd ?? null;
+    renderAdminView();
+    const nextInput = document.querySelector("#recipe-master-search");
+    if (nextInput) {
+      try {
+        nextInput.focus({ preventScroll: true });
+      } catch (_error) {
+        nextInput.focus();
+      }
+      if (selectionStart !== null && selectionEnd !== null) {
+        nextInput.setSelectionRange(selectionStart, selectionEnd);
+      }
+    }
+    window.scrollTo(scrollX, scrollY);
+  }
+  function getRecipeMasterFilteredRecipes(recipes, filterValue, searchValue) {
+    const normalizedSearch = (searchValue || "").trim().toLocaleLowerCase("ja");
+    const categoryFiltered = filterValue === "all"
+      ? [...recipes]
+      : recipes.filter((recipe) => recipe.category === filterValue);
+    return categoryFiltered
+      .filter((recipe) => !normalizedSearch || recipe.name.toLocaleLowerCase("ja").includes(normalizedSearch))
+      .sort((a, b) => a.name.localeCompare(b.name, "ja"));
+  }
+  function renderRecipeMasterPanel(recipes) {
+    const activeFilter = getRecipeMasterFilterValue();
+    const searchValue = getRecipeMasterSearchValue();
+    const searchInputValue = getRecipeMasterSearchInputValue();
+    const filteredRecipes = getRecipeMasterFilteredRecipes(recipes, activeFilter, searchValue);
+    const selectedRecipe = filteredRecipes.find((recipe) => recipe.id === state.selectedRecipeId) || null;
+    const filterButtons = RECIPE_MASTER_FILTER_OPTIONS.map((option) => `<button type="button" class="button button-secondary recipe-master-filter-button ${option.value === activeFilter ? "is-active" : ""}" data-recipe-filter="${escapeHtml(option.value)}">${escapeHtml(option.label)}</button>`).join("");
+    const searchField = `<div class="recipe-master-filter-search"><input id="recipe-master-search" class="recipe-master-search-input" type="search" placeholder="\u6599\u7406\u540d\u3067\u691c\u7d22" value="${escapeHtml(searchInputValue)}"></div>`;
+    const recipeCards = filteredRecipes.length
+      ? filteredRecipes.map((recipe) => `<article class="recipe-card ${recipe.id === state.selectedRecipeId ? "is-active" : ""}" data-recipe-card="${recipe.id}"><div class="sub-head"><div><h3>${escapeHtml(recipe.name)}</h3><span class="tag">${escapeHtml(recipe.cuisine)} / ${escapeHtml(recipe.category)}</span></div><span class="pill">${formatNumber(recipe.nutrition.energy, 0)} kcal</span></div></article>`).join("")
+      : `<article class="card"><div class="empty-state">\u8a72\u5f53\u3059\u308b\u6599\u7406\u304c\u3042\u308a\u307e\u305b\u3093\u3002</div></article>`;
+    const recipeDetail = selectedRecipe
+      ? renderRecipeDetailPanel(selectedRecipe)
+      : `<article class="card recipe-detail"><div class="empty-state">\u6599\u7406\u3092\u9078\u3076\u3068\u8a73\u7d30\u304c\u8868\u793a\u3055\u308c\u307e\u3059\u3002</div></article>`;
+    return `<div class="section-head"><div><p class="section-kicker">Recipe Master</p><h2>\u6599\u7406\u4e00\u89a7</h2></div></div><div class="recipe-master-filter-bar">${filterButtons}${searchField}</div><div class="detail-grid"><div class="recipe-list">${recipeCards}</div>${recipeDetail}</div>`;
+  }
+  function renderWeeklyEditorPanel(week, recipes) {
+    const byCategory = (category) => recipes.filter((recipe) => recipe.category === category).sort((a, b) => a.name.localeCompare(b.name, "ja"));
+    const settingsMarkup = `<div class="weekly-editor-settings"><div class="toolbar"><label class="field"><span>週の開始日</span><input id="admin-week-start" type="date" value="${escapeHtml(state.settings.weekStart)}"></label><label class="field"><span>調理人数</span><input id="admin-kitchen-servings" type="number" min="1" step="1" value="${escapeHtml(state.settings.kitchenServings)}"></label><label class="field"><span>誕生日週ルールを第3週に適用</span><input id="admin-birthday-week" type="checkbox" ${isBirthdayRuleEnabled() ? "checked" : ""}></label><button type="button" class="button button-primary" id="auto-generate-button">自動で5日分の献立を作成</button></div><p class="print-note">3週目ルール ${isThirdWeekRuleWeek(state.settings.weekStart) ? "適用中: 主食はお赤飯" : "対象外"} / 誕生日週ルール ${!isBirthdayRuleEnabled() ? "OFF" : (isThirdWeekRuleWeek(state.settings.weekStart) ? "適用中: 第3週のため お赤飯 + ケーキ" : "待機中: 第3週のみ適用")}</p></div>`;
+    const cards = WEEKDAY_KEYS.map((dayKey) => {
+      const dayMenu = week[dayKey];
+      return `<article class="menu-card weekly-editor-day-card" data-weekly-card="${dayKey}"><div class="weekly-editor-day-head"><div class="weekly-editor-day-meta"><div><p class="section-kicker">${WEEKDAY_LABELS[dayKey]}曜日</p><h3>${formatDate(dayMenu.date)}</h3></div><span class="pill weekly-editor-mode-pill">${dayMenu.mode === "basic" ? "通常献立" : "例外献立"}</span></div><input type="hidden" data-menu-day="${dayKey}" data-menu-field="mode" value="${escapeHtml(dayMenu.mode)}"></div><div class="weekly-editor-card-body"><section class="weekly-editor-card-section ${dayMenu.mode === "basic" ? "" : "is-hidden"}" data-mode-group="basic"><div class="weekly-editor-fields">${renderSlotSelect(dayKey, "basic", "staple", "主食", dayMenu.basic.staple, byCategory("主食"))}${renderSlotSelect(dayKey, "basic", "soup", "汁物", dayMenu.basic.soup, byCategory("汁物"))}${renderSlotSelect(dayKey, "basic", "main", "主菜", dayMenu.basic.main, byCategory("主菜"))}${renderSlotSelect(dayKey, "basic", "side1", "副菜1", dayMenu.basic.side1, byCategory("副菜"))}${renderSlotSelect(dayKey, "basic", "side2", "副菜2", dayMenu.basic.side2, byCategory("副菜"))}${renderSlotSelect(dayKey, "basic", "dessert", "デザート", dayMenu.basic.dessert, byCategory("デザート"))}</div></section><section class="weekly-editor-card-section ${dayMenu.mode === "exception" ? "" : "is-hidden"}" data-mode-group="exception"><div class="weekly-editor-fields">${renderSlotSelect(dayKey, "exception", "singleDish", "単品料理", dayMenu.exception.singleDish, byCategory("単品料理"))}${renderSlotSelect(dayKey, "exception", "extraSoup", "追加汁物", dayMenu.exception.extraSoup, byCategory("汁物"), true)}${renderSlotSelect(dayKey, "exception", "extraSide", "追加副菜", dayMenu.exception.extraSide, byCategory("副菜"), true)}${renderSlotSelect(dayKey, "exception", "extraDessert", "追加デザート", dayMenu.exception.extraDessert, byCategory("デザート"), true)}</div></section><section class="weekly-editor-card-section"><p class="weekly-editor-section-title">3時のおやつ</p><div class="weekly-editor-fields">${renderSlotSelect(dayKey, "snack", "snack", "3時のおやつ", dayMenu.snack, byCategory("おやつ"))}</div></section><section class="weekly-editor-card-section"><p class="weekly-editor-section-title">メモ</p><label class="field"><span>メモ</span><textarea data-menu-day="${dayKey}" data-menu-field="memo">${escapeHtml(dayMenu.memo || "")}</textarea></label></section></div></article>`;
+    }).join("");
+    return `<div class="section-head weekly-editor-head"><div><p class="section-kicker">Weekly Editor</p><h2>5日分献立編集</h2></div>${settingsMarkup}</div><div class="weekly-editor-scroll"><div class="weekly-editor-card-grid">${cards}</div></div>`;
+  }
+  function syncWeeklyEditorModeCards() {
+    Array.from(document.querySelectorAll("[data-weekly-card]")).forEach((card) => {
+      const modeSelect = card.querySelector('[data-menu-field="mode"]');
+      const mode = modeSelect?.value || "basic";
+      card.querySelectorAll("[data-mode-group]").forEach((group) => {
+        group.classList.toggle("is-hidden", group.dataset.modeGroup !== mode);
+      });
+      const pill = card.querySelector(".weekly-editor-mode-pill");
+      if (pill) {
+        pill.textContent = mode === "basic" ? "通常献立" : "例外献立";
+      }
+    });
+  }
+  function bindWeeklyEditorPanelEvents() {
+    document.querySelector('#admin-week-start')?.addEventListener('change', (event) => { state.settings.weekStart = event.target.value || mondayString(new Date()); ensureWeekExists(state.settings.weekStart); saveStorage(STORAGE_KEYS.settings, state.settings); renderAll(); });
+    document.querySelector('#admin-kitchen-servings')?.addEventListener('change', (event) => { state.settings.kitchenServings = Math.max(1, Number(event.target.value || 1)); saveStorage(STORAGE_KEYS.settings, state.settings); renderAll(); });
+    document.querySelector('#admin-birthday-week')?.addEventListener('change', (event) => { setBirthdayWeekRuleEnabled(event.target.checked); saveStorage(STORAGE_KEYS.settings, state.settings); renderAll(); });
+    document.querySelector('#auto-generate-button')?.addEventListener('click', () => { regenerateWeekFromScratch(state.settings.weekStart); });
+    Array.from(document.querySelectorAll('[data-weekly-card] [data-menu-field="mode"]')).forEach((select) => {
+      select.addEventListener('change', () => { syncWeeklyEditorModeCards(); });
+    });
+  }
+  function renderWeeklyEditorPanel(week, recipes) {
+    const byCategory = (category) => recipes.filter((recipe) => recipe.category === category).sort((a, b) => a.name.localeCompare(b.name, "ja"));
+    const renderWeeklyEditorSlotSelect = (dayKey, mode, field, label, currentValue, items, optional = false) => `<label class="field">${label ? `<span>${label}</span>` : ""}<select data-menu-day="${dayKey}" data-menu-mode="${mode}" data-menu-field="${field}"><option value="">${optional ? "追加しない" : "選択してください"}</option>${items.map((recipe) => `<option value="${recipe.id}" ${recipe.id === currentValue ? "selected" : ""}>${escapeHtml(recipe.name)}</option>`).join("")}</select></label>`;
+    const settingsMarkup = `<div class="weekly-editor-settings"><div class="toolbar"><label class="field"><span>週の開始日</span><input id="admin-week-start" type="date" value="${escapeHtml(state.settings.weekStart)}"></label><label class="field"><span>調理人数</span><input id="admin-kitchen-servings" type="number" min="1" step="1" value="${escapeHtml(state.settings.kitchenServings)}"></label><label class="field"><span>誕生日週ルールを第3週に適用</span><input id="admin-birthday-week" type="checkbox" ${isBirthdayRuleEnabled() ? "checked" : ""}></label><button type="button" class="button button-primary" id="auto-generate-button">自動で5日分の献立を作成</button></div><p class="print-note">3週目ルール ${isThirdWeekRuleWeek(state.settings.weekStart) ? "適用中: 主食はお赤飯" : "対象外"} / 誕生日週ルール ${!isBirthdayRuleEnabled() ? "OFF" : (isThirdWeekRuleWeek(state.settings.weekStart) ? "適用中: 第3週のため お赤飯 + ケーキ" : "待機中: 第3週のみ適用")}</p></div>`;
+    const cards = WEEKDAY_KEYS.map((dayKey) => {
+      const dayMenu = week[dayKey];
+      return `<article class="menu-card weekly-editor-day-card" data-weekly-card="${dayKey}"><div class="weekly-editor-day-head"><div class="weekly-editor-day-meta"><div><p class="section-kicker">${WEEKDAY_LABELS[dayKey]}曜日</p><h3>${formatDate(dayMenu.date)}</h3></div><span class="pill weekly-editor-mode-pill">${dayMenu.mode === "basic" ? "通常献立" : "例外献立"}</span></div><input type="hidden" data-menu-day="${dayKey}" data-menu-field="mode" value="${escapeHtml(dayMenu.mode)}"></div><div class="weekly-editor-card-body"><section class="weekly-editor-card-section ${dayMenu.mode === "basic" ? "" : "is-hidden"}" data-mode-group="basic"><div class="weekly-editor-fields">${renderWeeklyEditorSlotSelect(dayKey, "basic", "staple", "主食", dayMenu.basic.staple, byCategory("主食"))}${renderWeeklyEditorSlotSelect(dayKey, "basic", "soup", "汁物", dayMenu.basic.soup, byCategory("汁物"))}${renderWeeklyEditorSlotSelect(dayKey, "basic", "main", "主菜", dayMenu.basic.main, byCategory("主菜"))}${renderWeeklyEditorSlotSelect(dayKey, "basic", "side1", "副菜1", dayMenu.basic.side1, byCategory("副菜"))}${renderWeeklyEditorSlotSelect(dayKey, "basic", "side2", "副菜2", dayMenu.basic.side2, byCategory("副菜"))}${renderWeeklyEditorSlotSelect(dayKey, "basic", "dessert", "デザート", dayMenu.basic.dessert, byCategory("デザート"))}</div></section><section class="weekly-editor-card-section ${dayMenu.mode === "exception" ? "" : "is-hidden"}" data-mode-group="exception"><div class="weekly-editor-fields">${renderWeeklyEditorSlotSelect(dayKey, "exception", "singleDish", "主食", dayMenu.exception.singleDish, byCategory("単品料理"))}${renderWeeklyEditorSlotSelect(dayKey, "exception", "extraSoup", "追加汁物", dayMenu.exception.extraSoup, byCategory("汁物"), true)}${renderWeeklyEditorSlotSelect(dayKey, "exception", "extraSide", "追加副菜", dayMenu.exception.extraSide, byCategory("副菜"), true)}${renderWeeklyEditorSlotSelect(dayKey, "exception", "extraDessert", "追加デザート", dayMenu.exception.extraDessert, byCategory("デザート"), true)}</div></section><section class="weekly-editor-card-section"><p class="weekly-editor-section-title">3時のおやつ</p><div class="weekly-editor-fields">${renderWeeklyEditorSlotSelect(dayKey, "snack", "snack", "", dayMenu.snack, byCategory("おやつ"))}</div></section><section class="weekly-editor-card-section"><p class="weekly-editor-section-title">メモ</p><label class="field"><textarea data-menu-day="${dayKey}" data-menu-field="memo">${escapeHtml(dayMenu.memo || "")}</textarea></label></section></div></article>`;
+    }).join("");
+    return `<div class="section-head weekly-editor-head"><div><p class="section-kicker">Weekly Editor</p><h2>5日分献立編集</h2></div>${settingsMarkup}</div><div class="weekly-editor-scroll"><div class="weekly-editor-card-grid">${cards}</div></div>`;
+  }
+  const previousBindAdminViewEventsForRecipeMaster = bindAdminViewEvents;
+  bindAdminViewEvents = function () {
+    previousBindAdminViewEventsForRecipeMaster();
+    Array.from(document.querySelectorAll("[data-recipe-filter]")).forEach((button) => {
+      button.addEventListener("click", () => {
+        state.adminRecipeMasterFilter = button.dataset.recipeFilter || "all";
+        if (!getRecipeMasterSearchInputValue().trim()) {
+          state.adminRecipeMasterSearch = "";
+        }
+        renderAdminView();
+      });
+    });
+    document.querySelector("#recipe-master-search")?.addEventListener("input", (event) => {
+      if (event.isComposing || state.adminRecipeMasterSearchIsComposing) {
+        return;
+      }
+      commitRecipeMasterSearchInputValue(event.target.value);
+      rerenderAdminRecipeMasterSearch(event.target);
+    });
+    document.querySelector("#recipe-master-search")?.addEventListener("compositionstart", () => {
+      state.adminRecipeMasterSearchIsComposing = true;
+    });
+    document.querySelector("#recipe-master-search")?.addEventListener("compositionend", (event) => {
+      state.adminRecipeMasterSearchIsComposing = false;
+      commitRecipeMasterSearchInputValue(event.target.value);
+      rerenderAdminRecipeMasterSearch(event.target);
+    });
+    document.querySelector("#recipe-master-search")?.addEventListener("keydown", (event) => {
+      if (event.isComposing || event.keyCode === 229) {
+        return;
+      }
+      if (event.key === "Enter") {
+        event.preventDefault();
+      }
+    });
+  };
+  const previousRenderAdminViewForRecipeMaster = renderAdminView;
+  renderAdminView = function () {
+    const originalBindAdminViewEvents = bindAdminViewEvents;
+    bindAdminViewEvents = function () {};
+    try {
+      previousRenderAdminViewForRecipeMaster();
+    } finally {
+      bindAdminViewEvents = originalBindAdminViewEvents;
+    }
+    const recipeMasterPanel = Array.from(elements.adminView.querySelectorAll(".panel")).find((panel) => panel.querySelector(".section-kicker")?.textContent?.trim() === "Recipe Master");
+    if (recipeMasterPanel) {
+      recipeMasterPanel.innerHTML = renderRecipeMasterPanel(getAllRecipes());
+    }
+    const foodMasterPanel = Array.from(elements.adminView.querySelectorAll(".panel")).find((panel) => panel.querySelector(".section-kicker")?.textContent?.trim() === "Food Master");
+    if (foodMasterPanel) {
+      foodMasterPanel.remove();
+    }
+    const adminPanel = Array.from(elements.adminView.querySelectorAll(".panel")).find((panel) => panel.querySelector(".section-kicker")?.textContent?.trim() === "Admin");
+    const weeklyEditorPanel = Array.from(elements.adminView.querySelectorAll(".panel")).find((panel) => panel.querySelector(".section-kicker")?.textContent?.trim() === "Weekly Editor");
+    if (adminPanel && weeklyEditorPanel) {
+      const weeklyHead = weeklyEditorPanel.querySelector(".section-head");
+      const settingsToolbar = adminPanel.querySelector(".toolbar");
+      const settingsNote = adminPanel.querySelector(".print-note");
+      if (weeklyHead && settingsToolbar) {
+        const settingsWrap = document.createElement("div");
+        settingsWrap.className = "weekly-editor-settings";
+        settingsWrap.appendChild(settingsToolbar);
+        if (settingsNote) {
+          settingsWrap.appendChild(settingsNote);
+        }
+        weeklyHead.classList.add("weekly-editor-head");
+        weeklyHead.appendChild(settingsWrap);
+      }
+      adminPanel.remove();
+    }
+    bindAdminViewEvents();
+  };
+  const previousRenderAdminViewForWeeklyEditor = renderAdminView;
+  renderAdminView = function () {
+    previousRenderAdminViewForWeeklyEditor();
+    const weeklyEditorPanel = Array.from(elements.adminView.querySelectorAll(".panel")).find((panel) => panel.querySelector(".section-kicker")?.textContent?.trim() === "Weekly Editor");
+    if (weeklyEditorPanel) {
+      weeklyEditorPanel.classList.add("weekly-editor-panel");
+      weeklyEditorPanel.innerHTML = renderWeeklyEditorPanel(getWeekMenus(state.settings.weekStart), getAllRecipes());
+      bindWeeklyEditorPanelEvents();
+      syncWeeklyEditorModeCards();
+    }
   };
   const RESTORED_RESIDENT_CARD_STYLE = `
     .resident-friendly-panel { padding:18px; }
@@ -1916,7 +2360,7 @@
     .resident-card-item {
       position:relative;
       padding-right:16px;
-      font-size:1.22rem;
+      font-size:1.34rem;
       line-height:1.32;
       font-weight:800;
       color:#3a2f28;
@@ -1944,7 +2388,7 @@
     }
     .resident-card-snack-label {
       flex:0 0 auto;
-      font-size:0.84rem;
+      font-size:0.94rem;
       line-height:1.2;
       font-weight:800;
       color:#8d674f;
@@ -1953,7 +2397,7 @@
     }
     .resident-card-snack-text {
       min-width:0;
-      font-size:1rem;
+      font-size:1.12rem;
       line-height:1.35;
       font-weight:700;
       color:#4c3d33;
@@ -2022,7 +2466,7 @@
     }
     @media (max-width:1120px) {
       .resident-day-card { grid-template-columns:90px 82px minmax(0, 1fr); }
-      .resident-card-item { font-size:1.05rem; }
+      .resident-card-item { font-size:1.12rem; }
     }
     @media (max-width:760px) {
       .resident-board-shell { padding:14px 14px 12px; border-radius:24px; }
@@ -2048,16 +2492,16 @@
         border-left:1px solid rgba(125, 108, 93, 0.28);
       }
       .resident-card-menu { padding:12px 14px; }
-      .resident-card-item { font-size:1rem; padding-right:12px; }
+      .resident-card-item { font-size:1.06rem; padding-right:12px; }
       .resident-card-snack {
         gap:8px;
         padding:7px 10px;
       }
       .resident-card-snack-label {
-        font-size:0.78rem;
+        font-size:0.84rem;
       }
       .resident-card-snack-text {
-        font-size:0.92rem;
+        font-size:0.98rem;
       }
       .resident-board-footer {
         flex-direction:column;
@@ -2079,90 +2523,172 @@
       .resident-footer-app { text-align:left; }
     }
     @media print {
-      @page resident-landscape { size:A4 landscape; margin:8mm; }
+      html:has(#resident-view.is-print-target),
+      body:has(#resident-view.is-print-target) {
+        width:auto !important;
+      }
+
+      body:has(#resident-view.is-print-target) .app-shell {
+        width:100% !important;
+      }
+
+      @page resident-landscape { size:A4 landscape; margin:6mm; }
+
       #resident-view.is-print-target .resident-friendly-panel {
         page:resident-landscape;
         padding:0 !important;
         border:0;
         background:#fff;
         box-shadow:none;
+        width:100%;
+        max-width:none;
       }
+
       #resident-view.is-print-target .resident-board-shell {
-        border-width:2pt;
-        border-radius:18pt;
-        min-height:188mm;
-        padding:6mm 6mm 5mm;
+        border-width:1.5pt;
+        border-radius:16pt;
+        min-height:0;
+        padding:4.5mm 5mm 3.5mm;
         background:#fffdfa;
+        break-inside:avoid;
+        page-break-inside:avoid;
       }
+
       #resident-view.is-print-target .resident-board-header {
-        gap:3mm;
-        margin-bottom:4mm;
+        gap:2mm;
+        margin-bottom:2.8mm;
       }
-      #resident-view.is-print-target .resident-board-kicker { font-size:8pt; }
-      #resident-view.is-print-target .resident-board-title { font-size:22pt; }
-      #resident-view.is-print-target .resident-board-icon { width:18pt; height:18pt; }
+
+      #resident-view.is-print-target .resident-board-kicker { font-size:7.4pt; }
+      #resident-view.is-print-target .resident-board-title { font-size:20pt; }
+      #resident-view.is-print-target .resident-board-icon { width:15pt; height:15pt; }
+
       #resident-view.is-print-target .resident-board-range {
         min-height:0;
-        padding:2.5mm 8mm;
-        font-size:11pt;
+        padding:2mm 7mm;
+        font-size:10pt;
         box-shadow:none;
       }
-      #resident-view.is-print-target .resident-cards-stack { gap:3mm; }
+
+      #resident-view.is-print-target .resident-cards-stack { gap:2mm; }
+
       #resident-view.is-print-target .resident-day-card {
-        grid-template-columns:27mm 24mm minmax(0, 1fr);
-        min-height:29mm;
-        border-width:1.2pt;
-        border-radius:14pt;
+        grid-template-columns:21mm 18mm minmax(0, 1fr);
+        min-height:23.6mm;
+        border-width:1pt;
+        border-radius:12pt;
         box-shadow:none;
       }
-      #resident-view.is-print-target .resident-card-date { padding:4mm 2mm; }
-      #resident-view.is-print-target .resident-card-date .resident-day-date { font-size:10pt; }
-      #resident-view.is-print-target .resident-card-date .resident-day-weekday { font-size:27pt; }
+
+      #resident-view.is-print-target .resident-card-date { padding:2.6mm 1.2mm; }
+      #resident-view.is-print-target .resident-card-date .resident-day-date { font-size:8.9pt; }
+      #resident-view.is-print-target .resident-card-date .resident-day-weekday { font-size:22pt; }
+
       #resident-view.is-print-target .resident-card-metrics {
-        gap:2.4mm;
-        padding:3.5mm 2mm;
+        gap:1.3mm;
+        padding:2.3mm 1.1mm;
       }
-      #resident-view.is-print-target .resident-metric-value { font-size:11pt; }
-      #resident-view.is-print-target .resident-metric-label { font-size:7.6pt; }
-      #resident-view.is-print-target .resident-card-menu { padding:4mm 4.5mm; gap:2.5mm; }
-      #resident-view.is-print-target .resident-card-items { gap:3mm 5mm; }
+
+      #resident-view.is-print-target .resident-metric-value { font-size:9.2pt; }
+      #resident-view.is-print-target .resident-metric-label { font-size:6.6pt; }
+
+      #resident-view.is-print-target .resident-card-menu {
+        gap:1.5mm;
+        padding:2.2mm 2.6mm;
+        overflow:hidden;
+      }
+
+      #resident-view.is-print-target .resident-card-lunch {
+        min-width:0;
+      }
+
+      #resident-view.is-print-target .resident-card-items {
+        gap:1mm 2.8mm;
+        flex-wrap:nowrap;
+      }
+
       #resident-view.is-print-target .resident-card-item {
-        font-size:12pt;
-        padding-right:4.5mm;
+        flex:0 0 auto;
+        white-space:nowrap;
+        font-size:11.3pt;
+        line-height:1.08;
+        padding-right:2.4mm;
       }
+
       #resident-view.is-print-target .resident-card-item:not(:last-child)::after {
-        border-right-width:1.4pt;
+        border-right-width:1pt;
       }
+
       #resident-view.is-print-target .resident-card-snack {
-        gap:2.5mm;
-        padding:2.4mm 3mm;
-        border-radius:10pt;
+        gap:1.8mm;
+        padding:1.3mm 1.8mm;
+        border-radius:7pt;
       }
+
       #resident-view.is-print-target .resident-card-snack-label {
-        font-size:8pt;
+        padding:0.9mm 1.8mm;
+        font-size:7.6pt;
+        line-height:1;
       }
+
       #resident-view.is-print-target .resident-card-snack-text {
-        font-size:9pt;
+        font-size:8.6pt;
+        line-height:1.15;
+        font-weight:700;
       }
+
       #resident-view.is-print-target .resident-board-footer {
-        margin-top:4mm;
-        padding-top:3mm;
-        gap:3mm;
+        margin-top:2.5mm;
+        padding-top:2mm;
+        display:grid;
+        grid-template-columns:1fr auto 1fr;
+        align-items:center;
+        gap:0;
       }
-      #resident-view.is-print-target .resident-footer-mark svg { width:18pt; height:18pt; }
-      #resident-view.is-print-target .resident-footer-text { font-size:7.8pt; }
+
+      #resident-view.is-print-target .resident-footer-mark {
+        grid-column:1;
+        justify-self:start;
+        display:flex;
+        align-items:center;
+        gap:6px;
+      }
+      #resident-view.is-print-target .resident-footer-mark svg { width:15pt; height:15pt; }
+
+      #resident-view.is-print-target .resident-footer-text {
+        font-size:7pt;
+        font-weight:600;
+        color:#8a7769;
+      }
+
       #resident-view.is-print-target .resident-weekly-message {
-        gap:2.2mm;
-        margin-left:2mm;
-        flex:1 1 auto;
+        grid-column:2;
+        justify-self:center;
+        align-self:center;
+        min-width:0;
+        display:flex;
+        align-items:baseline;
+        justify-content:center;
+        gap:10px;
         flex-wrap:wrap;
+        text-align:center;
       }
-      #resident-view.is-print-target .resident-weekly-message-label { font-size:8.4pt; }
+
+      #resident-view.is-print-target .resident-weekly-message-label {
+        font-size:16pt;
+        font-weight:900;
+        letter-spacing:0.03em;
+        color:#845541;
+      }
+
       #resident-view.is-print-target .resident-weekly-message-text {
-        font-size:9pt;
-        line-height:1.35;
+        font-size:17.6pt;
+        line-height:1.22;
+        font-weight:700;
+        color:#4b3e37;
       }
-      #resident-view.is-print-target .resident-footer-app { font-size:7.2pt; }
+
+      #resident-view.is-print-target .resident-footer-app { display:none; }
     }
   `;
   if (!document.getElementById("resident-card-restore-style")) {
