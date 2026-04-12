@@ -10,9 +10,33 @@
   const state = globalThis.state;
   const elements = globalThis.elements;
   if (!state || !elements) return;
+  state.recipeMasterMode = state.recipeMasterMode || "view";
+  state.recipeMasterDraft = state.recipeMasterDraft || null;
+  state.recipeMasterDraftError = state.recipeMasterDraftError || "";
+  state.recipeMasterAiLoading = Boolean(state.recipeMasterAiLoading);
+  STORAGE_KEYS.customRecipeOverrides = STORAGE_KEYS.customRecipeOverrides || "nutrition-kun::custom-recipe-overrides";
+  STORAGE_KEYS.hiddenDefaultRecipeIds = STORAGE_KEYS.hiddenDefaultRecipeIds || "nutrition-kun::hidden-default-recipe-ids";
+  STORAGE_KEYS.aiApiKey = STORAGE_KEYS.aiApiKey || "nutrition-kun::ai-api-key";
+  state.customRecipeOverrides = state.customRecipeOverrides && typeof state.customRecipeOverrides === "object" && !Array.isArray(state.customRecipeOverrides)
+    ? state.customRecipeOverrides
+    : loadStorage(STORAGE_KEYS.customRecipeOverrides, {});
+  state.hiddenDefaultRecipeIds = Array.isArray(state.hiddenDefaultRecipeIds)
+    ? state.hiddenDefaultRecipeIds
+    : loadStorage(STORAGE_KEYS.hiddenDefaultRecipeIds, []);
   const EXTRA_STYLE = `
     .catalog-stats { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; }
-    .recipe-master-filter-bar { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-bottom:14px; }
+      .recipe-master-filter-bar { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-bottom:14px; }
+      .recipe-master-filter-actions { margin-left:auto; display:flex; align-items:center; }
+      .recipe-master-add-button.is-added {
+        background:rgba(104, 146, 88, 0.22);
+        border-color:rgba(104, 146, 88, 0.44);
+        color:#47603b;
+      }
+      .recipe-master-add-button.is-exists {
+        background:rgba(201, 105, 43, 0.18);
+        border-color:rgba(201, 105, 43, 0.38);
+        color:#7a431d;
+      }
     .recipe-master-filter-button.is-active {
       background:rgba(201, 105, 43, 0.14);
       border-color:rgba(201, 105, 43, 0.34);
@@ -38,6 +62,53 @@
     .recipe-master-search-input:focus {
       border-color:rgba(201, 105, 43, 0.34);
       box-shadow:0 0 0 3px rgba(201, 105, 43, 0.08);
+    }
+    .recipe-master-form-grid {
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0, 1fr));
+      gap:12px;
+    }
+    .recipe-master-form-grid .field {
+      min-width:0;
+    }
+    .recipe-master-form-grid .field.is-full {
+      grid-column:1 / -1;
+    }
+    .recipe-master-form-error {
+      margin:0;
+      color:#9b3b2d;
+      font-size:0.92rem;
+      line-height:1.45;
+    }
+    .recipe-master-form-actions {
+      display:flex;
+      justify-content:flex-end;
+      gap:10px;
+    }
+    .recipe-master-ai-row {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:12px;
+    }
+    .recipe-master-ai-note {
+      margin:0;
+      font-size:0.88rem;
+      line-height:1.45;
+      color:#7b6253;
+    }
+    .recipe-master-ai-button.is-loading {
+      background:rgba(201, 105, 43, 0.18);
+      border-color:rgba(201, 105, 43, 0.38);
+      color:#8a4e24;
+      box-shadow:none;
+    }
+    .recipe-master-detail-actions {
+      display:flex;
+      justify-content:flex-end;
+      gap:10px;
+      margin-top:14px;
     }
     #admin-view > .admin-settings-panel {
       padding:18px 20px;
@@ -1209,7 +1280,17 @@
   };
   renderRecipeDetailPanel = function (recipe) {
     if (!recipe) return `<article class="card recipe-detail"><div class="empty-state">料理を選ぶと、材料、調味料、作業指示、1人前量、総量、栄養価を確認できます。</div></article>`;
-    return `<article class="card recipe-detail"><div class="sub-head"><div><p class="section-kicker">Selected Recipe</p><h3>${escapeHtml(recipe.name)}</h3></div><span class="pill">${escapeHtml(recipe.cuisine)} / ${escapeHtml(recipe.category)}</span></div><div class="tag-row"><span class="tag">rotation ${escapeHtml(recipe.rotationKey)}</span>${recipe.tags.map((tag) => `<span class="pill">${escapeHtml(tag)}</span>`).join("")}</div><p class="muted">1人前 ${formatNumber(recipe.servingSize, 0)} g / エネルギー ${formatNumber(recipe.nutrition.energy, 0)} kcal / 塩分 ${formatNumber(recipe.nutrition.salt, 1)} g</p>${recipe.notes ? `<p class="muted">${escapeHtml(recipe.notes)}</p>` : ""}<div class="stack">${renderIngredientTable(recipe, state.settings.kitchenServings)}${renderMetricCards(recipe.nutrition, "食品成分表ベース")}<div><h4>作業指示</h4><ol class="detail-list">${recipe.instructions.map((step) => `<li>${escapeHtml(step)}</li>`).join("")}</ol></div></div></article>`;
+    if (state.recipeMasterMode === "edit") {
+      const draft = state.recipeMasterDraft || createRecipeDraftFromRecipe(recipe);
+      const categoryOptions = ["主食", "汁物", "主菜", "副菜", "デザート", "おやつ", "単品料理"]
+        .map((category) => `<option value="${escapeHtml(category)}" ${draft.category === category ? "selected" : ""}>${escapeHtml(category)}</option>`)
+        .join("");
+      const cuisineOptions = ["和食", "洋食", "中華"]
+        .map((cuisine) => `<option value="${escapeHtml(cuisine)}" ${draft.cuisine === cuisine ? "selected" : ""}>${escapeHtml(cuisine)}</option>`)
+        .join("");
+      return `<article class="card recipe-detail"><div class="sub-head"><div><p class="section-kicker">Selected Recipe</p><h3>料理を編集</h3></div><span class="pill">${escapeHtml(recipe.cuisine)} / ${escapeHtml(recipe.category)}</span></div>${state.recipeMasterDraftError ? `<p class="recipe-master-form-error">${escapeHtml(state.recipeMasterDraftError)}</p>` : ""}${renderRecipeMasterAiRow()}<div class="recipe-master-form-grid"><label class="field"><span>料理名</span><input id="recipe-master-draft-name" data-recipe-master-draft="name" type="text" value="${escapeHtml(draft.name)}"></label><label class="field"><span>カテゴリ</span><select id="recipe-master-draft-category" data-recipe-master-draft="category">${categoryOptions}</select></label><label class="field"><span>cuisine</span><select id="recipe-master-draft-cuisine" data-recipe-master-draft="cuisine">${cuisineOptions}</select></label><label class="field"><span>1人前量</span><input id="recipe-master-draft-serving-size" data-recipe-master-draft="servingSize" type="number" min="1" step="1" value="${escapeHtml(draft.servingSize)}"></label><label class="field is-full"><span>説明</span><textarea id="recipe-master-draft-description" data-recipe-master-draft="description">${escapeHtml(draft.description)}</textarea></label><label class="field is-full"><span>メモ / 注意点</span><textarea id="recipe-master-draft-notes" data-recipe-master-draft="notes">${escapeHtml(draft.notes)}</textarea></label><label class="field is-full"><span>作業指示</span><textarea id="recipe-master-draft-steps" data-recipe-master-draft="steps">${escapeHtml(draft.steps)}</textarea></label><label class="field"><span>エネルギー</span><input id="recipe-master-draft-energy" data-recipe-master-draft="energy" type="number" step="1" value="${escapeHtml(draft.energy)}"></label><label class="field"><span>塩分</span><input id="recipe-master-draft-salt" data-recipe-master-draft="salt" type="number" step="0.1" value="${escapeHtml(draft.salt)}"></label></div><div class="recipe-master-form-actions"><button type="button" class="button button-secondary" id="recipe-master-cancel-button">キャンセル</button><button type="button" class="button button-primary" id="recipe-master-save-button">保存</button></div></article>`;
+    }
+    return `<article class="card recipe-detail"><div class="sub-head"><div><p class="section-kicker">Selected Recipe</p><h3>${escapeHtml(recipe.name)}</h3></div><span class="pill">${escapeHtml(recipe.cuisine)} / ${escapeHtml(recipe.category)}</span></div><div class="tag-row"><span class="tag">rotation ${escapeHtml(recipe.rotationKey)}</span>${recipe.tags.map((tag) => `<span class="pill">${escapeHtml(tag)}</span>`).join("")}</div><p class="muted">1人前 ${formatNumber(recipe.servingSize, 0)} g / エネルギー ${formatNumber(recipe.nutrition.energy, 0)} kcal / 塩分 ${formatNumber(recipe.nutrition.salt, 1)} g</p>${recipe.notes ? `<p class="muted">${escapeHtml(recipe.notes)}</p>` : ""}<div class="stack">${renderIngredientTable(recipe, state.settings.kitchenServings)}${renderMetricCards(recipe.nutrition, "食品成分表ベース")}<div><h4>作業指示</h4><ol class="detail-list">${recipe.instructions.map((step) => `<li>${escapeHtml(step)}</li>`).join("")}</ol></div></div><div class="recipe-master-detail-actions"><button type="button" class="button button-secondary" id="recipe-master-edit-button">編集</button><button type="button" class="button button-secondary" id="recipe-master-delete-button">削除</button></div></article>`;
   };
   renderSlotSelect = function (dayKey, mode, field, label, currentValue, recipes, optional = false) {
     return `<label class="field"><span>${label}</span><select data-menu-day="${dayKey}" data-menu-mode="${mode}" data-menu-field="${field}"><option value="">${optional ? "追加しない" : "選択してください"}</option>${recipes.map((recipe) => `<option value="${recipe.id}" ${recipe.id === currentValue ? "selected" : ""}>${escapeHtml(recipe.name)} (${escapeHtml(recipe.cuisine)})</option>`).join("")}</select></label>`;
@@ -1246,7 +1327,7 @@
     document.querySelector('#auto-generate-button')?.addEventListener('click', () => { state.weeklyMenus[state.settings.weekStart] = generateAutoWeek(state.settings.weekStart); saveStorage(STORAGE_KEYS.weeklyMenus, state.weeklyMenus); renderAll(); });
     document.querySelector('#regenerate-week-button')?.addEventListener('click', () => { state.weeklyMenus[state.settings.weekStart] = generateAutoWeek(state.settings.weekStart); saveStorage(STORAGE_KEYS.weeklyMenus, state.weeklyMenus); renderAll(); });
     document.querySelector('#save-week-button')?.addEventListener('click', () => { state.weeklyMenus[state.settings.weekStart] = collectWeekDraftFromDom(); saveStorage(STORAGE_KEYS.weeklyMenus, state.weeklyMenus); renderAll(); });
-    Array.from(document.querySelectorAll('[data-recipe-card]')).forEach((card) => { card.addEventListener('click', () => { state.selectedRecipeId = card.dataset.recipeCard; renderAdminView(); }); });
+    Array.from(document.querySelectorAll('[data-recipe-card]')).forEach((card) => { card.addEventListener('click', () => { state.selectedRecipeId = card.dataset.recipeCard; state.recipeMasterMode = "view"; state.recipeMasterDraft = null; state.recipeMasterDraftError = ""; renderAdminView(); }); });
   };
   STORAGE_KEYS.menuHistory = STORAGE_KEYS.menuHistory || "nutrition-kun::menu-history";
   if (!CATEGORY_KEYS.includes("おやつ")) CATEGORY_KEYS.push("おやつ");
@@ -1528,7 +1609,24 @@
   const SEKIHAN_ID = "special-sekihan";
 
   const previousRenderAll = renderAll;
-  getAllRecipes = function () { return [...SPECIAL_MENU_RECIPES, ...EXPANDED_RECIPES, ...SNACK_MASTER, ...normalizeCustomRecipes(state.customRecipes || [])].map(applyRecipeDictionary).filter((recipe) => recipe.name !== "軟飯"); };
+  getAllRecipes = function () {
+    const hiddenDefaultRecipeIds = new Set((state.hiddenDefaultRecipeIds || []).filter(Boolean));
+    const recipeOverrides = state.customRecipeOverrides || {};
+    const defaultRecipes = [...SPECIAL_MENU_RECIPES, ...EXPANDED_RECIPES, ...SNACK_MASTER]
+      .map(applyRecipeDictionary)
+      .filter((recipe) => recipe.name !== "軟飯")
+      .filter((recipe) => !hiddenDefaultRecipeIds.has(recipe.id))
+      .map((recipe) => {
+        const override = recipeOverrides[recipe.id];
+        return override ? normalizeCustomRecipes([{ ...recipe, ...override, id: recipe.id }])[0] : recipe;
+      });
+    const recipes = [...defaultRecipes, ...normalizeCustomRecipes(state.customRecipes || [])];
+    const recipesById = new Map();
+    recipes.forEach((recipe) => {
+      recipesById.set(recipe.id, recipe);
+    });
+    return [...recipesById.values()];
+  };
   createEmptyWeekMenu = function (weekStart) {
     const week = {};
     WEEKDAY_KEYS.forEach((dayKey, index) => {
@@ -1592,6 +1690,82 @@
       };
     });
     return week;
+  }
+  function isCustomRecipeId(recipeId) {
+    return normalizeCustomRecipes(state.customRecipes || []).some((recipe) => recipe.id === recipeId);
+  }
+  function createRecipeDraftFromRecipe(recipe) {
+    return {
+      name: recipe?.name || "",
+      category: recipe?.category || "主菜",
+      cuisine: recipe?.cuisine || "和食",
+      description: recipe?.description || "",
+      notes: recipe?.notes || "",
+      servingSize: String(recipe?.servingSize || recipe?.servingWeight || 100),
+      steps: Array.isArray(recipe?.instructions) ? recipe.instructions.join("\n") : (Array.isArray(recipe?.steps) ? recipe.steps.join("\n") : ""),
+      energy: String(Number(recipe?.nutrition?.energy || recipe?.nutrition?.kcal || 0)),
+      salt: String(Number(recipe?.nutrition?.salt || 0))
+    };
+  }
+  function buildRecipeMasterEditedRecipeFromDraft(baseRecipe, draft) {
+    const normalizedName = (draft.name || "").trim();
+    const servingSize = Math.max(1, Number(draft.servingSize || baseRecipe?.servingSize || baseRecipe?.servingWeight || 100));
+    const energy = Number(draft.energy || 0);
+    const salt = Number(draft.salt || 0);
+    const stepsArray = (draft.steps || "").split(/\r?\n/).map((step) => step.trim()).filter(Boolean);
+    return {
+      ...baseRecipe,
+      id: baseRecipe.id,
+      name: normalizedName,
+      category: draft.category,
+      cuisine: draft.cuisine,
+      description: draft.description || "",
+      notes: draft.notes || "",
+      ingredients: normalizeParts(baseRecipe.ingredients || []).map((partItem) => ({ ...partItem })),
+      seasonings: normalizeParts(baseRecipe.seasonings || []).map((partItem) => ({ ...partItem })),
+      instructions: stepsArray.length ? stepsArray : ["手順未設定"],
+      steps: stepsArray.length ? stepsArray : ["手順未設定"],
+      servingSize,
+      servings: Number(baseRecipe.servings || 1),
+      servingWeight: servingSize,
+      rotationKey: baseRecipe.rotationKey || normalizedName,
+      tags: Array.isArray(baseRecipe.tags) ? [...baseRecipe.tags] : [],
+      nutrition: {
+        ...(baseRecipe.nutrition || emptyNutrition()),
+        energy,
+        kcal: energy,
+        salt
+      }
+    };
+  }
+  function removeRecipeIdFromWeeklyMenus(recipeId) {
+    if (!recipeId) return false;
+    let changed = false;
+    Object.keys(state.weeklyMenus || {}).forEach((weekStart) => {
+      const week = state.weeklyMenus[weekStart];
+      if (!week) return;
+      WEEKDAY_KEYS.forEach((dayKey) => {
+        const dayMenu = week[dayKey];
+        if (!dayMenu) return;
+        ["staple", "soup", "main", "side1", "side2", "dessert"].forEach((field) => {
+          if (dayMenu.basic?.[field] === recipeId) {
+            dayMenu.basic[field] = null;
+            changed = true;
+          }
+        });
+        ["singleDish", "extraSoup", "extraSide", "extraDessert"].forEach((field) => {
+          if (dayMenu.exception?.[field] === recipeId) {
+            dayMenu.exception[field] = null;
+            changed = true;
+          }
+        });
+        if (dayMenu.snack === recipeId) {
+          dayMenu.snack = null;
+          changed = true;
+        }
+      });
+    });
+    return changed;
   }
   getWeekMenus = function (weekStart) {
     const base = createEmptyWeekMenu(weekStart);
@@ -2078,7 +2252,7 @@
       saveStorage(STORAGE_KEYS.settings, state.settings);
       renderAll();
     });
-    Array.from(document.querySelectorAll('[data-recipe-card]')).forEach((card) => { card.addEventListener('click', () => { state.selectedRecipeId = card.dataset.recipeCard; renderAdminView(); }); });
+    Array.from(document.querySelectorAll('[data-recipe-card]')).forEach((card) => { card.addEventListener('click', () => { state.selectedRecipeId = card.dataset.recipeCard; state.recipeMasterMode = "view"; state.recipeMasterDraft = null; state.recipeMasterDraftError = ""; renderAdminView(); }); });
     Array.from(document.querySelectorAll('[data-recipe-filter]')).forEach((button) => {
       button.addEventListener('click', () => {
         state.adminRecipeMasterFilter = button.dataset.recipeFilter || "all";
@@ -2118,6 +2292,142 @@
     searchInput?.addEventListener('search', () => {
       if (state.isRecipeMasterComposing) return;
       applyRecipeMasterSearch();
+    });
+    document.querySelector('#recipe-master-add-button')?.addEventListener('click', () => {
+      state.recipeMasterMode = "create";
+      state.recipeMasterDraft = createEmptyRecipeMasterDraft();
+      state.recipeMasterDraftError = "";
+      renderAdminView();
+    });
+    document.querySelector('#recipe-master-edit-button')?.addEventListener('click', () => {
+      const recipe = getRecipeMap().get(state.selectedRecipeId);
+      if (!recipe) return;
+      state.recipeMasterMode = "edit";
+      state.recipeMasterDraft = createRecipeDraftFromRecipe(recipe);
+      state.recipeMasterDraftError = "";
+      renderAdminView();
+    });
+    document.querySelector('#recipe-master-delete-button')?.addEventListener('click', () => {
+      const recipe = getRecipeMap().get(state.selectedRecipeId);
+      if (!recipe) return;
+      if (!window.confirm("この料理を削除しますか？")) return;
+      if (isCustomRecipeId(recipe.id)) {
+        state.customRecipes = (state.customRecipes || []).filter((item) => item.id !== recipe.id);
+        saveStorage(STORAGE_KEYS.customRecipes, state.customRecipes);
+      } else {
+        state.hiddenDefaultRecipeIds = [...new Set([...(state.hiddenDefaultRecipeIds || []), recipe.id])];
+        saveStorage(STORAGE_KEYS.hiddenDefaultRecipeIds, state.hiddenDefaultRecipeIds);
+        if (state.customRecipeOverrides?.[recipe.id]) {
+          const nextOverrides = { ...(state.customRecipeOverrides || {}) };
+          delete nextOverrides[recipe.id];
+          state.customRecipeOverrides = nextOverrides;
+          saveStorage(STORAGE_KEYS.customRecipeOverrides, state.customRecipeOverrides);
+        }
+      }
+      if (removeRecipeIdFromWeeklyMenus(recipe.id)) {
+        syncMenuHistoryStorage();
+        saveStorage(STORAGE_KEYS.weeklyMenus, state.weeklyMenus);
+      }
+      state.recipeMasterMode = "view";
+      state.recipeMasterDraft = null;
+      state.recipeMasterDraftError = "";
+      const filteredRecipes = getRecipeMasterFilteredRecipes(getAllRecipes(), getRecipeMasterFilterValue(), getRecipeMasterSearchValue());
+      state.selectedRecipeId = filteredRecipes[0]?.id || getAllRecipes()[0]?.id || null;
+      renderAll();
+    });
+    const syncRecipeMasterDraft = () => {
+      if (state.recipeMasterMode !== "create" && state.recipeMasterMode !== "edit") return;
+      state.recipeMasterDraft = collectRecipeMasterDraftFromDom();
+    };
+    Array.from(document.querySelectorAll('[data-recipe-master-draft]')).forEach((input) => {
+      input.addEventListener('input', syncRecipeMasterDraft);
+      input.addEventListener('change', syncRecipeMasterDraft);
+    });
+    document.querySelector('#recipe-master-ai-button')?.addEventListener('click', () => {
+      const currentDraft = collectRecipeMasterDraftFromDom();
+      const recipeName = (currentDraft.name || "").trim();
+      state.recipeMasterDraft = currentDraft;
+      if (!recipeName) {
+        state.recipeMasterDraftError = "料理名を先に入力してください。";
+        renderAdminView();
+        return;
+      }
+      state.recipeMasterDraftError = "";
+      state.recipeMasterAiLoading = true;
+      renderAdminView();
+      window.setTimeout(async () => {
+        try {
+          const aiResult = await callRecipeAutofillAI(recipeName);
+          state.recipeMasterDraft = mergeRecipeMasterDraftWithAiResult(currentDraft, aiResult);
+          state.recipeMasterDraftError = "";
+        } catch (_error) {
+          state.recipeMasterDraft = currentDraft;
+          state.recipeMasterDraftError = _error instanceof Error && _error.message
+            ? _error.message
+            : "AI入力に失敗しました。もう一度お試しください。";
+        } finally {
+          state.recipeMasterAiLoading = false;
+          renderAdminView();
+        }
+      }, 0);
+    });
+    document.querySelector('#recipe-master-cancel-button')?.addEventListener('click', () => {
+      state.recipeMasterMode = "view";
+      state.recipeMasterDraft = null;
+      state.recipeMasterDraftError = "";
+      renderAdminView();
+    });
+    document.querySelector('#recipe-master-save-button')?.addEventListener('click', () => {
+      const draft = collectRecipeMasterDraftFromDom();
+      state.recipeMasterDraft = draft;
+      const normalizedName = (draft.name || "").trim();
+      if (!normalizedName || !draft.category || !draft.cuisine) {
+        state.recipeMasterDraftError = "料理名、カテゴリ、cuisine は必須です。";
+        renderAdminView();
+        return;
+      }
+      const duplicateRecipe = getAllRecipes().find((recipe) => recipe.name === normalizedName && recipe.id !== state.selectedRecipeId);
+      if (duplicateRecipe) {
+        state.recipeMasterDraftError = "同じ料理名が既にあります。";
+        renderAdminView();
+        return;
+      }
+      if (state.recipeMasterMode === "edit") {
+        const selectedRecipe = getRecipeMap().get(state.selectedRecipeId);
+        if (!selectedRecipe) {
+          state.recipeMasterDraftError = "編集対象の料理が見つかりません。";
+          renderAdminView();
+          return;
+        }
+        const editedRecipe = buildRecipeMasterEditedRecipeFromDraft(selectedRecipe, draft);
+        if (isCustomRecipeId(selectedRecipe.id)) {
+          state.customRecipes = normalizeCustomRecipes(state.customRecipes || []).map((recipe) => recipe.id === selectedRecipe.id ? editedRecipe : recipe);
+          saveStorage(STORAGE_KEYS.customRecipes, state.customRecipes);
+        } else {
+          state.customRecipeOverrides = {
+            ...(state.customRecipeOverrides || {}),
+            [selectedRecipe.id]: editedRecipe
+          };
+          saveStorage(STORAGE_KEYS.customRecipeOverrides, state.customRecipeOverrides);
+        }
+        state.selectedRecipeId = editedRecipe.id;
+        state.recipeMasterMode = "view";
+        state.recipeMasterDraft = null;
+        state.recipeMasterDraftError = "";
+        renderAll();
+        return;
+      }
+      const customRecipe = buildRecipeMasterCustomRecipeFromDraft(draft);
+      state.customRecipes = [...(state.customRecipes || []), customRecipe];
+      saveStorage(STORAGE_KEYS.customRecipes, state.customRecipes);
+      state.selectedRecipeId = customRecipe.id;
+      state.recipeMasterMode = "view";
+      state.recipeMasterDraft = null;
+      state.recipeMasterDraftError = "";
+      state.adminRecipeMasterFilter = "all";
+      state.adminRecipeMasterSearch = "";
+      state.adminRecipeMasterSearchDraft = "";
+      renderAdminView();
     });
   };
   const RECIPE_MASTER_FILTER_OPTIONS = [
@@ -2162,6 +2472,182 @@
     }
     window.scrollTo(scrollX, scrollY);
   }
+  function createRecipeMasterCustomRecipe(recipe) {
+    return {
+      id: recipe.id,
+      name: recipe.name,
+      category: recipe.category,
+      cuisine: recipe.cuisine,
+      notes: recipe.notes || "",
+      servingSize: recipe.servingSize || recipe.servingWeight || 100,
+      rotationKey: recipe.rotationKey || recipe.name,
+      tags: Array.isArray(recipe.tags) ? [...recipe.tags] : [],
+      nutrition: recipe.nutrition ? { ...recipe.nutrition } : emptyNutrition(),
+      ingredients: normalizeParts(recipe.ingredients || []).map((partItem) => ({ ...partItem })),
+      seasonings: normalizeParts(recipe.seasonings || []).map((partItem) => ({ ...partItem })),
+      instructions: Array.isArray(recipe.instructions) ? [...recipe.instructions] : (Array.isArray(recipe.steps) ? [...recipe.steps] : [])
+    };
+  }
+  function createEmptyRecipeMasterDraft() {
+    return {
+      name: "",
+      category: "主菜",
+      cuisine: "和食",
+      description: "",
+      notes: "",
+      servingSize: "100",
+      steps: "",
+      energy: "0",
+      salt: "0"
+    };
+  }
+  function collectRecipeMasterDraftFromDom() {
+    return {
+      name: document.querySelector('#recipe-master-draft-name')?.value || "",
+      category: document.querySelector('#recipe-master-draft-category')?.value || "",
+      cuisine: document.querySelector('#recipe-master-draft-cuisine')?.value || "",
+      description: document.querySelector('#recipe-master-draft-description')?.value || "",
+      notes: document.querySelector('#recipe-master-draft-notes')?.value || "",
+      servingSize: document.querySelector('#recipe-master-draft-serving-size')?.value || "",
+      steps: document.querySelector('#recipe-master-draft-steps')?.value || "",
+      energy: document.querySelector('#recipe-master-draft-energy')?.value || "",
+      salt: document.querySelector('#recipe-master-draft-salt')?.value || ""
+    };
+  }
+  function buildRecipeMasterCustomRecipeFromDraft(draft) {
+    const normalizedName = (draft.name || "").trim();
+    const servingSize = Math.max(1, Number(draft.servingSize || 100));
+    const energy = Number(draft.energy || 0);
+    const salt = Number(draft.salt || 0);
+    const stepsArray = (draft.steps || "").split(/\r?\n/).map((step) => step.trim()).filter(Boolean);
+    return {
+      id: `custom-recipe-${Date.now()}`,
+      name: normalizedName,
+      category: draft.category,
+      cuisine: draft.cuisine,
+      description: draft.description || "",
+      notes: draft.notes || "",
+      ingredients: [],
+      seasonings: [],
+      instructions: stepsArray.length ? stepsArray : ["手順未設定"],
+      steps: stepsArray.length ? stepsArray : ["手順未設定"],
+      servingSize,
+      servings: 1,
+      servingWeight: servingSize,
+      rotationKey: normalizedName,
+      tags: ["custom"],
+      nutrition: {
+        energy,
+        protein: 0,
+        fat: 0,
+        carbs: 0,
+        fiber: 0,
+        salt,
+        kcal: energy
+      }
+    };
+  }
+  function renderRecipeMasterAiRow() {
+    return `<div class="recipe-master-ai-row"><p class="recipe-master-ai-note">AI下書き。内容確認後に保存してください。</p><button type="button" class="button button-secondary recipe-master-ai-button${state.recipeMasterAiLoading ? " is-loading" : ""}" id="recipe-master-ai-button" ${state.recipeMasterAiLoading ? "disabled" : ""}>${state.recipeMasterAiLoading ? "AI入力中..." : "AI"}</button></div>`;
+  }
+  function getRecipeMasterAiApiKey() {
+    const globalKey = typeof globalThis.MOGU_AI_API_KEY === "string" ? globalThis.MOGU_AI_API_KEY.trim() : "";
+    if (globalKey) return globalKey;
+    try {
+      const storedKey = globalThis.localStorage?.getItem(STORAGE_KEYS.aiApiKey) || "";
+      return storedKey.trim();
+    } catch (_error) {
+      return "";
+    }
+  }
+  function extractRecipeMasterAiJson(text) {
+    const trimmed = (text || "").trim();
+    if (!trimmed) return "{}";
+    const fenceMatch = trimmed.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
+    if (fenceMatch?.[1]) {
+      return fenceMatch[1].trim();
+    }
+    const start = trimmed.indexOf("{");
+    const end = trimmed.lastIndexOf("}");
+    if (start >= 0 && end > start) {
+      return trimmed.slice(start, end + 1);
+    }
+    return trimmed;
+  }
+  async function callRecipeAutofillAI(recipeName) {
+    const apiKey = getRecipeMasterAiApiKey();
+    if (!apiKey) {
+      throw new Error("AI APIキーが設定されていません。");
+    }
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(apiKey)}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        systemInstruction: {
+          parts: [{
+            text: "あなたは高齢者施設向け昼食献立アプリの補助AIです。料理名から管理栄養士が確認しやすい下書きをJSONのみで返してください。カテゴリは 主食 / 汁物 / 主菜 / 副菜 / デザート / おやつ / 単品料理 のどれかだけ、cuisine は 和食 / 洋食 / 中華 のどれかだけを使ってください。servingSize は g の数値、energy は kcal の数値、salt は g の数値です。steps は調理士が分かる短い手順配列にしてください。不明な項目は推測しすぎず控えめな妥当値にしてください。JSON以外は返さないでください。"
+          }]
+        },
+        contents: [{
+          role: "user",
+          parts: [{
+            text: `料理名: ${recipeName}\n上記の料理名に対して、category, cuisine, servingSize, description, notes, steps, nutrition.energy, nutrition.salt をJSONで返してください。`
+          }]
+        }],
+        generationConfig: {
+          temperature: 0.2,
+          responseMimeType: "application/json"
+        }
+      })
+    });
+    if (!response.ok) {
+      throw new Error("AI入力に失敗しました。もう一度お試しください。");
+    }
+    const data = await response.json();
+    const responseText = data?.candidates?.[0]?.content?.parts?.map((part) => part?.text || "").join("\n").trim();
+    if (!responseText) {
+      throw new Error("AI入力に失敗しました。もう一度お試しください。");
+    }
+    return JSON.parse(extractRecipeMasterAiJson(responseText));
+  }
+  function mergeRecipeMasterDraftWithAiResult(draft, aiResult) {
+    const nextDraft = { ...(draft || createEmptyRecipeMasterDraft()) };
+    const allowedCategories = new Set(["主食", "汁物", "主菜", "副菜", "デザート", "おやつ", "単品料理"]);
+    const allowedCuisines = new Set(["和食", "洋食", "中華"]);
+    const category = typeof aiResult?.category === "string" ? aiResult.category.trim() : "";
+    const cuisine = typeof aiResult?.cuisine === "string" ? aiResult.cuisine.trim() : "";
+    const description = typeof aiResult?.description === "string" ? aiResult.description.trim() : "";
+    const notes = typeof aiResult?.notes === "string" ? aiResult.notes.trim() : "";
+    const servingSize = Number(aiResult?.servingSize);
+    const energy = Number(aiResult?.nutrition?.energy);
+    const salt = Number(aiResult?.nutrition?.salt);
+    const steps = Array.isArray(aiResult?.steps)
+      ? aiResult.steps.map((step) => `${step || ""}`.trim()).filter(Boolean).join("\n")
+      : (typeof aiResult?.steps === "string" ? aiResult.steps.trim() : "");
+    return {
+      ...nextDraft,
+      category: allowedCategories.has(category) ? category : nextDraft.category,
+      cuisine: allowedCuisines.has(cuisine) ? cuisine : nextDraft.cuisine,
+      servingSize: Number.isFinite(servingSize) && servingSize > 0 ? `${Math.round(servingSize)}` : nextDraft.servingSize,
+      description: description || nextDraft.description,
+      notes: notes || nextDraft.notes,
+      steps: steps || nextDraft.steps,
+      energy: Number.isFinite(energy) ? `${Math.round(energy)}` : nextDraft.energy,
+      salt: Number.isFinite(salt) ? `${Math.round(salt * 10) / 10}` : nextDraft.salt
+    };
+  }
+  function renderRecipeMasterCreatePanel() {
+    const draft = state.recipeMasterDraft || createEmptyRecipeMasterDraft();
+    const categoryOptions = ["主食", "汁物", "主菜", "副菜", "デザート", "おやつ", "単品料理"]
+      .map((category) => `<option value="${escapeHtml(category)}" ${draft.category === category ? "selected" : ""}>${escapeHtml(category)}</option>`)
+      .join("");
+    const cuisineOptions = ["和食", "洋食", "中華"]
+      .map((cuisine) => `<option value="${escapeHtml(cuisine)}" ${draft.cuisine === cuisine ? "selected" : ""}>${escapeHtml(cuisine)}</option>`)
+      .join("");
+    return `<article class="card recipe-detail"><div class="sub-head"><div><p class="section-kicker">New Selected Recipe</p><h3>新しいメニューを追加</h3></div><span class="pill">customRecipes</span></div>${state.recipeMasterDraftError ? `<p class="recipe-master-form-error">${escapeHtml(state.recipeMasterDraftError)}</p>` : ""}${renderRecipeMasterAiRow()}<div class="recipe-master-form-grid"><label class="field"><span>料理名</span><input id="recipe-master-draft-name" data-recipe-master-draft="name" type="text" value="${escapeHtml(draft.name)}"></label><label class="field"><span>カテゴリ</span><select id="recipe-master-draft-category" data-recipe-master-draft="category">${categoryOptions}</select></label><label class="field"><span>cuisine</span><select id="recipe-master-draft-cuisine" data-recipe-master-draft="cuisine">${cuisineOptions}</select></label><label class="field"><span>1人前量</span><input id="recipe-master-draft-serving-size" data-recipe-master-draft="servingSize" type="number" min="1" step="1" value="${escapeHtml(draft.servingSize)}"></label><label class="field is-full"><span>説明</span><textarea id="recipe-master-draft-description" data-recipe-master-draft="description">${escapeHtml(draft.description)}</textarea></label><label class="field is-full"><span>メモ / 注意点</span><textarea id="recipe-master-draft-notes" data-recipe-master-draft="notes">${escapeHtml(draft.notes)}</textarea></label><label class="field is-full"><span>手順</span><textarea id="recipe-master-draft-steps" data-recipe-master-draft="steps">${escapeHtml(draft.steps)}</textarea></label><label class="field"><span>エネルギー</span><input id="recipe-master-draft-energy" data-recipe-master-draft="energy" type="number" step="1" value="${escapeHtml(draft.energy)}"></label><label class="field"><span>塩分</span><input id="recipe-master-draft-salt" data-recipe-master-draft="salt" type="number" step="0.1" value="${escapeHtml(draft.salt)}"></label></div><div class="recipe-master-form-actions"><button type="button" class="button button-secondary" id="recipe-master-cancel-button">キャンセル</button><button type="button" class="button button-primary" id="recipe-master-save-button">追加保存</button></div></article>`;
+  }
   function getRecipeMasterFilteredRecipes(recipes, filterValue, searchValue) {
     const normalizedSearch = (searchValue || "").trim().toLocaleLowerCase("ja");
     const categoryFiltered = filterValue === "all"
@@ -2179,13 +2665,16 @@
     const selectedRecipe = filteredRecipes.find((recipe) => recipe.id === state.selectedRecipeId) || null;
     const filterButtons = RECIPE_MASTER_FILTER_OPTIONS.map((option) => `<button type="button" class="button button-secondary recipe-master-filter-button ${option.value === activeFilter ? "is-active" : ""}" data-recipe-filter="${escapeHtml(option.value)}">${escapeHtml(option.label)}</button>`).join("");
     const searchField = `<div class="recipe-master-filter-search"><input id="recipe-master-search" class="recipe-master-search-input" type="search" placeholder="\u6599\u7406\u540d\u3067\u691c\u7d22" value="${escapeHtml(searchInputValue)}"></div>`;
+    const addButton = `<div class="recipe-master-filter-actions"><button type="button" class="button button-primary recipe-master-add-button${state.adminRecipeMasterAddState ? ` is-${state.adminRecipeMasterAddState}` : ""}" id="recipe-master-add-button" ${selectedRecipe ? "" : "disabled"}>\u30e1\u30cb\u30e5\u30fc\u8ffd\u52a0</button></div>`;
     const recipeCards = filteredRecipes.length
       ? filteredRecipes.map((recipe) => `<article class="recipe-card ${recipe.id === state.selectedRecipeId ? "is-active" : ""}" data-recipe-card="${recipe.id}"><div class="sub-head"><div><h3>${escapeHtml(recipe.name)}</h3><span class="tag">${escapeHtml(recipe.cuisine)} / ${escapeHtml(recipe.category)}</span></div><span class="pill">${formatNumber(recipe.nutrition.energy, 0)} kcal</span></div></article>`).join("")
       : `<article class="card"><div class="empty-state">\u8a72\u5f53\u3059\u308b\u6599\u7406\u304c\u3042\u308a\u307e\u305b\u3093\u3002</div></article>`;
-    const recipeDetail = selectedRecipe
-      ? renderRecipeDetailPanel(selectedRecipe)
-      : `<article class="card recipe-detail"><div class="empty-state">\u6599\u7406\u3092\u9078\u3076\u3068\u8a73\u7d30\u304c\u8868\u793a\u3055\u308c\u307e\u3059\u3002</div></article>`;
-    return `<div class="section-head"><div><p class="section-kicker">Recipe Master</p><h2>\u6599\u7406\u4e00\u89a7</h2></div></div><div class="recipe-master-filter-bar">${filterButtons}${searchField}</div><div class="detail-grid"><div class="recipe-list">${recipeCards}</div>${recipeDetail}</div>`;
+    const recipeDetail = state.recipeMasterMode === "create"
+      ? renderRecipeMasterCreatePanel()
+      : (selectedRecipe
+        ? renderRecipeDetailPanel(selectedRecipe)
+        : `<article class="card recipe-detail"><div class="empty-state">\u6599\u7406\u3092\u9078\u3076\u3068\u8a73\u7d30\u304c\u8868\u793a\u3055\u308c\u307e\u3059\u3002</div></article>`);
+    return `<div class="section-head"><div><p class="section-kicker">Recipe Master</p><h2>\u6599\u7406\u4e00\u89a7</h2></div></div><div class="recipe-master-filter-bar">${filterButtons}${searchField}${addButton}</div><div class="detail-grid"><div class="recipe-list">${recipeCards}</div>${recipeDetail}</div>`;
   }
   function renderWeeklyEditorPanel(week, recipes) {
     const byCategory = (category) => recipes.filter((recipe) => recipe.category === category).sort((a, b) => a.name.localeCompare(b.name, "ja"));
