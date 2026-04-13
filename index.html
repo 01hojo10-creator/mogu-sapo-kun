@@ -1269,27 +1269,54 @@
       localStorage.setItem(key, JSON.stringify(value));
     }
 
-    function mondayString(date) {
-      const copy = new Date(date);
-      const day = copy.getDay();
-      const diff = day === 0 ? -6 : 1 - day;
-      copy.setDate(copy.getDate() + diff);
-      return `${copy.getFullYear()}-${String(copy.getMonth() + 1).padStart(2, "0")}-${String(copy.getDate()).padStart(2, "0")}`;
-    }
+  function parseLocalDate(dateInput) {
+  if (dateInput instanceof Date) {
+    return new Date(dateInput.getFullYear(), dateInput.getMonth(), dateInput.getDate());
+  }
 
-    function addDays(dateString, days) {
-      const date = new Date(dateString);
-      date.setDate(date.getDate() + days);
-      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+  if (typeof dateInput === "string") {
+    const match = dateInput.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (match) {
+      const year = Number(match[1]);
+      const month = Number(match[2]);
+      const day = Number(match[3]);
+      return new Date(year, month - 1, day);
     }
+  }
 
-    function formatDate(dateString) {
-      return new Intl.DateTimeFormat("ja-JP", { month: "numeric", day: "numeric" }).format(new Date(dateString));
-    }
+  const fallback = new Date(dateInput);
+  return new Date(fallback.getFullYear(), fallback.getMonth(), fallback.getDate());
+}
 
-    function formatWeekLabel(weekStart) {
-      return `${formatDate(weekStart)} - ${formatDate(addDays(weekStart, 4))}`;
-    }
+function formatLocalDateKey(date) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+}
+
+function mondayString(dateInput) {
+  const copy = parseLocalDate(dateInput);
+  const day = copy.getDay();
+  const diff = day === 0 ? -6 : 1 - day;
+  copy.setDate(copy.getDate() + diff);
+  return formatLocalDateKey(copy);
+}
+
+function addDays(dateInput, days) {
+  const date = parseLocalDate(dateInput);
+  date.setDate(date.getDate() + days);
+  return formatLocalDateKey(date);
+}
+
+function formatDate(dateInput) {
+  const date = parseLocalDate(dateInput);
+  return new Intl.DateTimeFormat("ja-JP", {
+    month: "numeric",
+    day: "numeric"
+  }).format(date);
+}
+
+function formatWeekLabel(weekStart) {
+  return `${formatDate(weekStart)} - ${formatDate(addDays(weekStart, 4))}`;
+}
 
     function formatNumber(value, digits) {
       return Number(value || 0).toFixed(digits);
@@ -1820,7 +1847,7 @@
       return draft;
     }
   </script>
-  <script src="./enhancements.js?v=20260413-openai1"></script>
+  <script src="./enhancements.js?v=20260413-openai2"></script>
   <script>
     (function () {
       const viewIds = ["resident-view", "kitchen-view", "admin-view"];
