@@ -2356,18 +2356,25 @@
   }
   function setBirthdayWeekRuleEnabled(value) {
     state.settings.birthdayThirdWeekEnabled = Boolean(value);
+  }  
+function parseLocalDate(dateInput) {
+  if (dateInput instanceof Date) {
+    return new Date(dateInput.getFullYear(), dateInput.getMonth(), dateInput.getDate());
   }
-  function isThirdWeekRuleWeek(weekStart) {
-    const targetMonday = new Date(weekStart);
-    const monthStart = new Date(targetMonday.getFullYear(), targetMonday.getMonth(), 1);
-    const monthStartWeekday = monthStart.getDay();
-    const offsetToMonday = monthStartWeekday === 0 ? -6 : 1 - monthStartWeekday;
-    const firstWeekMonday = new Date(monthStart);
-    firstWeekMonday.setDate(monthStart.getDate() + offsetToMonday);
-    const thirdWeekMonday = new Date(firstWeekMonday);
-    thirdWeekMonday.setDate(firstWeekMonday.getDate() + 14);
-    return mondayString(targetMonday) === mondayString(thirdWeekMonday);
+
+  if (typeof dateInput === "string") {
+    const match = dateInput.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (match) {
+      const year = Number(match[1]);
+      const month = Number(match[2]);
+      const day = Number(match[3]);
+      return new Date(year, month - 1, day);
+    }
   }
+
+  const fallback = new Date(dateInput);
+  return new Date(fallback.getFullYear(), fallback.getMonth(), fallback.getDate());
+  }  
   function businessDaysBetween(fromDate, toDate) {
     const from = new Date(fromDate);
     const to = new Date(toDate);
