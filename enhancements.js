@@ -760,6 +760,397 @@
     });
     return recipes;
   }
+  function buildAdditionalSingleDishes() {
+    const dish = (definition) => createRecipe({
+      ...definition,
+      category: definition.id.startsWith("single-plus2-") ? "主食" : "単品料理",
+      notes: definition.notes || "主食の完成メニューとして、そのまま提供する。",
+      description: definition.description || `${definition.name}を主食の完成メニューとして提供する。`,
+      tags: ["追加レシピ", "完成主食", ...(definition.tags || [])]
+    });
+    const definitions = [
+      { id: "single-plus-jp-soboro-bowl", name: "鶏そぼろ丼", cuisine: "和食", servingSize: 300, rotationKey: "丼", tags: ["丼もの"], ingredients: [part("rice", 145), part("chicken_breast", 55), part("egg", 18), part("green_peas", 10)], seasonings: [part("broth", 30), part("soy_sauce", 4), part("mirin", 4), part("sugar", 2)], instructions: ["具材をやわらかく煮てそぼろ状にまとめる。", "ごはんにのせて提供する。"] },
+      { id: "single-plus-jp-salmon-bowl", name: "鮭ほぐし丼", cuisine: "和食", servingSize: 295, rotationKey: "丼", tags: ["丼もの"], ingredients: [part("rice", 145), part("salmon", 50), part("egg", 16), part("komatsuna", 12)], seasonings: [part("broth", 25), part("soy_sauce", 3), part("mirin", 3)], instructions: ["鮭をやわらかく加熱してほぐす。", "ごはんに彩りよく盛り付ける。"] },
+      { id: "single-plus-jp-pork-bowl", name: "豚のしょうが丼", cuisine: "和食", servingSize: 300, rotationKey: "丼", tags: ["丼もの"], ingredients: [part("rice", 145), part("pork_lean", 55), part("onion", 25), part("carrot", 12)], seasonings: [part("broth", 25), part("soy_sauce", 4), part("mirin", 3)], instructions: ["豚肉と玉ねぎをやわらかく煮る。", "ごはんにのせて提供する。"] },
+      { id: "single-plus-jp-tofu-bowl", name: "豆腐そぼろ丼", cuisine: "和食", servingSize: 295, rotationKey: "丼", tags: ["丼もの"], ingredients: [part("rice", 145), part("tofu", 85), part("pork_mince", 20), part("green_peas", 10)], seasonings: [part("broth", 25), part("soy_sauce", 3), part("mirin", 3), part("starch", 1)], instructions: ["豆腐とそぼろをやわらかく煮る。", "軽くとろみをつけてごはんにのせる。"] },
+      { id: "single-plus-jp-mushroom-oyako", name: "きのこ親子丼", cuisine: "和食", servingSize: 305, rotationKey: "丼", tags: ["丼もの"], ingredients: [part("rice", 145), part("chicken_thigh", 50), part("egg", 28), part("mushrooms", 20), part("onion", 20)], seasonings: [part("broth", 30), part("soy_sauce", 4), part("mirin", 4)], instructions: ["具材をだしでやわらかく煮る。", "卵でとじてごはんにのせる。"] },
+      { id: "single-plus-jp-fish-bowl", name: "白身魚あんかけ丼", cuisine: "和食", servingSize: 300, rotationKey: "丼", tags: ["丼もの"], ingredients: [part("rice", 145), part("white_fish", 55), part("chinese_cabbage", 25), part("carrot", 12)], seasonings: [part("broth", 30), part("light_soy", 3), part("starch", 2)], instructions: ["白身魚と野菜をやわらかく煮る。", "とろみあんにしてごはんへかける。"] },
+      { id: "single-plus-jp-egg-bowl", name: "たまごあん丼", cuisine: "和食", servingSize: 290, rotationKey: "丼", tags: ["丼もの"], ingredients: [part("rice", 145), part("egg", 40), part("onion", 20), part("mushrooms", 15)], seasonings: [part("broth", 35), part("soy_sauce", 3), part("starch", 2)], instructions: ["具材をだしで煮て卵を加える。", "あんにしてごはんへかける。"] },
+      { id: "single-plus-jp-root-bowl", name: "根菜そぼろ丼", cuisine: "和食", servingSize: 300, rotationKey: "丼", tags: ["丼もの"], ingredients: [part("rice", 145), part("chicken_breast", 45), part("carrot", 15), part("burdock", 18), part("lotus_root", 15)], seasonings: [part("broth", 28), part("soy_sauce", 4), part("mirin", 3)], instructions: ["根菜をやわらかく煮る。", "そぼろと合わせてごはんにのせる。"] },
+      { id: "single-plus-jp-shrimp-bowl", name: "えびたま丼", cuisine: "和食", servingSize: 295, rotationKey: "丼", tags: ["丼もの"], ingredients: [part("rice", 145), part("shrimp", 40), part("egg", 30), part("onion", 18)], seasonings: [part("broth", 28), part("soy_sauce", 3), part("mirin", 3)], instructions: ["えびと玉ねぎをやわらかく煮る。", "卵でとじてごはんにのせる。"] },
+      { id: "single-plus-jp-green-bowl", name: "青菜あん丼", cuisine: "和食", servingSize: 295, rotationKey: "丼", tags: ["丼もの"], ingredients: [part("rice", 145), part("komatsuna", 25), part("tofu", 55), part("carrot", 10)], seasonings: [part("broth", 28), part("light_soy", 3), part("starch", 2)], instructions: ["青菜と豆腐をやわらかく煮る。", "あんにしてごはんへかける。"] },
+      { id: "single-plus-west-chicken-curry", name: "チキンカレー", cuisine: "洋食", servingSize: 335, rotationKey: "カレー", tags: ["カレー"], ingredients: [part("rice", 150), part("chicken_thigh", 65), part("potato", 45), part("onion", 30), part("carrot", 20)], seasonings: [part("curry_roux", 18), part("broth", 55)], instructions: ["具材をやわらかく煮る。", "カレーに仕上げてごはんに添える。"] },
+      { id: "single-plus-west-pork-curry", name: "ポークカレー", cuisine: "洋食", servingSize: 335, rotationKey: "カレー", tags: ["カレー"], ingredients: [part("rice", 150), part("pork_lean", 60), part("potato", 45), part("onion", 30), part("carrot", 20)], seasonings: [part("curry_roux", 18), part("broth", 55)], instructions: ["具材をやわらかく煮る。", "カレーに仕上げてごはんに添える。"] },
+      { id: "single-plus-west-mushroom-curry", name: "きのこカレーライス", cuisine: "洋食", servingSize: 325, rotationKey: "カレー", tags: ["カレー"], ingredients: [part("rice", 150), part("mushrooms", 35), part("onion", 30), part("corn", 15)], seasonings: [part("curry_roux", 17), part("broth", 55)], instructions: ["具材をやわらかく煮る。", "香りよくカレーに仕上げる。"] },
+      { id: "single-plus-west-vegetable-curry", name: "野菜カレーライス", cuisine: "洋食", servingSize: 325, rotationKey: "カレー", tags: ["カレー"], ingredients: [part("rice", 150), part("potato", 40), part("pumpkin", 30), part("onion", 25), part("carrot", 18)], seasonings: [part("curry_roux", 17), part("broth", 55)], instructions: ["野菜をやわらかく煮る。", "ルウを溶かしてごはんに添える。"] },
+      { id: "single-plus-west-cutlet-curry", name: "カツカレー", cuisine: "洋食", servingSize: 340, rotationKey: "カレー", tags: ["カレー"], ingredients: [part("rice", 150), part("pork_lean", 60, { label: "やわらかカツ用豚肉" }), part("egg", 12), part("flour", 6), part("onion", 25), part("carrot", 18)], seasonings: [part("curry_roux", 18), part("broth", 55)], instructions: ["豚肉をやわらかく加熱し、カツ仕立てに整える。", "カレーをかけてごはんと合わせる。"] },
+      { id: "single-plus-west-hayashi", name: "ハヤシライス", cuisine: "洋食", servingSize: 330, rotationKey: "ハヤシ", tags: ["洋食主食"], ingredients: [part("rice", 150), part("beef_mince", 45), part("onion", 35), part("mushrooms", 25)], seasonings: [part("ketchup", 8), part("tomato", 28), part("consomme", 2), part("broth", 35)], instructions: ["具材をやわらかく煮る。", "ハヤシソースにまとめてごはんに添える。"] },
+      { id: "single-plus-west-mushroom-hayashi", name: "きのこハヤシライス", cuisine: "洋食", servingSize: 325, rotationKey: "ハヤシ", tags: ["洋食主食"], ingredients: [part("rice", 150), part("mushrooms", 35), part("onion", 30), part("beef_mince", 35)], seasonings: [part("ketchup", 8), part("tomato", 28), part("consomme", 2), part("broth", 35)], instructions: ["きのこをやわらかく煮る。", "ハヤシソースでまとめてごはんに添える。"] },
+      { id: "single-plus-west-cheese-curry", name: "チーズカレーライス", cuisine: "洋食", servingSize: 330, rotationKey: "カレー", tags: ["カレー", "チーズ"], ingredients: [part("rice", 150), part("chicken_breast", 55), part("potato", 40), part("onion", 28), part("cheese", 10)], seasonings: [part("curry_roux", 17), part("broth", 50)], instructions: ["具材をやわらかく煮る。", "カレーにチーズを合わせてごはんに添える。"] },
+      { id: "single-plus-west-dry-pilaf", name: "ドライカレーピラフ", cuisine: "洋食", servingSize: 305, rotationKey: "ピラフ", tags: ["洋食主食"], ingredients: [part("rice", 145), part("beef_mince", 40), part("onion", 25), part("carrot", 15), part("corn", 12)], seasonings: [part("curry_roux", 10), part("ketchup", 4), part("consomme", 2)], instructions: ["具材を炒めて味をまとめる。", "ごはんと合わせて提供する。"] },
+      { id: "single-plus-west-chicken-rice", name: "チキンライス", cuisine: "洋食", servingSize: 300, rotationKey: "洋食主食", tags: ["洋食主食"], ingredients: [part("rice", 145), part("chicken_breast", 45), part("onion", 20), part("green_peas", 10), part("carrot", 12)], seasonings: [part("ketchup", 8), part("consomme", 2), part("butter", 2)], instructions: ["具材をやわらかく加熱する。", "ごはんと合わせてケチャップ味に仕上げる。"] },
+      { id: "single-plus-west-meat-sauce", name: "ミートソーススパゲティ", cuisine: "洋食", servingSize: 270, rotationKey: "パスタ", tags: ["パスタ"], ingredients: [part("pasta", 180), part("beef_mince", 45), part("onion", 20), part("tomato", 30)], seasonings: [part("ketchup", 8), part("consomme", 2)], instructions: ["具材をやわらかく煮てソースにする。", "パスタに合わせて提供する。"] },
+      { id: "single-plus-west-kinoko-pasta", name: "きのこ和風スパゲティ", cuisine: "和食", servingSize: 255, rotationKey: "パスタ", tags: ["パスタ"], ingredients: [part("pasta", 170), part("mushrooms", 30), part("chicken_breast", 28), part("onion", 15)], seasonings: [part("soy_sauce", 4), part("butter", 3)], instructions: ["具材をやわらかく加熱する。", "和風の味でパスタにまとめる。"] },
+      { id: "single-plus-west-tomato-pasta", name: "鶏肉のトマトパスタ", cuisine: "洋食", servingSize: 270, rotationKey: "パスタ", tags: ["パスタ"], ingredients: [part("pasta", 180), part("chicken_breast", 40), part("tomato", 30), part("onion", 18)], seasonings: [part("ketchup", 7), part("consomme", 2)], instructions: ["具材をやわらかく煮る。", "トマト味でパスタと合わせる。"] },
+      { id: "single-plus-west-spinach-cream", name: "ほうれん草クリームパスタ", cuisine: "洋食", servingSize: 270, rotationKey: "パスタ", tags: ["パスタ"], ingredients: [part("pasta", 180), part("spinach", 20), part("chicken_breast", 35), part("onion", 15)], seasonings: [part("milk", 45), part("butter", 3), part("flour", 4), part("consomme", 1), part("salt", 0.2), part("pepper", 0.05)], instructions: ["具材をやわらかく加熱する。", "クリームソースでパスタに合わせる。"] },
+      { id: "single-plus-west-corn-pasta", name: "コーンバターパスタ", cuisine: "洋食", servingSize: 260, rotationKey: "パスタ", tags: ["パスタ"], ingredients: [part("pasta", 175), part("corn", 25), part("onion", 15)], seasonings: [part("butter", 3), part("consomme", 2)], instructions: ["具材をやわらかく加熱する。", "バター風味でパスタと合わせる。"] },
+      { id: "single-plus-west-salmon-pasta", name: "鮭のミルクパスタ", cuisine: "洋食", servingSize: 270, rotationKey: "パスタ", tags: ["パスタ"], ingredients: [part("pasta", 180), part("salmon", 40), part("broccoli", 20), part("onion", 15)], seasonings: [part("milk", 40), part("butter", 2), part("consomme", 1), part("salt", 0.2)], instructions: ["鮭と野菜をやわらかく加熱する。", "ミルクソースでパスタに合わせる。"] },
+      { id: "single-plus-west-shrimp-pasta", name: "えびトマトパスタ", cuisine: "洋食", servingSize: 265, rotationKey: "パスタ", tags: ["パスタ"], ingredients: [part("pasta", 175), part("shrimp", 38), part("tomato", 28), part("onion", 15)], seasonings: [part("ketchup", 7), part("consomme", 2)], instructions: ["えびと野菜をやわらかく煮る。", "トマト味でパスタに合わせる。"] },
+      { id: "single-plus-west-vegetable-pasta", name: "野菜コンソメパスタ", cuisine: "洋食", servingSize: 255, rotationKey: "パスタ", tags: ["パスタ"], ingredients: [part("pasta", 170), part("broccoli", 20), part("carrot", 15), part("corn", 12), part("onion", 15)], seasonings: [part("consomme", 3), part("butter", 2)], instructions: ["野菜をやわらかく加熱する。", "コンソメ味でパスタと合わせる。"] },
+      { id: "single-plus-west-cheese-napolitan", name: "チーズナポリタン", cuisine: "洋食", servingSize: 270, rotationKey: "パスタ", tags: ["パスタ", "チーズ"], ingredients: [part("pasta", 180), part("chicken_breast", 35), part("onion", 18), part("bell_pepper", 12), part("cheese", 10)], seasonings: [part("ketchup", 9), part("consomme", 2)], instructions: ["具材をやわらかく炒める。", "チーズを合わせてパスタに仕上げる。"] },
+      { id: "single-plus-west-mushroom-cream", name: "きのこクリームスパゲティ", cuisine: "洋食", servingSize: 270, rotationKey: "パスタ", tags: ["パスタ"], ingredients: [part("pasta", 180), part("mushrooms", 32), part("onion", 15), part("milk", 20)], seasonings: [part("milk", 35), part("butter", 3), part("flour", 4), part("consomme", 1), part("salt", 0.2)], instructions: ["きのこをやわらかく加熱する。", "クリームソースでパスタと合わせる。"] },
+      { id: "single-plus-jp-yakiudon", name: "やわらか焼うどん", cuisine: "和食", servingSize: 310, rotationKey: "うどん", tags: ["麺類"], ingredients: [part("udon", 190), part("pork_lean", 35), part("cabbage", 25), part("carrot", 12)], seasonings: [part("soy_sauce", 4), part("broth", 20)], instructions: ["具材をやわらかく炒め煮にする。", "うどんと合わせて仕上げる。"] },
+      { id: "single-plus-jp-egg-udon", name: "玉子とじうどん", cuisine: "和食", servingSize: 320, rotationKey: "うどん", tags: ["麺類"], ingredients: [part("udon", 190), part("egg", 28), part("onion", 18), part("komatsuna", 15)], seasonings: [part("broth", 85), part("soy_sauce", 4)], instructions: ["だしに具材を入れてやわらかく煮る。", "卵でとじてうどんに合わせる。"] },
+      { id: "single-plus-jp-kenchin-udon", name: "けんちんうどん", cuisine: "和食", servingSize: 325, rotationKey: "うどん", tags: ["麺類"], ingredients: [part("udon", 190), part("tofu", 50), part("daikon", 20), part("carrot", 15)], seasonings: [part("broth", 85), part("soy_sauce", 4)], instructions: ["具材をやわらかく煮る。", "うどんに合わせて温かく仕上げる。"] },
+      { id: "single-plus-jp-tofu-udon", name: "豆腐あんかけうどん", cuisine: "和食", servingSize: 320, rotationKey: "うどん", tags: ["麺類"], ingredients: [part("udon", 190), part("tofu", 60), part("mushrooms", 20), part("komatsuna", 15)], seasonings: [part("broth", 85), part("soy_sauce", 4), part("starch", 2)], instructions: ["具材をやわらかく煮る。", "うどんにとろみあんをかける。"] },
+      { id: "single-plus-cn-soy-yakisoba", name: "しょうゆ焼きそば", cuisine: "中華", servingSize: 295, rotationKey: "焼きそば", tags: ["麺類"], ingredients: [part("chinese_noodles", 170), part("pork_lean", 35), part("bean_sprouts", 25), part("carrot", 12)], seasonings: [part("soy_sauce", 4), part("sesame_oil", 1), part("broth", 15)], instructions: ["具材をやわらかく炒め煮にする。", "麺と合わせてしょうゆ味に仕上げる。"] },
+      { id: "single-plus-cn-sauce-yakisoba", name: "ソース焼きそば", cuisine: "中華", servingSize: 300, rotationKey: "焼きそば", tags: ["麺類"], ingredients: [part("chinese_noodles", 170), part("pork_lean", 35), part("cabbage", 25), part("carrot", 12)], seasonings: [part("ketchup", 7), part("soy_sauce", 2), part("broth", 12)], instructions: ["具材をやわらかく加熱する。", "麺と合わせて食べやすく仕上げる。"] },
+      { id: "single-plus-cn-gomoku-ramen", name: "五目ラーメン", cuisine: "中華", servingSize: 325, rotationKey: "ラーメン", tags: ["麺類"], ingredients: [part("chinese_noodles", 180), part("chicken_breast", 35), part("chinese_cabbage", 20), part("carrot", 12), part("mushrooms", 15)], seasonings: [part("broth", 90), part("soy_sauce", 4), part("sesame_oil", 1)], instructions: ["スープと具材をやわらかく仕上げる。", "麺と合わせて提供する。"] },
+      { id: "single-plus-cn-miso-ramen", name: "味噌ラーメン", cuisine: "中華", servingSize: 325, rotationKey: "ラーメン", tags: ["麺類"], ingredients: [part("chinese_noodles", 180), part("pork_lean", 35), part("bean_sprouts", 20), part("corn", 12)], seasonings: [part("broth", 88), part("miso", 10), part("soy_sauce", 2)], instructions: ["具材をやわらかく煮る。", "味噌味のスープで麺と合わせる。"] },
+      { id: "single-plus-cn-anmen", name: "中華あんかけ麺", cuisine: "中華", servingSize: 310, rotationKey: "麺類", tags: ["麺類"], ingredients: [part("chinese_noodles", 175), part("pork_lean", 35), part("chinese_cabbage", 25), part("carrot", 12), part("green_peas", 10)], seasonings: [part("broth", 45), part("soy_sauce", 3), part("starch", 2)], instructions: ["具材をやわらかく煮てあんにする。", "麺へかけて提供する。"] },
+      { id: "single-plus-cn-kinoko-ramen", name: "きのこ塩ラーメン", cuisine: "中華", servingSize: 320, rotationKey: "ラーメン", tags: ["麺類"], ingredients: [part("chinese_noodles", 180), part("mushrooms", 25), part("komatsuna", 15), part("chicken_breast", 30)], seasonings: [part("broth", 90), part("salt", 0.4), part("sesame_oil", 1)], instructions: ["具材をやわらかく煮る。", "塩味のスープで麺と合わせる。"] },
+      { id: "single-plus-cn-corn-ramen", name: "コーンラーメン", cuisine: "中華", servingSize: 320, rotationKey: "ラーメン", tags: ["麺類"], ingredients: [part("chinese_noodles", 180), part("corn", 18), part("chicken_breast", 30), part("komatsuna", 15)], seasonings: [part("broth", 90), part("soy_sauce", 3), part("sesame_oil", 1)], instructions: ["具材をやわらかく煮る。", "コーンをのせて麺と合わせる。"] },
+      { id: "single-plus-jp-chicken-zosui", name: "鶏雑炊", cuisine: "和食", servingSize: 285, rotationKey: "雑炊", tags: ["雑炊"], ingredients: [part("soft_rice", 140), part("chicken_breast", 35), part("egg", 20), part("komatsuna", 15)], seasonings: [part("broth", 75), part("soy_sauce", 2)], instructions: ["具材をやわらかく煮る。", "雑炊に仕上げて提供する。"] },
+      { id: "single-plus-jp-vegetable-zosui", name: "野菜雑炊", cuisine: "和食", servingSize: 280, rotationKey: "雑炊", tags: ["雑炊"], ingredients: [part("soft_rice", 140), part("chinese_cabbage", 25), part("carrot", 15), part("egg", 18)], seasonings: [part("broth", 75), part("soy_sauce", 2)], instructions: ["野菜をやわらかく煮る。", "雑炊に仕上げて提供する。"] },
+      { id: "single-plus-west-mushroom-risotto", name: "きのこリゾット", cuisine: "洋食", servingSize: 285, rotationKey: "リゾット", tags: ["洋食主食"], ingredients: [part("rice", 135), part("mushrooms", 28), part("onion", 20), part("milk", 20)], seasonings: [part("broth", 45), part("consomme", 2), part("cheese", 8)], instructions: ["具材をやわらかく煮る。", "チーズを加えてリゾットに仕上げる。"] },
+      { id: "single-plus-west-tomato-risotto", name: "トマトリゾット", cuisine: "洋食", servingSize: 285, rotationKey: "リゾット", tags: ["洋食主食"], ingredients: [part("rice", 135), part("tomato", 35), part("onion", 20), part("chicken_breast", 25)], seasonings: [part("broth", 45), part("consomme", 2), part("cheese", 6)], instructions: ["具材をやわらかく煮る。", "トマト風味のリゾットに仕上げる。"] },
+      { id: "single-plus-west-shrimp-pilaf", name: "えびピラフ", cuisine: "洋食", servingSize: 280, rotationKey: "ピラフ", tags: ["洋食主食"], ingredients: [part("rice", 145), part("shrimp", 35), part("corn", 15), part("onion", 20)], seasonings: [part("consomme", 2), part("butter", 2)], instructions: ["具材をやわらかく加熱する。", "ごはんと合わせてピラフに仕上げる。"] },
+      { id: "single-plus-west-vegetable-pilaf", name: "野菜ピラフ", cuisine: "洋食", servingSize: 275, rotationKey: "ピラフ", tags: ["洋食主食"], ingredients: [part("rice", 145), part("corn", 15), part("carrot", 15), part("onion", 18), part("green_peas", 10)], seasonings: [part("consomme", 2), part("butter", 2)], instructions: ["具材をやわらかく加熱する。", "ごはんと合わせて提供する。"] },
+      { id: "single-plus-west-corn-risotto", name: "コーンチーズリゾット", cuisine: "洋食", servingSize: 285, rotationKey: "リゾット", tags: ["洋食主食"], ingredients: [part("rice", 135), part("corn", 22), part("onion", 18), part("milk", 22)], seasonings: [part("broth", 45), part("consomme", 2), part("cheese", 8)], instructions: ["具材をやわらかく煮る。", "チーズを加えてリゾットに仕上げる。"] },
+      { id: "single-plus-cn-egg-fried-rice", name: "たまご炒飯", cuisine: "中華", servingSize: 275, rotationKey: "中華主食", tags: ["炒飯"], ingredients: [part("rice", 140), part("egg", 22), part("green_peas", 10), part("carrot", 10), part("onion", 15)], seasonings: [part("soy_sauce", 2), part("sesame_oil", 1)], instructions: ["具材をやわらかく加熱する。", "ごはんと合わせてやさしく炒める。"] },
+      { id: "single-plus-cn-vegetable-rice", name: "野菜あんかけごはん", cuisine: "中華", servingSize: 295, rotationKey: "中華主食", tags: ["丼もの"], ingredients: [part("rice", 145), part("chinese_cabbage", 25), part("carrot", 15), part("mushrooms", 15), part("tofu", 40)], seasonings: [part("broth", 35), part("soy_sauce", 3), part("starch", 2)], instructions: ["具材をやわらかく煮る。", "あんにしてごはんへかける。"] },
+      { id: "single-plus2-jp-oyako-bowl", name: "親子丼", cuisine: "和食", servingSize: 305, rotationKey: "丼", tags: ["丼もの"], ingredients: [part("rice", 145), part("chicken_thigh", 50), part("egg", 30), part("onion", 22)], seasonings: [part("broth", 30), part("soy_sauce", 4), part("mirin", 4)], instructions: ["鶏肉と玉ねぎをやわらかく煮る。", "卵でとじてごはんにのせる。"] },
+      { id: "single-plus2-jp-tanin-bowl", name: "他人丼", cuisine: "和食", servingSize: 305, rotationKey: "丼", tags: ["丼もの"], ingredients: [part("rice", 145), part("pork_lean", 50), part("egg", 28), part("onion", 22)], seasonings: [part("broth", 30), part("soy_sauce", 4), part("mirin", 4)], instructions: ["豚肉と玉ねぎをやわらかく煮る。", "卵でとじてごはんにのせる。"] },
+      { id: "single-plus2-jp-teriyaki-bowl", name: "鶏照り焼き丼", cuisine: "和食", servingSize: 300, rotationKey: "丼", tags: ["丼もの"], ingredients: [part("rice", 145), part("chicken_thigh", 55), part("komatsuna", 15), part("carrot", 10)], seasonings: [part("soy_sauce", 5), part("mirin", 4), part("sugar", 2)], instructions: ["鶏肉をやわらかく照り焼きにする。", "ごはんに彩りよく盛り付ける。"] },
+      { id: "single-plus2-jp-miso-pork-bowl", name: "豚みそ丼", cuisine: "和食", servingSize: 300, rotationKey: "丼", tags: ["丼もの"], ingredients: [part("rice", 145), part("pork_lean", 55), part("onion", 22), part("cabbage", 18)], seasonings: [part("miso", 10), part("mirin", 4), part("broth", 18)], instructions: ["豚肉と野菜をやわらかく煮る。", "みそ味でまとめてごはんにのせる。"] },
+      { id: "single-plus2-jp-salmon-egg-bowl", name: "鮭たま丼", cuisine: "和食", servingSize: 300, rotationKey: "丼", tags: ["丼もの"], ingredients: [part("rice", 145), part("salmon", 45), part("egg", 28), part("onion", 18)], seasonings: [part("broth", 28), part("soy_sauce", 3), part("mirin", 3)], instructions: ["鮭をやわらかく煮てほぐす。", "卵と合わせてごはんにのせる。"] },
+      { id: "single-plus2-jp-hakusai-bowl", name: "白菜うま煮丼", cuisine: "和食", servingSize: 295, rotationKey: "丼", tags: ["丼もの"], ingredients: [part("rice", 145), part("chinese_cabbage", 30), part("chicken_breast", 40), part("carrot", 12), part("mushrooms", 15)], seasonings: [part("broth", 30), part("light_soy", 3), part("starch", 2)], instructions: ["具材をやわらかく煮る。", "とろみをつけてごはんへかける。"] },
+      { id: "single-plus2-jp-kinoko-soboro-bowl", name: "きのこそぼろ丼", cuisine: "和食", servingSize: 300, rotationKey: "丼", tags: ["丼もの"], ingredients: [part("rice", 145), part("chicken_breast", 45), part("mushrooms", 25), part("green_peas", 10)], seasonings: [part("broth", 28), part("soy_sauce", 4), part("mirin", 3)], instructions: ["きのこと鶏そぼろをやわらかく煮る。", "ごはんにのせて提供する。"] },
+      { id: "single-plus2-jp-gomoku-rice", name: "五目炊き込みごはん", cuisine: "和食", servingSize: 170, rotationKey: "炊き込みごはん", tags: ["混ぜごはん"], ingredients: [part("rice", 145), part("chicken_breast", 25), part("carrot", 12), part("burdock", 15), part("mushrooms", 18)], seasonings: [part("soy_sauce", 4), part("mirin", 3), part("broth", 18)], instructions: ["具材をやわらかく煮る。", "ごはんに混ぜて炊き込み風に仕上げる。"] },
+      { id: "single-plus2-jp-chicken-burdock-rice", name: "鶏ごぼうごはん", cuisine: "和食", servingSize: 168, rotationKey: "炊き込みごはん", tags: ["混ぜごはん"], ingredients: [part("rice", 145), part("chicken_breast", 28), part("burdock", 18), part("carrot", 12)], seasonings: [part("soy_sauce", 4), part("mirin", 3), part("broth", 18)], instructions: ["鶏肉とごぼうをやわらかく煮る。", "ごはんと合わせて提供する。"] },
+      { id: "single-plus2-jp-hijiki-rice", name: "ひじきごはん", cuisine: "和食", servingSize: 165, rotationKey: "混ぜごはん", tags: ["混ぜごはん"], ingredients: [part("rice", 145), part("carrot", 12), part("green_peas", 10), part("tofu", 30)], seasonings: [part("soy_sauce", 3), part("mirin", 2), part("broth", 15)], instructions: ["具材をやわらかく煮る。", "ごはんに混ぜて仕上げる。"] },
+      { id: "single-plus2-jp-sweetpotato-rice", name: "さつまいもごはん", cuisine: "和食", servingSize: 168, rotationKey: "混ぜごはん", tags: ["混ぜごはん"], ingredients: [part("rice", 145), part("sweet_potato", 30)], seasonings: [part("salt", 0.3), part("broth", 10)], instructions: ["さつまいもをやわらかく加熱する。", "ごはんと合わせて食べやすく仕上げる。"] },
+      { id: "single-plus2-jp-kinoko-ankake-udon", name: "きのこあんかけうどん", cuisine: "和食", servingSize: 320, rotationKey: "うどん", tags: ["麺類"], ingredients: [part("udon", 190), part("mushrooms", 28), part("komatsuna", 15), part("tofu", 40)], seasonings: [part("broth", 85), part("soy_sauce", 4), part("starch", 2)], instructions: ["具材をやわらかく煮る。", "うどんにとろみあんをかける。"] },
+      { id: "single-plus2-jp-nanban-udon", name: "鶏南蛮うどん", cuisine: "和食", servingSize: 325, rotationKey: "うどん", tags: ["麺類"], ingredients: [part("udon", 190), part("chicken_thigh", 45), part("onion", 18), part("komatsuna", 15)], seasonings: [part("broth", 88), part("soy_sauce", 4), part("mirin", 3)], instructions: ["鶏肉と玉ねぎをやわらかく煮る。", "うどんに合わせて温かく仕上げる。"] },
+      { id: "single-plus2-jp-hakusai-toji-udon", name: "白菜とじうどん", cuisine: "和食", servingSize: 320, rotationKey: "うどん", tags: ["麺類"], ingredients: [part("udon", 190), part("chinese_cabbage", 25), part("egg", 25), part("onion", 15)], seasonings: [part("broth", 88), part("soy_sauce", 4)], instructions: ["白菜をやわらかく煮る。", "卵でとじてうどんに合わせる。"] },
+      { id: "single-plus2-jp-soft-shoyu-ramen", name: "やわらか醤油ラーメン", cuisine: "和食", servingSize: 320, rotationKey: "ラーメン", tags: ["麺類"], ingredients: [part("chinese_noodles", 180), part("chicken_breast", 35), part("komatsuna", 15), part("corn", 10)], seasonings: [part("broth", 90), part("soy_sauce", 4), part("sesame_oil", 1)], instructions: ["具材をやわらかく煮る。", "しょうゆ味のスープで麺と合わせる。"] },
+      { id: "single-plus2-jp-shrimp-udon", name: "えびあんかけうどん", cuisine: "和食", servingSize: 320, rotationKey: "うどん", tags: ["麺類"], ingredients: [part("udon", 190), part("shrimp", 35), part("chinese_cabbage", 20), part("carrot", 12)], seasonings: [part("broth", 85), part("light_soy", 3), part("starch", 2)], instructions: ["えびと野菜をやわらかく煮る。", "とろみあんをうどんへかける。"] },
+      { id: "single-plus2-west-curry-rice", name: "カレーライス", cuisine: "洋食", servingSize: 330, rotationKey: "カレー", tags: ["カレー"], ingredients: [part("rice", 150), part("chicken_breast", 55), part("potato", 45), part("onion", 30), part("carrot", 18)], seasonings: [part("curry_roux", 18), part("broth", 55)], instructions: ["具材をやわらかく煮る。", "カレーに仕上げてごはんに添える。"] },
+      { id: "single-plus2-west-dry-curry", name: "ドライカレー", cuisine: "洋食", servingSize: 310, rotationKey: "カレー", tags: ["カレー"], ingredients: [part("rice", 145), part("beef_mince", 40), part("onion", 22), part("carrot", 15), part("green_peas", 10)], seasonings: [part("curry_roux", 10), part("ketchup", 5), part("consomme", 2)], instructions: ["具材をやわらかく炒め煮にする。", "ごはんと合わせて仕上げる。"] },
+      { id: "single-plus2-west-omelet-rice", name: "オムライス", cuisine: "洋食", servingSize: 310, rotationKey: "洋食主食", tags: ["オムライス"], ingredients: [part("rice", 140), part("egg", 35), part("chicken_breast", 35), part("onion", 18), part("green_peas", 10)], seasonings: [part("ketchup", 10), part("consomme", 2), part("butter", 2)], instructions: ["チキンライスをやわらかく仕上げる。", "卵で包むように整えて提供する。"] },
+      { id: "single-plus2-west-mushroom-omelet-rice", name: "きのこオムライス", cuisine: "洋食", servingSize: 310, rotationKey: "洋食主食", tags: ["オムライス"], ingredients: [part("rice", 140), part("egg", 35), part("mushrooms", 22), part("chicken_breast", 30), part("onion", 18)], seasonings: [part("ketchup", 9), part("consomme", 2), part("butter", 2)], instructions: ["具材をやわらかく加熱する。", "卵で包むように整えて提供する。"] },
+      { id: "single-plus2-west-chicken-pilaf", name: "チキンピラフ", cuisine: "洋食", servingSize: 285, rotationKey: "ピラフ", tags: ["洋食主食"], ingredients: [part("rice", 145), part("chicken_breast", 38), part("corn", 12), part("onion", 18), part("carrot", 12)], seasonings: [part("consomme", 2), part("butter", 2)], instructions: ["具材をやわらかく加熱する。", "ごはんと合わせてピラフに仕上げる。"] },
+      { id: "single-plus2-west-pumpkin-pilaf", name: "かぼちゃピラフ", cuisine: "洋食", servingSize: 285, rotationKey: "ピラフ", tags: ["洋食主食"], ingredients: [part("rice", 145), part("pumpkin", 28), part("onion", 18), part("corn", 12)], seasonings: [part("consomme", 2), part("butter", 2)], instructions: ["かぼちゃをやわらかく加熱する。", "ごはんと合わせて提供する。"] },
+      { id: "single-plus2-west-cheese-doria", name: "チーズドリア", cuisine: "洋食", servingSize: 295, rotationKey: "ドリア", tags: ["洋食主食"], ingredients: [part("rice", 140), part("milk", 45), part("onion", 18), part("cheese", 12)], seasonings: [part("consomme", 2), part("butter", 2), part("flour", 4), part("salt", 0.2)], instructions: ["ホワイトソースをやわらかく作る。", "ごはんにかけて焼き色を軽くつける。"] },
+      { id: "single-plus2-west-meat-doria", name: "ミートドリア", cuisine: "洋食", servingSize: 300, rotationKey: "ドリア", tags: ["洋食主食"], ingredients: [part("rice", 140), part("beef_mince", 35), part("onion", 18), part("milk", 40), part("cheese", 10)], seasonings: [part("ketchup", 6), part("consomme", 2), part("flour", 4)], instructions: ["ミートソースをやわらかくまとめる。", "ごはんにのせて温かく仕上げる。"] },
+      { id: "single-plus2-west-cream-pasta", name: "クリームパスタ", cuisine: "洋食", servingSize: 270, rotationKey: "パスタ", tags: ["パスタ"], ingredients: [part("pasta", 180), part("chicken_breast", 35), part("onion", 15), part("milk", 35)], seasonings: [part("milk", 35), part("butter", 3), part("flour", 4), part("consomme", 1), part("salt", 0.2)], instructions: ["具材をやわらかく加熱する。", "クリームソースでパスタに合わせる。"] },
+      { id: "single-plus2-west-napolitan", name: "ナポリタン", cuisine: "洋食", servingSize: 270, rotationKey: "パスタ", tags: ["パスタ"], ingredients: [part("pasta", 180), part("chicken_breast", 35), part("onion", 18), part("bell_pepper", 12)], seasonings: [part("ketchup", 9), part("consomme", 2)], instructions: ["具材をやわらかく加熱する。", "ケチャップ味でパスタに仕上げる。"] },
+      { id: "single-plus2-west-pumpkin-cream-pasta", name: "かぼちゃクリームパスタ", cuisine: "洋食", servingSize: 270, rotationKey: "パスタ", tags: ["パスタ"], ingredients: [part("pasta", 180), part("pumpkin", 26), part("onion", 15), part("milk", 35)], seasonings: [part("milk", 35), part("butter", 3), part("flour", 4), part("consomme", 1), part("salt", 0.2)], instructions: ["かぼちゃをやわらかく煮る。", "クリームソースでパスタに合わせる。"] },
+      { id: "single-plus2-west-broccoli-meat-pasta", name: "ブロッコリーミートパスタ", cuisine: "洋食", servingSize: 270, rotationKey: "パスタ", tags: ["パスタ"], ingredients: [part("pasta", 180), part("beef_mince", 38), part("broccoli", 20), part("tomato", 28)], seasonings: [part("ketchup", 7), part("consomme", 2)], instructions: ["具材をやわらかく煮てソースにする。", "パスタに合わせて提供する。"] },
+      { id: "single-plus2-west-corn-cheese-pasta", name: "コーンチーズパスタ", cuisine: "洋食", servingSize: 265, rotationKey: "パスタ", tags: ["パスタ", "チーズ"], ingredients: [part("pasta", 175), part("corn", 20), part("onion", 15), part("cheese", 10)], seasonings: [part("consomme", 2), part("butter", 2), part("milk", 18)], instructions: ["具材をやわらかく加熱する。", "チーズを合わせてパスタに仕上げる。"] },
+      { id: "single-plus2-west-egg-sand-plate", name: "たまごサンドプレート", cuisine: "洋食", servingSize: 240, rotationKey: "パン主食", tags: ["パン主食"], ingredients: [part("bread", 75), part("egg", 35), part("cabbage", 15), part("potato", 25)], seasonings: [part("butter", 4), part("salt", 0.2)], instructions: ["具材を食べやすく整える。", "パンにはさんで主食プレートにまとめる。"] },
+      { id: "single-plus2-west-chicken-sand-plate", name: "チキンサンドプレート", cuisine: "洋食", servingSize: 250, rotationKey: "パン主食", tags: ["パン主食"], ingredients: [part("roll_bread", 80), part("chicken_breast", 40), part("cabbage", 15), part("tomato", 12)], seasonings: [part("butter", 4), part("salt", 0.2), part("pepper", 0.05)], instructions: ["鶏肉をやわらかく加熱する。", "パンにはさんで食べやすく仕上げる。"] },
+      { id: "single-plus2-west-french-toast-plate", name: "フレンチトーストプレート", cuisine: "洋食", servingSize: 235, rotationKey: "パン主食", tags: ["パン主食"], ingredients: [part("bread", 75), part("egg", 25), part("milk", 35), part("pumpkin", 20)], seasonings: [part("sugar", 4), part("butter", 2)], instructions: ["パンを卵液に浸してやわらかく焼く。", "付け合わせを添えて提供する。"] },
+      { id: "single-plus2-west-meat-gratin", name: "ミートマカロニグラタン", cuisine: "洋食", servingSize: 290, rotationKey: "グラタン", tags: ["洋食主食"], ingredients: [part("pasta", 165), part("beef_mince", 35), part("onion", 18), part("milk", 40), part("cheese", 10)], seasonings: [part("consomme", 2), part("butter", 2), part("flour", 4)], instructions: ["具材をやわらかく加熱する。", "ホワイトソースでまとめて温かく仕上げる。"] },
+      { id: "single-plus2-cn-chuka-bowl", name: "中華丼", cuisine: "中華", servingSize: 305, rotationKey: "丼", tags: ["丼もの"], ingredients: [part("rice", 145), part("pork_lean", 45), part("chinese_cabbage", 25), part("carrot", 12), part("mushrooms", 15)], seasonings: [part("broth", 35), part("soy_sauce", 3), part("starch", 2)], instructions: ["具材をやわらかく煮る。", "中華あんをごはんへかける。"] },
+      { id: "single-plus2-cn-mabo-bowl", name: "麻婆丼", cuisine: "中華", servingSize: 305, rotationKey: "丼", tags: ["丼もの"], ingredients: [part("rice", 145), part("tofu", 85), part("pork_mince", 25), part("onion", 15)], seasonings: [part("miso", 8), part("soy_sauce", 3), part("broth", 22), part("starch", 2)], instructions: ["豆腐とそぼろをやわらかく煮る。", "とろみをつけてごはんへかける。"] },
+      { id: "single-plus2-cn-tenshinhan", name: "天津飯", cuisine: "中華", servingSize: 300, rotationKey: "丼", tags: ["丼もの"], ingredients: [part("rice", 145), part("egg", 40), part("green_peas", 10), part("mushrooms", 15)], seasonings: [part("broth", 30), part("soy_sauce", 3), part("starch", 2)], instructions: ["卵をやわらかくまとめる。", "あんをかけてごはんにのせる。"] },
+      { id: "single-plus2-cn-gomoku-fried-rice", name: "五目炒飯", cuisine: "中華", servingSize: 280, rotationKey: "中華主食", tags: ["炒飯"], ingredients: [part("rice", 140), part("chicken_breast", 30), part("egg", 20), part("green_peas", 10), part("carrot", 10), part("onion", 15)], seasonings: [part("soy_sauce", 2), part("sesame_oil", 1)], instructions: ["具材をやわらかく加熱する。", "ごはんと合わせて食べやすく炒める。"] },
+      { id: "single-plus2-cn-pork-fried-rice", name: "豚肉炒飯", cuisine: "中華", servingSize: 280, rotationKey: "中華主食", tags: ["炒飯"], ingredients: [part("rice", 140), part("pork_lean", 35), part("egg", 18), part("onion", 15), part("carrot", 10)], seasonings: [part("soy_sauce", 2), part("sesame_oil", 1)], instructions: ["具材をやわらかく加熱する。", "ごはんと合わせて仕上げる。"] },
+      { id: "single-plus2-cn-chicken-ankake-fried-rice", name: "鶏あんかけ炒飯", cuisine: "中華", servingSize: 295, rotationKey: "中華主食", tags: ["炒飯"], ingredients: [part("rice", 140), part("chicken_breast", 35), part("egg", 18), part("chinese_cabbage", 20), part("carrot", 10)], seasonings: [part("broth", 28), part("soy_sauce", 3), part("starch", 2)], instructions: ["炒飯をやさしく仕上げる。", "鶏あんをかけて提供する。"] },
+      { id: "single-plus2-cn-gomoku-yakisoba", name: "五目あんかけ焼きそば", cuisine: "中華", servingSize: 305, rotationKey: "焼きそば", tags: ["麺類"], ingredients: [part("chinese_noodles", 175), part("pork_lean", 35), part("chinese_cabbage", 22), part("carrot", 12), part("mushrooms", 15)], seasonings: [part("broth", 35), part("soy_sauce", 3), part("starch", 2)], instructions: ["具材をやわらかく煮る。", "あんを麺へかけて提供する。"] },
+      { id: "single-plus2-cn-shio-yakisoba", name: "鶏塩焼きそば", cuisine: "中華", servingSize: 300, rotationKey: "焼きそば", tags: ["麺類"], ingredients: [part("chinese_noodles", 175), part("chicken_breast", 35), part("bean_sprouts", 22), part("cabbage", 20)], seasonings: [part("broth", 18), part("salt", 0.4), part("sesame_oil", 1)], instructions: ["具材をやわらかく加熱する。", "塩味で麺と合わせて仕上げる。"] },
+      { id: "single-plus2-cn-kinoko-yakisoba", name: "きのこあんかけ焼きそば", cuisine: "中華", servingSize: 300, rotationKey: "焼きそば", tags: ["麺類"], ingredients: [part("chinese_noodles", 175), part("mushrooms", 25), part("chinese_cabbage", 20), part("carrot", 12), part("tofu", 35)], seasonings: [part("broth", 35), part("soy_sauce", 3), part("starch", 2)], instructions: ["具材をやわらかく煮る。", "あんを麺へかけて提供する。"] },
+      { id: "single-plus2-cn-pork-vegetable-bowl", name: "豚肉白菜中華丼", cuisine: "中華", servingSize: 305, rotationKey: "丼", tags: ["丼もの"], ingredients: [part("rice", 145), part("pork_lean", 45), part("chinese_cabbage", 30), part("carrot", 12), part("onion", 15)], seasonings: [part("broth", 35), part("oyster_sauce", 3), part("starch", 2)], instructions: ["具材をやわらかく煮る。", "中華あんをかけてごはんにのせる。"] },
+      { id: "single-plus2-cn-tofu-mabo-rice", name: "豆腐麻婆あんかけごはん", cuisine: "中華", servingSize: 300, rotationKey: "丼", tags: ["丼もの"], ingredients: [part("rice", 145), part("tofu", 90), part("pork_mince", 20), part("onion", 15), part("green_peas", 10)], seasonings: [part("miso", 8), part("soy_sauce", 3), part("broth", 22), part("starch", 2)], instructions: ["豆腐とそぼろをやわらかく煮る。", "あんにしてごはんへかける。"] },
+      { id: "single-plus2-cn-chicken-shio-men", name: "鶏塩あんかけ麺", cuisine: "中華", servingSize: 320, rotationKey: "麺類", tags: ["麺類"], ingredients: [part("chinese_noodles", 180), part("chicken_breast", 35), part("chinese_cabbage", 20), part("corn", 10)], seasonings: [part("broth", 85), part("salt", 0.4), part("starch", 2)], instructions: ["具材をやわらかく煮る。", "塩味のあんを麺へかける。"] },
+      { id: "single-plus2-cn-hakusai-ramen", name: "白菜あんかけラーメン", cuisine: "中華", servingSize: 325, rotationKey: "ラーメン", tags: ["麺類"], ingredients: [part("chinese_noodles", 180), part("chinese_cabbage", 28), part("pork_lean", 30), part("carrot", 12)], seasonings: [part("broth", 88), part("soy_sauce", 4), part("starch", 2)], instructions: ["具材をやわらかく煮る。", "あんをのせて麺と合わせる。"] },
+      { id: "single-plus2-cn-seafood-ramen", name: "海鮮風塩ラーメン", cuisine: "中華", servingSize: 325, rotationKey: "ラーメン", tags: ["麺類"], ingredients: [part("chinese_noodles", 180), part("shrimp", 30), part("white_fish", 25), part("komatsuna", 15)], seasonings: [part("broth", 88), part("salt", 0.4), part("sesame_oil", 1)], instructions: ["具材をやわらかく煮る。", "塩味のスープで麺と合わせる。"] },
+      { id: "single-plus2-cn-shrimp-porridge", name: "えび中華粥", cuisine: "中華", servingSize: 285, rotationKey: "中華粥", tags: ["中華主食"], ingredients: [part("soft_rice", 140), part("shrimp", 30), part("egg", 15), part("komatsuna", 12)], seasonings: [part("broth", 75), part("salt", 0.3), part("sesame_oil", 1)], instructions: ["具材をやわらかく煮る。", "中華粥に仕上げて提供する。"] },
+      { id: "single-plus2-cn-egg-porridge", name: "中華風たまご粥", cuisine: "中華", servingSize: 280, rotationKey: "中華粥", tags: ["中華主食"], ingredients: [part("soft_rice", 140), part("egg", 25), part("onion", 15), part("komatsuna", 12)], seasonings: [part("broth", 75), part("salt", 0.3), part("sesame_oil", 1)], instructions: ["具材をやわらかく煮る。", "卵を加えて中華粥に仕上げる。"] },
+      { id: "single-plus2-cn-champon-udon", name: "ちゃんぽん風うどん", cuisine: "中華", servingSize: 325, rotationKey: "うどん", tags: ["麺類"], ingredients: [part("udon", 190), part("chicken_breast", 35), part("chinese_cabbage", 20), part("carrot", 12), part("corn", 10)], seasonings: [part("broth", 88), part("soy_sauce", 3), part("sesame_oil", 1)], instructions: ["具材をやわらかく煮る。", "うどんに合わせてちゃんぽん風に仕上げる。"] }
+    ];
+    return definitions.map(dish);
+  }
+  function buildAdditionalSoupRecipes() {
+    const recipes = [];
+    const japaneseBases = [
+      { key: "daikon", label: "大根", ingredients: [part("daikon", 35)] },
+      { key: "komatsuna", label: "小松菜", ingredients: [part("komatsuna", 28)] },
+      { key: "carrot", label: "にんじん", ingredients: [part("carrot", 30)] },
+      { key: "onion", label: "玉ねぎ", ingredients: [part("onion", 30)] },
+      { key: "sweetpotato", label: "さつまいも", ingredients: [part("sweet_potato", 30)] },
+      { key: "potato", label: "じゃがいも", ingredients: [part("potato", 32)] },
+      { key: "cabbage", label: "キャベツ", ingredients: [part("cabbage", 30)] },
+      { key: "spinach", label: "ほうれん草", ingredients: [part("spinach", 26)] },
+      { key: "tofu-onion", label: "豆腐と玉ねぎ", ingredients: [part("tofu", 30), part("onion", 15)] },
+      { key: "mushroom-daikon", label: "きのこと大根", ingredients: [part("mushrooms", 20), part("daikon", 20)] }
+    ];
+    const japaneseMethods = [
+      { key: "miso", label: "味噌汁", servingSize: 150, seasonings: [part("broth", 120), part("miso", 10)], instructions: ["具材をやわらかく煮る。", "味噌を溶いて温かく仕上げる。"] },
+      { key: "clear", label: "すまし汁", servingSize: 150, seasonings: [part("broth", 125), part("light_soy", 3)], instructions: ["具材をやわらかく煮る。", "だしを生かして薄味で仕上げる。"] }
+    ];
+    japaneseBases.forEach((base, baseIndex) => {
+      japaneseMethods.forEach((method) => {
+        recipes.push(createRecipe({ id: `plus-jp-soup-${baseIndex}-${method.key}`, name: `${base.label}${method.label}`, category: "汁物", cuisine: "和食", servingSize: method.servingSize, rotationKey: `和食追加汁物-${method.key}`, tags: ["追加レシピ", "汁物"], description: `${base.label}を使った食べやすい${method.label}。`, ingredients: base.ingredients, seasonings: method.seasonings, instructions: method.instructions }));
+      });
+    });
+    const westernBases = [
+      { key: "tomato", label: "トマト", ingredients: [part("tomato", 35), part("onion", 12)] },
+      { key: "pumpkin", label: "かぼちゃ", ingredients: [part("pumpkin", 35), part("onion", 10)] },
+      { key: "sweetpotato", label: "さつまいも", ingredients: [part("sweet_potato", 35), part("onion", 10)] },
+      { key: "carrot", label: "にんじん", ingredients: [part("carrot", 35), part("onion", 10)] },
+      { key: "mushroom", label: "きのこ", ingredients: [part("mushrooms", 30), part("onion", 12)] }
+    ];
+    const westernMethods = [
+      { key: "consomme", label: "コンソメスープ", servingSize: 150, seasonings: [part("broth", 120), part("consomme", 3)], instructions: ["具材をやわらかく煮る。", "コンソメで味を整えて仕上げる。"] },
+      { key: "potage", label: "ポタージュ", servingSize: 150, seasonings: [part("milk", 55), part("butter", 3), part("flour", 4), part("consomme", 1), part("salt", 0.2), part("pepper", 0.05)], instructions: ["具材をやわらかく煮る。", "牛乳でのばしてなめらかに仕上げる。"] },
+      { key: "milk", label: "ミルクスープ", servingSize: 150, seasonings: [part("milk", 60), part("broth", 55), part("consomme", 1), part("salt", 0.2)], instructions: ["具材をやわらかく煮る。", "ミルクを加えてやさしく仕上げる。"] }
+    ];
+    westernBases.forEach((base, baseIndex) => {
+      westernMethods.forEach((method) => {
+        recipes.push(createRecipe({ id: `plus-west-soup-${baseIndex}-${method.key}`, name: `${base.label}${method.label}`, category: "汁物", cuisine: "洋食", servingSize: method.servingSize, rotationKey: `洋食追加汁物-${method.key}`, tags: ["追加レシピ", "汁物"], description: `${base.label}を使ったやさしい${method.label}。`, ingredients: base.ingredients, seasonings: method.seasonings, instructions: method.instructions }));
+      });
+    });
+    const chineseBases = [
+      { key: "tofu", label: "豆腐", ingredients: [part("tofu", 35), part("onion", 10)] },
+      { key: "corn", label: "コーン", ingredients: [part("corn", 25), part("egg", 14)] },
+      { key: "mushroom", label: "きのこ", ingredients: [part("mushrooms", 28), part("komatsuna", 12)] },
+      { key: "tomato", label: "トマト", ingredients: [part("tomato", 28), part("egg", 14)] },
+      { key: "greens", label: "青菜", ingredients: [part("komatsuna", 24), part("tofu", 20)] }
+    ];
+    const chineseMethods = [
+      { key: "soup", label: "中華スープ", servingSize: 150, seasonings: [part("broth", 120), part("soy_sauce", 2), part("sesame_oil", 1)], instructions: ["具材をやわらかく煮る。", "中華風に味を整える。"] },
+      { key: "thick", label: "とろみスープ", servingSize: 150, seasonings: [part("broth", 118), part("soy_sauce", 2), part("starch", 2)], instructions: ["具材をやわらかく煮る。", "ゆるいとろみをつけて仕上げる。"] },
+      { key: "soft", label: "やわらかスープ", servingSize: 150, seasonings: [part("broth", 120), part("salt", 0.3), part("sesame_oil", 1)], instructions: ["具材をやわらかく煮る。", "あっさりした塩味で仕上げる。"] }
+    ];
+    chineseBases.forEach((base, baseIndex) => {
+      chineseMethods.forEach((method) => {
+        recipes.push(createRecipe({ id: `plus-cn-soup-${baseIndex}-${method.key}`, name: `${base.label}${method.label}`, category: "汁物", cuisine: "中華", servingSize: method.servingSize, rotationKey: `中華追加汁物-${method.key}`, tags: ["追加レシピ", "汁物"], description: `${base.label}を使った食べやすい${method.label}。`, ingredients: base.ingredients, seasonings: method.seasonings, instructions: method.instructions }));
+      });
+    });
+    return recipes;
+  }
+  function buildAdditionalMainRecipes() {
+    const recipes = [];
+    const japaneseProteins = [
+      { label: "鮭", id: "salmon", grams: 90, rotationKey: "魚" },
+      { label: "白身魚", id: "white_fish", grams: 90, rotationKey: "魚" },
+      { label: "鶏もも", id: "chicken_thigh", grams: 90, rotationKey: "鶏" },
+      { label: "豚肉", id: "pork_lean", grams: 85, rotationKey: "豚" },
+      { label: "豆腐", id: "tofu", grams: 120, rotationKey: "豆腐" }
+    ];
+    const japaneseMethods = [
+      { key: "ginger", label: "の生姜煮", ingredients: [part("onion", 15)], seasonings: [part("broth", 20), part("soy_sauce", 5), part("mirin", 4), part("sugar", 1)], instructions: ["主材料をやわらかく煮る。", "甘辛くまとめて仕上げる。"] },
+      { key: "negi-miso", label: "のねぎ味噌焼き", ingredients: [part("onion", 20)], seasonings: [part("miso", 8), part("mirin", 4), part("sugar", 1)], instructions: ["主材料をやわらかく加熱する。", "ねぎ味噌をのせて仕上げる。"] },
+      { key: "mizore", label: "のみぞれ煮", ingredients: [part("daikon", 25)], seasonings: [part("broth", 22), part("light_soy", 4), part("starch", 2)], instructions: ["主材料をやわらかく煮る。", "大根おろし風のあんでまとめる。"] },
+      { key: "goma", label: "の胡麻煮", ingredients: [part("carrot", 15)], seasonings: [part("broth", 20), part("soy_sauce", 4), part("sesame", 3), part("sugar", 1)], instructions: ["主材料をやわらかく煮る。", "胡麻の風味で仕上げる。"] }
+    ];
+    japaneseProteins.forEach((protein, proteinIndex) => {
+      japaneseMethods.forEach((method) => {
+        recipes.push(createRecipe({ id: `plus-jp-main-${proteinIndex}-${method.key}`, name: `${protein.label}${method.label}`, category: "主菜", cuisine: "和食", servingSize: protein.grams + 42, rotationKey: protein.rotationKey, tags: ["追加レシピ", "主菜"], description: `${protein.label}をやわらかく仕上げた和食の主菜。`, ingredients: [part(protein.id, protein.grams), ...method.ingredients], seasonings: method.seasonings, instructions: method.instructions }));
+      });
+    });
+    const westernProteins = [
+      { label: "チキン", id: "chicken_thigh", grams: 90, rotationKey: "鶏" },
+      { label: "ポーク", id: "pork_lean", grams: 85, rotationKey: "豚" },
+      { label: "白身魚", id: "white_fish", grams: 90, rotationKey: "魚" },
+      { label: "鮭", id: "salmon", grams: 90, rotationKey: "魚" },
+      { label: "豆腐", id: "tofu", grams: 120, rotationKey: "豆腐" }
+    ];
+    const westernMethods = [
+      { key: "lemon", label: "のレモンソテー", ingredients: [part("carrot", 16)], seasonings: [part("butter", 2), part("salt", 0.2), part("pepper", 0.05)], instructions: ["主材料をやわらかく焼く。", "付け合わせとともに仕上げる。"] },
+      { key: "mushroom", label: "のきのこソース", ingredients: [part("mushrooms", 20), part("onion", 18)], seasonings: [part("broth", 20), part("consomme", 2), part("starch", 1)], instructions: ["主材料をやわらかく加熱する。", "きのこソースをかけて仕上げる。"] },
+      { key: "milk", label: "のミルク煮", ingredients: [part("onion", 18)], seasonings: [part("milk", 45), part("butter", 2), part("flour", 3), part("consomme", 1), part("salt", 0.2), part("pepper", 0.05)], instructions: ["主材料をやわらかく加熱する。", "ミルクソースでまとめる。"] }
+    ];
+    westernProteins.forEach((protein, proteinIndex) => {
+      westernMethods.forEach((method) => {
+        recipes.push(createRecipe({ id: `plus-west-main-${proteinIndex}-${method.key}`, name: `${protein.label}${method.label}`, category: "主菜", cuisine: "洋食", servingSize: protein.grams + 42, rotationKey: protein.rotationKey, tags: ["追加レシピ", "主菜"], description: `${protein.label}を食べやすく仕上げた洋食の主菜。`, ingredients: [part(protein.id, protein.grams), ...method.ingredients], seasonings: method.seasonings, instructions: method.instructions }));
+      });
+    });
+    const chineseProteins = [
+      { label: "鶏肉", id: "chicken_thigh", grams: 90, rotationKey: "鶏" },
+      { label: "豚肉", id: "pork_lean", grams: 85, rotationKey: "豚" },
+      { label: "白身魚", id: "white_fish", grams: 90, rotationKey: "魚" },
+      { label: "豆腐", id: "tofu", grams: 120, rotationKey: "豆腐" },
+      { label: "えび", id: "shrimp", grams: 80, rotationKey: "海鮮" }
+    ];
+    const chineseMethods = [
+      { key: "greens-an", label: "の青菜あん", ingredients: [part("komatsuna", 20)], seasonings: [part("broth", 25), part("soy_sauce", 3), part("starch", 2)], instructions: ["主材料をやわらかく加熱する。", "青菜あんをかけて仕上げる。"] },
+      { key: "soy-braise", label: "のしょうゆ煮込み", ingredients: [part("chinese_cabbage", 20)], seasonings: [part("broth", 20), part("soy_sauce", 4), part("sesame_oil", 1)], instructions: ["主材料をやわらかく煮る。", "しょうゆ味でまとめる。"] },
+      { key: "salt-stir", label: "のやわらか塩炒め", ingredients: [part("onion", 16), part("bell_pepper", 12)], seasonings: [part("broth", 18), part("salt", 0.3), part("sesame_oil", 1)], instructions: ["主材料と野菜をやわらかく加熱する。", "塩味で食べやすく仕上げる。"] }
+    ];
+    chineseProteins.forEach((protein, proteinIndex) => {
+      chineseMethods.forEach((method) => {
+        recipes.push(createRecipe({ id: `plus-cn-main-${proteinIndex}-${method.key}`, name: `${protein.label}${method.label}`, category: "主菜", cuisine: "中華", servingSize: protein.grams + 42, rotationKey: protein.rotationKey, tags: ["追加レシピ", "主菜"], description: `${protein.label}をやわらかく仕上げた中華の主菜。`, ingredients: [part(protein.id, protein.grams), ...method.ingredients], seasonings: method.seasonings, instructions: method.instructions }));
+      });
+    });
+    return recipes;
+  }
+  function buildAdditionalSideRecipes() {
+    const recipes = [];
+    const japaneseBases = [
+      { key: "daikon", label: "大根", ingredients: [part("daikon", 70)], rotationKey: "根菜" },
+      { key: "pumpkin", label: "かぼちゃ", ingredients: [part("pumpkin", 65)], rotationKey: "かぼちゃ" },
+      { key: "potato", label: "じゃがいも", ingredients: [part("potato", 65)], rotationKey: "じゃがいも" },
+      { key: "carrot", label: "にんじん", ingredients: [part("carrot", 55)], rotationKey: "にんじん" },
+      { key: "komatsuna", label: "小松菜", ingredients: [part("komatsuna", 55)], rotationKey: "青菜" }
+    ];
+    const japaneseMethods = [
+      { key: "dashi", makeName: (base) => `${base.label}のだし煮`, makeIngredients: () => [], seasonings: [part("broth", 18), part("soy_sauce", 2), part("mirin", 2)], tags: ["煮物"] },
+      { key: "soboro", makeName: (base) => `${base.label}のそぼろあん`, makeIngredients: () => [part("chicken_breast", 15)], seasonings: [part("broth", 18), part("soy_sauce", 2), part("starch", 1)], tags: ["そぼろ"] },
+      { key: "ume", makeName: (base) => `${base.label}の梅和え`, makeIngredients: () => [], seasonings: [part("vinegar", 2), part("sugar", 1), part("soy_sauce", 1)], tags: ["和え物"] },
+      { key: "goma", makeName: (base) => `${base.label}の胡麻煮`, makeIngredients: () => [], seasonings: [part("soy_sauce", 2), part("sesame", 3), part("sugar", 1)], tags: ["胡麻"] }
+    ];
+    japaneseBases.forEach((base, baseIndex) => {
+      japaneseMethods.forEach((method) => {
+        recipes.push(sideRecipe(`plus-jp-side-${baseIndex}-${method.key}`, method.makeName(base), "和食", [...base.ingredients, ...method.makeIngredients(base)], method.seasonings, base.label === "小松菜" ? 60 : 75, base.rotationKey, ["追加レシピ", ...(method.tags || [])]));
+      });
+    });
+    const westernBases = [
+      { key: "cabbage", label: "キャベツ", ingredients: [part("cabbage", 55), part("onion", 10)], rotationKey: "キャベツ" },
+      { key: "broccoli", label: "ブロッコリー", ingredients: [part("broccoli", 55), part("corn", 10)], rotationKey: "ブロッコリー" },
+      { key: "tomato", label: "トマト", ingredients: [part("tomato", 55), part("onion", 10)], rotationKey: "トマト" },
+      { key: "corn", label: "コーン", ingredients: [part("corn", 45), part("potato", 20)], rotationKey: "コーン" },
+      { key: "sweetpotato", label: "さつまいも", ingredients: [part("sweet_potato", 50), part("cucumber", 8)], rotationKey: "さつまいも" }
+    ];
+    const westernMethods = [
+      { key: "salad", makeName: (base) => `${base.label}サラダ`, seasonings: [part("mayonnaise", 5), part("vinegar", 2)], tags: ["サラダ"] },
+      { key: "butter", makeName: (base) => `${base.label}のバター煮`, seasonings: [part("butter", 2), part("consomme", 1)], tags: ["煮込み"] },
+      { key: "cream", makeName: (base) => `${base.label}のクリーム和え`, seasonings: [part("milk", 18), part("butter", 1.5), part("flour", 1.5), part("salt", 0.1)], tags: ["クリーム"] }
+    ];
+    westernBases.forEach((base, baseIndex) => {
+      westernMethods.forEach((method) => {
+        recipes.push(sideRecipe(`plus-west-side-${baseIndex}-${method.key}`, method.makeName(base), "洋食", base.ingredients, method.seasonings, 75, base.rotationKey, ["追加レシピ", ...(method.tags || [])]));
+      });
+    });
+    const chineseBases = [
+      { key: "beansprout", label: "もやし", ingredients: [part("bean_sprouts", 55), part("carrot", 10)], rotationKey: "もやし" },
+      { key: "hakusai", label: "白菜", ingredients: [part("chinese_cabbage", 60), part("carrot", 10)], rotationKey: "白菜" },
+      { key: "cucumber", label: "きゅうり", ingredients: [part("cucumber", 50), part("corn", 10)], rotationKey: "きゅうり" },
+      { key: "carrot", label: "にんじん", ingredients: [part("carrot", 50), part("onion", 10)], rotationKey: "にんじん" },
+      { key: "tofu", label: "豆腐", ingredients: [part("tofu", 55), part("komatsuna", 10)], rotationKey: "豆腐" }
+    ];
+    const chineseMethods = [
+      { key: "mix", makeName: (base) => `${base.label}の中華和え`, seasonings: [part("soy_sauce", 2), part("sesame_oil", 1)], tags: ["和え物"] },
+      { key: "oyster", makeName: (base) => `${base.label}のオイスター煮`, seasonings: [part("oyster_sauce", 2), part("broth", 10)], tags: ["煮物"] },
+      { key: "sweet", makeName: (base) => `${base.label}の甘酢和え`, seasonings: [part("vinegar", 3), part("sugar", 1), part("soy_sauce", 1)], tags: ["甘酢"] }
+    ];
+    chineseBases.forEach((base, baseIndex) => {
+      chineseMethods.forEach((method) => {
+        recipes.push(sideRecipe(`plus-cn-side-${baseIndex}-${method.key}`, method.makeName(base), "中華", base.ingredients, method.seasonings, 70, base.rotationKey, ["追加レシピ", ...(method.tags || [])]));
+      });
+    });
+    return recipes;
+  }
+  function buildAdditionalDessertRecipes() {
+    const fruitFlavors = [
+      { key: "apple", name: "りんご", foodId: "apple", tag: "果物:りんご" },
+      { key: "banana", name: "バナナ", foodId: "banana", tag: "果物:バナナ" },
+      { key: "mandarin", name: "みかん", foodId: "mandarin", tag: "果物:みかん" },
+      { key: "peach", name: "白桃", foodId: "peach", tag: "果物:白桃" },
+      { key: "grape", name: "ぶどう", foodId: "grape", tag: "果物:ぶどう" }
+    ];
+    const fruitBases = [
+      { key: "jelly", label: "ゼリー", servingSize: 85, rotationKey: "追加デザートゼリー", ingredients: (flavor) => [part(flavor.foodId, 62)], seasonings: () => [part("sugar", 5), part("gelatin_powder", 2)], instructions: ["果物を食べやすく整える。", "ゼラチンで固めて冷やす。"] },
+      { key: "yogurt", label: "ヨーグルト", servingSize: 95, rotationKey: "追加デザートヨーグルト", ingredients: (flavor) => [part("yogurt", 68), part(flavor.foodId, 24)], seasonings: () => [], instructions: ["果物を刻んでヨーグルトに合わせる。", "冷やして提供する。"] },
+      { key: "compote", label: "コンポート", servingSize: 88, rotationKey: "追加デザートコンポート", ingredients: (flavor) => [part(flavor.foodId, 76)], seasonings: () => [part("sugar", 4)], instructions: ["果物をやわらかく整える。", "軽く甘みをつけて冷やす。"] },
+      { key: "mousse", label: "ムース", servingSize: 84, rotationKey: "追加デザートムース", ingredients: (flavor) => [part("yogurt", 38), part("milk", 18), part(flavor.foodId, 20)], seasonings: () => [part("sugar", 5), part("gelatin_powder", 1.5)], instructions: ["材料をなめらかに混ぜる。", "冷やし固めて提供する。"] },
+      { key: "pudding", label: "プリン", servingSize: 90, rotationKey: "追加デザートプリン", ingredients: (flavor) => [part("milk", 52), part("egg", 16), part(flavor.foodId, 15)], seasonings: () => [part("sugar", 7)], instructions: ["材料を合わせてやさしく加熱する。", "冷やし固めて提供する。"] }
+    ];
+    const softFlavors = [
+      { key: "pumpkin", name: "かぼちゃ", foodId: "pumpkin", tag: "素材:かぼちゃ" },
+      { key: "sweetpotato", name: "さつまいも", foodId: "sweet_potato", tag: "素材:さつまいも" },
+      { key: "carrot", name: "にんじん", foodId: "carrot", tag: "素材:にんじん" },
+      { key: "milk", name: "ミルク", foodId: "milk", tag: "素材:ミルク" },
+      { key: "corn", name: "コーン", foodId: "corn", tag: "素材:コーン" }
+    ];
+    const softBases = [
+      { key: "pudding", label: "プリン", servingSize: 88, rotationKey: "追加ソフトプリン", ingredients: (flavor) => [part("milk", 48), part("egg", 16), part(flavor.foodId, 18)], seasonings: () => [part("sugar", 7)], instructions: ["材料を合わせてやさしく加熱する。", "冷やし固めて提供する。"] },
+      { key: "mousse", label: "ムース", servingSize: 84, rotationKey: "追加ソフトムース", ingredients: (flavor) => [part("yogurt", 36), part("milk", 18), part(flavor.foodId, 22)], seasonings: () => [part("sugar", 5), part("gelatin_powder", 1.5)], instructions: ["材料をなめらかに混ぜる。", "冷やし固めて提供する。"] },
+      { key: "kanten", label: "ミルク寒天", servingSize: 86, rotationKey: "追加ソフト寒天", ingredients: (flavor) => [part("milk", 55), part(flavor.foodId, 18)], seasonings: () => [part("sugar", 5), part("gelatin_powder", 2)], instructions: ["材料を混ぜて温める。", "冷やし固めて提供する。"] },
+      { key: "bavarois", label: "ババロア", servingSize: 86, rotationKey: "追加ソフトババロア", ingredients: (flavor) => [part("milk", 50), part("egg", 12), part(flavor.foodId, 18)], seasonings: () => [part("sugar", 6), part("gelatin_powder", 1.5)], instructions: ["材料を混ぜてなめらかにする。", "冷やし固めて提供する。"] },
+      { key: "cake", label: "やわらかケーキ", servingSize: 82, rotationKey: "追加ソフトケーキ", ingredients: (flavor) => [part("flour", 20), part("egg", 12), part("milk", 14), part(flavor.foodId, 18)], seasonings: () => [part("sugar", 7), part("baking_powder", 1.5)], instructions: ["生地に素材を合わせる。", "やわらかく焼くか蒸して仕上げる。"] }
+    ];
+    const recipes = [];
+    fruitFlavors.forEach((flavor, flavorIndex) => {
+      fruitBases.forEach((base, baseIndex) => {
+        recipes.push(createRecipe({ id: `plus-dessert-fruit-${flavor.key}-${base.key}`, name: `${flavor.name}${base.label}`, category: "デザート", cuisine: CUISINES[(flavorIndex + baseIndex) % CUISINES.length], servingSize: base.servingSize, rotationKey: base.rotationKey, tags: ["追加レシピ", "デザート", flavor.tag], description: `${flavor.name}を使った食べやすいデザート。`, ingredients: base.ingredients(flavor), seasonings: base.seasonings(flavor), instructions: base.instructions }));
+      });
+    });
+    softFlavors.forEach((flavor, flavorIndex) => {
+      softBases.forEach((base, baseIndex) => {
+        recipes.push(createRecipe({ id: `plus-dessert-soft-${flavor.key}-${base.key}`, name: `${flavor.name}${base.label}`, category: "デザート", cuisine: CUISINES[(flavorIndex + baseIndex + 1) % CUISINES.length], servingSize: base.servingSize, rotationKey: base.rotationKey, tags: ["追加レシピ", "デザート", flavor.tag], description: `${flavor.name}を使ったやわらかいデザート。`, ingredients: base.ingredients(flavor), seasonings: base.seasonings(flavor), instructions: base.instructions }));
+      });
+    });
+    return recipes;
+  }
+  function buildAdditionalSnackRecipes() {
+    const fruitFlavors = [
+      { key: "apple", name: "りんご", foodId: "apple" },
+      { key: "banana", name: "バナナ", foodId: "banana" },
+      { key: "mandarin", name: "みかん", foodId: "mandarin" },
+      { key: "peach", name: "白桃", foodId: "peach" },
+      { key: "grape", name: "ぶどう", foodId: "grape" }
+    ];
+    const fruitBases = [
+      { key: "steamed", label: "蒸しパン", servingSize: 80, rotationKey: "追加おやつ蒸しパン", ingredients: (flavor) => [part("flour", 20), part("milk", 14), part("egg", 10), part(flavor.foodId, 20)], seasonings: () => [part("sugar", 7), part("baking_powder", 1.5)], instructions: ["生地に果物を合わせる。", "やわらかく蒸して提供する。"] },
+      { key: "cake", label: "ふんわりケーキ", servingSize: 82, rotationKey: "追加おやつケーキ", ingredients: (flavor) => [part("flour", 22), part("egg", 12), part("milk", 12), part(flavor.foodId, 18)], seasonings: () => [part("sugar", 8), part("baking_powder", 1.5)], instructions: ["生地に果物を合わせる。", "しっとり焼き上げる。"] },
+      { key: "manju", label: "やわらかまんじゅう", servingSize: 76, rotationKey: "追加おやつまんじゅう", ingredients: (flavor) => [part("flour", 18), part(flavor.foodId, 22)], seasonings: () => [part("sugar", 6), part("baking_powder", 1)], instructions: ["生地に具材を包む。", "やわらかく蒸して提供する。"] },
+      { key: "pudding", label: "パンプディング", servingSize: 82, rotationKey: "追加おやつパンプディング", ingredients: (flavor) => [part("bread", 35), part("milk", 24), part("egg", 12), part(flavor.foodId, 14)], seasonings: () => [part("sugar", 5)], instructions: ["材料を合わせてしっとり加熱する。", "食べやすく冷まして提供する。"] },
+      { key: "roll", label: "ロールケーキ", servingSize: 78, rotationKey: "追加おやつロール", ingredients: (flavor) => [part("flour", 18), part("egg", 12), part("milk", 10), part(flavor.foodId, 18)], seasonings: () => [part("sugar", 7), part("baking_powder", 1)], instructions: ["生地に果物を合わせる。", "やわらかいロールケーキに仕上げる。"] }
+    ];
+    const softFlavors = [
+      { key: "pumpkin", name: "かぼちゃ", foodId: "pumpkin" },
+      { key: "sweetpotato", name: "さつまいも", foodId: "sweet_potato" },
+      { key: "carrot", name: "にんじん", foodId: "carrot" },
+      { key: "milk", name: "ミルク", foodId: "milk" },
+      { key: "corn", name: "コーン", foodId: "corn" }
+    ];
+    const softBases = [
+      { key: "steamed", label: "蒸しパン", servingSize: 80, rotationKey: "追加おやつ蒸しパン", ingredients: (flavor) => [part("flour", 20), part("milk", 14), part("egg", 10), part(flavor.foodId, 20)], seasonings: () => [part("sugar", 7), part("baking_powder", 1.5)], instructions: ["生地に素材を合わせる。", "やわらかく蒸して提供する。"] },
+      { key: "cake", label: "しっとりケーキ", servingSize: 82, rotationKey: "追加おやつケーキ", ingredients: (flavor) => [part("flour", 22), part("egg", 12), part("milk", 12), part(flavor.foodId, 18)], seasonings: () => [part("sugar", 8), part("baking_powder", 1.5)], instructions: ["生地に素材を合わせる。", "しっとり焼き上げる。"] },
+      { key: "pudding", label: "パンプディング", servingSize: 82, rotationKey: "追加おやつパンプディング", ingredients: (flavor) => [part("bread", 35), part("milk", 24), part("egg", 12), part(flavor.foodId, 14)], seasonings: () => [part("sugar", 5)], instructions: ["材料を合わせてしっとり加熱する。", "食べやすく冷まして提供する。"] },
+      { key: "cookie", label: "ソフトクッキー", servingSize: 70, rotationKey: "追加おやつ焼き菓子", ingredients: (flavor) => [part("flour", 18), part("milk", 10), part(flavor.foodId, 16)], seasonings: () => [part("sugar", 6), part("butter", 3), part("baking_powder", 1)], instructions: ["生地に素材を合わせる。", "やわらかく焼き上げる。"] },
+      { key: "bouchee", label: "やわらかブッセ", servingSize: 74, rotationKey: "追加おやつブッセ", ingredients: (flavor) => [part("flour", 16), part("egg", 12), part("milk", 10), part(flavor.foodId, 16)], seasonings: () => [part("sugar", 6), part("baking_powder", 1)], instructions: ["生地に素材を合わせる。", "ふんわりと焼き上げる。"] }
+    ];
+    const recipes = [];
+    fruitFlavors.forEach((flavor, flavorIndex) => {
+      fruitBases.forEach((base, baseIndex) => {
+        recipes.push(createRecipe({ id: `plus-snack-fruit-${flavor.key}-${base.key}`, name: `${flavor.name}${base.label}`, category: "おやつ", cuisine: CUISINES[(flavorIndex + baseIndex) % CUISINES.length], servingSize: base.servingSize, rotationKey: base.rotationKey, tags: ["追加レシピ", "おやつ", "追加おやつ"], description: `${flavor.name}を使った食べやすいおやつ。`, ingredients: base.ingredients(flavor), seasonings: base.seasonings(flavor), instructions: base.instructions }));
+      });
+    });
+    softFlavors.forEach((flavor, flavorIndex) => {
+      softBases.forEach((base, baseIndex) => {
+        recipes.push(createRecipe({ id: `plus-snack-soft-${flavor.key}-${base.key}`, name: `${flavor.name}${base.label}`, category: "おやつ", cuisine: CUISINES[(flavorIndex + baseIndex + 1) % CUISINES.length], servingSize: base.servingSize, rotationKey: base.rotationKey, tags: ["追加レシピ", "おやつ", "追加おやつ"], description: `${flavor.name}を使ったやわらかいおやつ。`, ingredients: base.ingredients(flavor), seasonings: base.seasonings(flavor), instructions: base.instructions }));
+      });
+    });
+    return recipes;
+  }
+  function buildBirthdayCakeRecipes() {
+    const flavors = [
+      { key: "apple", name: "りんご", foodId: "apple" },
+      { key: "banana", name: "バナナ", foodId: "banana" },
+      { key: "mandarin", name: "みかん", foodId: "mandarin" },
+      { key: "orange", name: "オレンジ", foodId: "orange" },
+      { key: "peach", name: "白桃", foodId: "peach" },
+      { key: "grape", name: "ぶどう", foodId: "grape" }
+    ];
+    const cakeStyles = [
+      { key: "short", label: "のバースデーショートケーキ", servingSize: 88, ingredients: (flavor) => [part("flour", 22), part("egg", 14), part("milk", 16), part(flavor.foodId, 18)], seasonings: () => [part("sugar", 8), part("baking_powder", 1.5)], instructions: ["生地を焼いてやわらかく仕上げる。", "果物を添えて提供する。"] },
+      { key: "roll", label: "のバースデーロールケーキ", servingSize: 86, ingredients: (flavor) => [part("flour", 20), part("egg", 14), part("milk", 14), part(flavor.foodId, 18)], seasonings: () => [part("sugar", 8), part("baking_powder", 1.5)], instructions: ["生地をやわらかく焼く。", "果物を合わせて巻き、食べやすく切る。"] },
+      { key: "mousse", label: "のバースデームースケーキ", servingSize: 84, ingredients: (flavor) => [part("yogurt", 38), part("milk", 18), part(flavor.foodId, 22)], seasonings: () => [part("sugar", 5), part("gelatin_powder", 1.5)], instructions: ["材料をなめらかに混ぜる。", "冷やし固めてケーキ仕立てにする。"] },
+      { key: "milk", label: "のバースデーミルクケーキ", servingSize: 86, ingredients: (flavor) => [part("flour", 20), part("egg", 12), part("milk", 18), part(flavor.foodId, 16)], seasonings: () => [part("sugar", 8), part("baking_powder", 1.5)], instructions: ["生地をやわらかく焼く。", "果物を添えて食べやすく仕上げる。"] },
+      { key: "fruit", label: "のバースデーフルーツケーキ", servingSize: 88, ingredients: (flavor) => [part("flour", 22), part("egg", 12), part("milk", 14), part(flavor.foodId, 20)], seasonings: () => [part("sugar", 8), part("baking_powder", 1.5)], instructions: ["生地に果物を合わせて焼く。", "冷まして提供する。"] }
+    ];
+    const recipes = [];
+    flavors.forEach((flavor) => {
+      cakeStyles.forEach((style) => {
+        recipes.push(createRecipe({ id: `birthday-cake-${flavor.key}-${style.key}`, name: `${flavor.name}${style.label}`, category: "おやつ", cuisine: "洋食", servingSize: style.servingSize, rotationKey: "誕生日ケーキ", tags: ["追加レシピ", "おやつ", "birthday-cake", "誕生日", "ケーキ"], description: `${flavor.name}を使ったお誕生日用ケーキ。`, notes: "誕生日提供向けのやわらかいケーキ。", ingredients: style.ingredients(flavor), seasonings: style.seasonings(flavor), instructions: style.instructions }));
+      });
+    });
+    return recipes;
+  }
   function buildRecipeMaster() {
     const recipes = [];
     recipes.push(
@@ -785,7 +1176,19 @@
     buildMainSeries(recipes, "jp", "和食", [{ id: "white_fish", name: "白身魚", grams: 90, rotationKey: "魚" }, { id: "salmon", name: "鮭", grams: 90, rotationKey: "魚" }, { id: "chicken_thigh", name: "鶏もも", grams: 90, rotationKey: "鶏" }, { id: "pork_lean", name: "豚肉", grams: 85, rotationKey: "豚" }], [{ key: "nimono", label: "の煮付け", seasonings: [part("soy_sauce", 6), part("mirin", 6), part("sugar", 2), part("broth", 18)], ingredients: [], tags: ["煮物"] }, { key: "miso", label: "の味噌煮", seasonings: [part("miso", 10), part("mirin", 4), part("sugar", 2), part("broth", 18)], ingredients: [], tags: ["味噌"] }, { key: "teri", label: "の照り焼き", seasonings: [part("soy_sauce", 7), part("mirin", 7), part("sugar", 2)], ingredients: [], tags: ["照り焼き"] }, { key: "oroshi", label: "のおろしあん", seasonings: [part("light_soy", 4), part("broth", 22), part("starch", 2)], ingredients: [part("daikon", 25)], tags: ["あん"] }, { key: "yawaraka", label: "のやわらか煮", seasonings: [part("soy_sauce", 5), part("mirin", 4), part("broth", 24)], ingredients: [part("onion", 18)], tags: ["やわらか"] }]);
     buildMainSeries(recipes, "west", "洋食", [{ id: "chicken_thigh", name: "チキン", grams: 90, rotationKey: "鶏" }, { id: "pork_lean", name: "ポーク", grams: 85, rotationKey: "豚" }, { id: "white_fish", name: "白身魚", grams: 90, rotationKey: "魚" }, { id: "salmon", name: "鮭", grams: 90, rotationKey: "魚" }], [{ key: "tomato", label: "のトマト煮", seasonings: [part("tomato", 28), part("ketchup", 6), part("consomme", 2), part("salt", 0.2), part("pepper", 0.05)], ingredients: [part("onion", 20)], tags: ["トマト"], instructions: ["主材料と玉ねぎをやわらかく煮る。", "トマト、ケチャップ、コンソメで味を整える。"] }, { key: "cream", label: "のクリーム煮", seasonings: [part("milk", 45), part("butter", 4), part("flour", 4), part("consomme", 1), part("salt", 0.2), part("pepper", 0.05)], ingredients: [part("onion", 18)], tags: ["クリーム"], instructions: ["主材料と玉ねぎをやわらかく加熱する。", "バターと小麦粉をなじませ、牛乳とコンソメでクリーム煮に仕上げる。"] }, { key: "munier", label: "のムニエル", seasonings: [part("butter", 3), part("pepper", 0.1)], ingredients: [part("potato", 20), part("flour", 3)], tags: ["焼き"], instructions: ["主材料に薄く小麦粉をまぶす。", "バターでやわらかく焼き、付け合わせを添える。"] }, { key: "herb", label: "のハーブ焼き", seasonings: [part("butter", 2), part("pepper", 0.1), part("salt", 0.2)], ingredients: [part("carrot", 16)], tags: ["焼き"], instructions: ["主材料に下味をつける。", "付け合わせとともにやわらかく焼く。"] }, { key: "cheese", label: "のチーズ焼き", seasonings: [part("cheese", 10), part("consomme", 1)], ingredients: [part("tomato", 18)], tags: ["チーズ"], instructions: ["主材料にトマトを添えて加熱する。", "チーズをのせてやわらかく焼き上げる。"] }]);
     buildMainSeries(recipes, "cn", "中華", [{ id: "chicken_thigh", name: "鶏肉", grams: 90, rotationKey: "鶏" }, { id: "pork_lean", name: "豚肉", grams: 85, rotationKey: "豚" }, { id: "white_fish", name: "白身魚", grams: 90, rotationKey: "魚" }, { id: "tofu", name: "豆腐", grams: 120, rotationKey: "豆腐" }], [{ key: "an", label: "の中華あん", seasonings: [part("broth", 25), part("soy_sauce", 3), part("starch", 2)], ingredients: [part("carrot", 16), part("green_peas", 10)], tags: ["あん"] }, { key: "oyster", label: "のオイスター煮", seasonings: [part("oyster_sauce", 4), part("broth", 20), part("sesame_oil", 1)], ingredients: [part("onion", 18)], tags: ["オイスター"] }, { key: "sweet-sour", label: "の甘酢あん", seasonings: [part("ketchup", 5), part("vinegar", 3), part("sugar", 2), part("starch", 2)], ingredients: [part("onion", 16)], tags: ["甘酢"] }, { key: "ginger", label: "のしょうが蒸し", seasonings: [part("soy_sauce", 3), part("broth", 18), part("sesame_oil", 1)], ingredients: [part("chinese_cabbage", 20)], tags: ["蒸し"] }, { key: "stir", label: "のやわらか炒め", seasonings: [part("soy_sauce", 3), part("oyster_sauce", 2), part("sesame_oil", 1)], ingredients: [part("bell_pepper", 12), part("onion", 16)], tags: ["炒め"] }]);
-    recipes.push(...buildJapaneseSides(), ...buildWesternSides(), ...buildChineseSides(), ...buildExtraSides(), ...buildSingleDishes(), ...buildDesserts());
+    recipes.push(
+      ...buildJapaneseSides(),
+      ...buildWesternSides(),
+      ...buildChineseSides(),
+      ...buildExtraSides(),
+      ...buildAdditionalSideRecipes(),
+      ...buildSingleDishes(),
+      ...buildAdditionalSingleDishes(),
+      ...buildDesserts(),
+      ...buildAdditionalDessertRecipes(),
+      ...buildAdditionalSoupRecipes(),
+      ...buildAdditionalMainRecipes()
+    );
     return recipes;
   }
 
@@ -1389,7 +1792,7 @@
       createRecipe({ id: "snack-simple-waffle", name: "ワッフル", category: "おやつ", cuisine: "洋食", servingSize: 70, rotationKey: "焼き菓子", tags: ["おやつ", "洋菓子", "焼き菓子"], notes: "市販のワッフルを食べやすい状態で提供する。", ingredients: [part("bread", 70, { label: "市販ワッフル 1個", prep: "食べやすい大きさを確認する" })], seasonings: [], instructions: ["個包装のまま、または皿にのせて提供する。"], nutrition: { energy: 156, protein: 3.5, fat: 5.8, carbs: 22.8, fiber: 0.4, salt: 0.2 } }),
       createRecipe({ id: "snack-simple-minicake", name: "ミニケーキ", category: "おやつ", cuisine: "洋食", servingSize: 70, rotationKey: "洋菓子", tags: ["おやつ", "洋菓子"], notes: "市販のミニケーキを人数分配りやすい形で使用する。", ingredients: [part("bread", 70, { label: "市販ミニケーキ 1個", prep: "個包装または皿で提供できるよう準備する" })], seasonings: [], instructions: ["個包装のまま、または皿にのせて提供する。"], nutrition: { energy: 152, protein: 3.2, fat: 6.1, carbs: 21.6, fiber: 0.4, salt: 0.2 } })
     ];
-    return simpleSnacks;
+    return [...simpleSnacks, ...buildAdditionalSnackRecipes(), ...buildBirthdayCakeRecipes()];
   }
 
   const SPECIAL_MENU_RECIPES = [
@@ -2550,67 +2953,34 @@
   function renderRecipeMasterAiRow() {
     return `<div class="recipe-master-ai-row"><p class="recipe-master-ai-note">AI下書き。内容確認後に保存してください。</p><button type="button" class="button button-secondary recipe-master-ai-button${state.recipeMasterAiLoading ? " is-loading" : ""}" id="recipe-master-ai-button" ${state.recipeMasterAiLoading ? "disabled" : ""}>${state.recipeMasterAiLoading ? "AI入力中..." : "AI"}</button></div>`;
   }
-  function getRecipeMasterAiApiKey() {
-    const globalKey = typeof globalThis.MOGU_AI_API_KEY === "string" ? globalThis.MOGU_AI_API_KEY.trim() : "";
-    if (globalKey) return globalKey;
-    try {
-      const storedKey = globalThis.localStorage?.getItem(STORAGE_KEYS.aiApiKey) || "";
-      return storedKey.trim();
-    } catch (_error) {
-      return "";
+  const RECIPE_MASTER_AI_ENDPOINT = "/api/recipe-autofill";
+  function readRecipeMasterAiErrorMessage(payload) {
+    if (payload && typeof payload.error === "string" && payload.error.trim()) {
+      return payload.error.trim();
     }
-  }
-  function extractRecipeMasterAiJson(text) {
-    const trimmed = (text || "").trim();
-    if (!trimmed) return "{}";
-    const fenceMatch = trimmed.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
-    if (fenceMatch?.[1]) {
-      return fenceMatch[1].trim();
-    }
-    const start = trimmed.indexOf("{");
-    const end = trimmed.lastIndexOf("}");
-    if (start >= 0 && end > start) {
-      return trimmed.slice(start, end + 1);
-    }
-    return trimmed;
+    return "AI入力に失敗しました。もう一度お試しください。";
   }
   async function callRecipeAutofillAI(recipeName) {
-    const apiKey = getRecipeMasterAiApiKey();
-    if (!apiKey) {
-      throw new Error("AI APIキーが設定されていません。");
-    }
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(apiKey)}`, {
+    const response = await fetch(RECIPE_MASTER_AI_ENDPOINT, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({
-        systemInstruction: {
-          parts: [{
-            text: "あなたは高齢者施設向け昼食献立アプリの補助AIです。料理名から管理栄養士が確認しやすい下書きをJSONのみで返してください。カテゴリは 主食 / 汁物 / 主菜 / 副菜 / デザート / おやつ / 単品料理 のどれかだけ、cuisine は 和食 / 洋食 / 中華 のどれかだけを使ってください。servingSize は g の数値、energy は kcal の数値、salt は g の数値です。steps は調理士が分かる短い手順配列にしてください。不明な項目は推測しすぎず控えめな妥当値にしてください。JSON以外は返さないでください。"
-          }]
-        },
-        contents: [{
-          role: "user",
-          parts: [{
-            text: `料理名: ${recipeName}\n上記の料理名に対して、category, cuisine, servingSize, description, notes, steps, nutrition.energy, nutrition.salt をJSONで返してください。`
-          }]
-        }],
-        generationConfig: {
-          temperature: 0.2,
-          responseMimeType: "application/json"
-        }
-      })
+      body: JSON.stringify({ recipeName })
     });
+    let payload = null;
+    try {
+      payload = await response.json();
+    } catch (_error) {
+      payload = null;
+    }
     if (!response.ok) {
+      throw new Error(readRecipeMasterAiErrorMessage(payload));
+    }
+    if (!payload || typeof payload !== "object") {
       throw new Error("AI入力に失敗しました。もう一度お試しください。");
     }
-    const data = await response.json();
-    const responseText = data?.candidates?.[0]?.content?.parts?.map((part) => part?.text || "").join("\n").trim();
-    if (!responseText) {
-      throw new Error("AI入力に失敗しました。もう一度お試しください。");
-    }
-    return JSON.parse(extractRecipeMasterAiJson(responseText));
+    return payload;
   }
   function mergeRecipeMasterDraftWithAiResult(draft, aiResult) {
     const nextDraft = { ...(draft || createEmptyRecipeMasterDraft()) };
