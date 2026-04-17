@@ -1,4 +1,4 @@
-(function () {
+﻿(function () {
   const STORAGE_KEYS = globalThis.STORAGE_KEYS || {
     customFoods: "nutrition-kun::custom-foods",
     customRecipes: "nutrition-kun::custom-recipes",
@@ -282,6 +282,17 @@
       color:#5a473a;
     }
     .detail-grid > .recipe-list { gap:9px; }
+    .detail-grid > .recipe-list .recipe-master-cuisine-group {
+      display:grid;
+      gap:9px;
+    }
+    .detail-grid > .recipe-list .recipe-master-cuisine-heading {
+      margin:2px 2px 0;
+      font-size:0.84rem;
+      font-weight:800;
+      letter-spacing:0.08em;
+      color:#8b654c;
+    }
     .detail-grid > .recipe-list .recipe-card {
       padding:12px 13px;
       min-height:0;
@@ -868,7 +879,38 @@
       { id: "single-plus2-cn-seafood-ramen", name: "海鮮風塩ラーメン", cuisine: "中華", servingSize: 325, rotationKey: "ラーメン", tags: ["麺類"], ingredients: [part("chinese_noodles", 180), part("shrimp", 30), part("white_fish", 25), part("komatsuna", 15)], seasonings: [part("broth", 88), part("salt", 0.4), part("sesame_oil", 1)], instructions: ["具材をやわらかく煮る。", "塩味のスープで麺と合わせる。"] },
       { id: "single-plus2-cn-shrimp-porridge", name: "えび中華粥", cuisine: "中華", servingSize: 285, rotationKey: "中華粥", tags: ["中華主食"], ingredients: [part("soft_rice", 140), part("shrimp", 30), part("egg", 15), part("komatsuna", 12)], seasonings: [part("broth", 75), part("salt", 0.3), part("sesame_oil", 1)], instructions: ["具材をやわらかく煮る。", "中華粥に仕上げて提供する。"] },
       { id: "single-plus2-cn-egg-porridge", name: "中華風たまご粥", cuisine: "中華", servingSize: 280, rotationKey: "中華粥", tags: ["中華主食"], ingredients: [part("soft_rice", 140), part("egg", 25), part("onion", 15), part("komatsuna", 12)], seasonings: [part("broth", 75), part("salt", 0.3), part("sesame_oil", 1)], instructions: ["具材をやわらかく煮る。", "卵を加えて中華粥に仕上げる。"] },
-      { id: "single-plus2-cn-champon-udon", name: "ちゃんぽん風うどん", cuisine: "中華", servingSize: 325, rotationKey: "うどん", tags: ["麺類"], ingredients: [part("udon", 190), part("chicken_breast", 35), part("chinese_cabbage", 20), part("carrot", 12), part("corn", 10)], seasonings: [part("broth", 88), part("soy_sauce", 3), part("sesame_oil", 1)], instructions: ["具材をやわらかく煮る。", "うどんに合わせてちゃんぽん風に仕上げる。"] }
+      { id: "single-plus2-cn-champon-udon", name: "ちゃんぽん風うどん", cuisine: "中華", servingSize: 325, rotationKey: "うどん", tags: ["麺類"], ingredients: [part("udon", 190), part("chicken_breast", 35), part("chinese_cabbage", 20), part("carrot", 12), part("corn", 10)], seasonings: [part("broth", 88), part("soy_sauce", 3), part("sesame_oil", 1)], instructions: ["具材をやわらかく煮る。", "うどんに合わせてちゃんぽん風に仕上げる。"] },
+      { id: "single-plus2-cn-gomoku-ankake-udon", name: "五目あんかけうどん", cuisine: "中華", servingSize: 325, rotationKey: "うどん", tags: ["麺類"], description: "やわらかく茹でたうどんに中華あんをかけた、食べやすい完成主食。", notes: "主食の完成メニューとして扱い、具とうどんを分割しないこと。", ingredients: [part("udon", 190), part("chicken_breast", 35), part("chinese_cabbage", 20), part("carrot", 12), part("mushrooms", 15)], seasonings: [part("broth", 88), part("soy_sauce", 3), part("sesame_oil", 1), part("starch", 2)], instructions: ["うどんをやわらかめに茹でる。", "野菜と具材を食べやすく煮る。", "中華あんを作ってとろみをつける。", "うどんにかけて仕上げる。"] },
+      { id: "single-plus2-jp-sansai-soba", name: "山菜そば", cuisine: "和食", servingSize: 320, rotationKey: "そば", tags: ["麺類", "そば"], description: "だしの旨味を活かした、食べやすいそばの完成主食です。", notes: "麺はやや短めにし、山菜はやわらかく煮て提供する。", ingredients: [part("udon", 180, { label: "そば", prep: "やや短めにしてやわらかく仕上げる" }), part("komatsuna", 20, { label: "山菜ミックス", prep: "食べやすい長さに整える" }), part("carrot", 10, { prep: "細切り" })], seasonings: [part("broth", 220, { label: "だし" }), part("light_soy", 7), part("mirin", 4)], instructions: ["そばをやわらかめに茹でて短めに整える。", "山菜とにんじんをだしでやわらかく煮る。", "調味してそばにかけて仕上げる。"], nutrition: { energy: 338, protein: 11.6, fat: 4.1, carbs: 61.8, fiber: 3.9, salt: 2.4 } },
+      { id: "single-plus2-jp-tanuki-soba", name: "たぬきそば", cuisine: "和食", servingSize: 315, rotationKey: "そば", tags: ["麺類", "そば"], description: "だしの香りを活かした、親しみやすいそばの完成主食です。", notes: "麺は短めにし、天かすは少量でつゆを含ませて食べやすくする。", ingredients: [part("udon", 180, { label: "そば", prep: "やや短めにしてやわらかく仕上げる" }), part("onion", 12, { label: "天かす", prep: "少量を使用" }), part("komatsuna", 12, { label: "青ねぎ", prep: "やわらかくする" })], seasonings: [part("broth", 220, { label: "だし" }), part("light_soy", 7), part("mirin", 4)], instructions: ["そばをやわらかめに茹でて短めに整える。", "だしを温めて調味する。", "そばに具をのせて仕上げる。"], nutrition: { energy: 352, protein: 10.9, fat: 6.3, carbs: 60.5, fiber: 2.8, salt: 2.5 } },
+      { id: "single-plus2-jp-kitsune-soba", name: "きつねそば", cuisine: "和食", servingSize: 325, rotationKey: "そば", tags: ["麺類", "そば"], description: "味を含ませた具材でやさしく仕上げる、定番のそば主食です。", notes: "油揚げは甘辛くやわらかく煮て、麺は短めに仕上げる。", ingredients: [part("udon", 180, { label: "そば", prep: "やや短めにしてやわらかく仕上げる" }), part("tofu", 35, { label: "油揚げ", prep: "やわらかく煮る" }), part("komatsuna", 12, { label: "青ねぎ", prep: "やわらかくする" })], seasonings: [part("broth", 220, { label: "だし" }), part("light_soy", 7), part("mirin", 5), part("sugar", 2)], instructions: ["油揚げを甘辛くやわらかく煮る。", "そばをやわらかめに茹でて短めに整える。", "だしを温めて具をのせて仕上げる。"], nutrition: { energy: 361, protein: 12.4, fat: 6.8, carbs: 60.9, fiber: 3.1, salt: 2.5 } },
+      { id: "single-plus2-jp-tsukimi-soba", name: "月見そば", cuisine: "和食", servingSize: 320, rotationKey: "そば", tags: ["麺類", "そば"], description: "卵のやわらかさを活かし、のどごし良く仕上げたそばの完成主食です。", notes: "卵はやわらかく仕上げ、麺は短めにして提供する。", ingredients: [part("udon", 180, { label: "そば", prep: "やや短めにしてやわらかく仕上げる" }), part("egg", 35, { prep: "やわらかく加熱する" }), part("komatsuna", 10, { label: "青ねぎ", prep: "やわらかくする" })], seasonings: [part("broth", 220, { label: "だし" }), part("light_soy", 7), part("mirin", 4)], instructions: ["そばをやわらかめに茹でて短めに整える。", "だしを温めて調味する。", "卵をやわらかく加熱してのせ、仕上げる。"], nutrition: { energy: 348, protein: 13.1, fat: 6.2, carbs: 58.7, fiber: 2.6, salt: 2.4 } },
+      { id: "single-plus2-jp-kakitama-soba", name: "かき玉そば", cuisine: "和食", servingSize: 325, rotationKey: "そば", tags: ["麺類", "そば"], description: "卵でつゆをやさしくまとめた、飲み込みやすいそばの完成主食です。", notes: "卵はふんわり仕上げ、軽いとろみでつゆをまとわせる。", ingredients: [part("udon", 180, { label: "そば", prep: "やや短めにしてやわらかく仕上げる" }), part("egg", 40), part("onion", 12, { label: "長ねぎ", prep: "やわらかく煮る" })], seasonings: [part("broth", 220, { label: "だし" }), part("light_soy", 7), part("mirin", 4), part("starch", 2)], instructions: ["そばをやわらかめに茹でて短めに整える。", "だしを温めて軽くとろみをつける。", "溶き卵を流し入れてふんわり仕上げる。"], nutrition: { energy: 354, protein: 13.6, fat: 6.1, carbs: 59.8, fiber: 2.5, salt: 2.5 } },
+      { id: "single-plus2-jp-nishin-soba", name: "にしんそば", cuisine: "和食", servingSize: 330, rotationKey: "そば", tags: ["麺類", "そば"], description: "やわらかく煮た魚をのせ、だしの旨味で食べやすくしたそばの完成主食です。", notes: "魚は骨に注意し、やわらかく煮てから提供する。", ingredients: [part("udon", 180, { label: "そば", prep: "やや短めにしてやわらかく仕上げる" }), part("salmon", 45, { label: "にしん甘露煮風", prep: "骨に注意してやわらかく煮る" }), part("onion", 10, { label: "長ねぎ", prep: "やわらかく煮る" })], seasonings: [part("broth", 220, { label: "だし" }), part("light_soy", 7), part("mirin", 5), part("sugar", 2)], instructions: ["魚をやわらかく煮て味を含ませる。", "そばをやわらかめに茹でて短めに整える。", "だしを温め、魚をのせて仕上げる。"], nutrition: { energy: 372, protein: 16.2, fat: 7.3, carbs: 58.9, fiber: 2.4, salt: 2.6 } },
+      { id: "single-plus2-jp-tori-nanban-soba", name: "鶏南蛮そば", cuisine: "和食", servingSize: 330, rotationKey: "そば", tags: ["麺類", "そば"], description: "鶏肉と長ねぎをやわらかく仕上げた、だしの風味豊かなそばの完成主食です。", notes: "鶏肉は小さめにし、長ねぎは十分にやわらかく煮る。", ingredients: [part("udon", 180, { label: "そば", prep: "やや短めにしてやわらかく仕上げる" }), part("chicken_thigh", 45, { prep: "小さめに切る" }), part("onion", 20, { label: "長ねぎ", prep: "やわらかく煮る" })], seasonings: [part("broth", 220, { label: "だし" }), part("light_soy", 7), part("mirin", 5)], instructions: ["鶏肉と長ねぎをだしでやわらかく煮る。", "そばをやわらかめに茹でて短めに整える。", "温かいつゆを注いで仕上げる。"], nutrition: { energy: 381, protein: 16.8, fat: 7.8, carbs: 60.1, fiber: 2.7, salt: 2.6 } },
+      { id: "single-plus2-jp-gomoku-ankake-soba", name: "五目あんかけそば", cuisine: "中華", servingSize: 340, rotationKey: "そば", tags: ["麺類", "そば", "とろみ"], description: "具だくさんのあんをかけ、とろみでまとめた食べやすいそばの完成主食です。", notes: "主食の完成メニューとして扱い、具とそばを分割しない。具材は小さめにそろえる。", ingredients: [part("udon", 180, { label: "そば", prep: "やや短めにしてやわらかく仕上げる" }), part("chicken_breast", 30, { label: "鶏肉", prep: "小さめに切る" }), part("chinese_cabbage", 20, { label: "白菜", prep: "やわらかく煮る" }), part("carrot", 15, { prep: "細切り" }), part("mushrooms", 12, { label: "しいたけ", prep: "小さめに切る" })], seasonings: [part("broth", 220, { label: "中華だし" }), part("soy_sauce", 7), part("mirin", 3), part("starch", 3)], instructions: ["具材を食べやすい大きさにそろえてやわらかく煮る。", "調味して片栗粉でとろみをつける。", "そばにあんをかけて仕上げる。"], nutrition: { energy: 392, protein: 15.2, fat: 6.8, carbs: 64.5, fiber: 3.6, salt: 2.7 } },
+      { id: "single-plus2-jp-yawaraka-niku-soba", name: "やわらか肉そば", cuisine: "和食", servingSize: 330, rotationKey: "そば", tags: ["麺類", "そば"], description: "薄切り肉をやわらかく煮てのせた、食べやすいそばの完成主食です。", notes: "肉は薄切りでやわらかく煮含め、麺は短めにして提供する。", ingredients: [part("udon", 180, { label: "そば", prep: "やや短めにしてやわらかく仕上げる" }), part("pork_lean", 45, { label: "やわらか肉", prep: "薄切りでやわらかく煮る" }), part("onion", 18, { label: "長ねぎ", prep: "やわらかく煮る" })], seasonings: [part("broth", 220, { label: "だし" }), part("light_soy", 7), part("mirin", 5), part("sugar", 2)], instructions: ["肉を薄切りでやわらかく煮含める。", "そばをやわらかめに茹でて短めに整える。", "温かいつゆと一緒に盛り付ける。"], nutrition: { energy: 387, protein: 16.4, fat: 8.1, carbs: 60.3, fiber: 2.7, salt: 2.6 } },
+      { id: "single-plus2-jp-kinoko-negi-soba", name: "きのこと長ねぎのそば", cuisine: "和食", servingSize: 320, rotationKey: "そば", tags: ["麺類", "そば", "きのこ"], description: "きのこの旨味と長ねぎの甘みを活かした、やさしい味わいのそばの完成主食です。", notes: "きのこは細かめにし、長ねぎはやわらかく煮て食べやすくする。", ingredients: [part("udon", 180, { label: "そば", prep: "やや短めにしてやわらかく仕上げる" }), part("mushrooms", 25, { label: "きのこ", prep: "食べやすく切る" }), part("onion", 22, { label: "長ねぎ", prep: "やわらかく煮る" })], seasonings: [part("broth", 220, { label: "だし" }), part("light_soy", 7), part("mirin", 4)], instructions: ["きのこと長ねぎをだしでやわらかく煮る。", "そばをやわらかめに茹でて短めに整える。", "温かいつゆを注いで仕上げる。"], nutrition: { energy: 341, protein: 11.9, fat: 4.5, carbs: 61.2, fiber: 3.4, salt: 2.5 } },
+      { id: "single-plus2-west-meat-sauce-spaghetti-2", name: "ミートソーススパゲティ", cuisine: "洋食", servingSize: 275, rotationKey: "パスタ", tags: ["パスタ"], description: "しっとりしたミートソースで食べやすく仕上げたパスタ主食です。", notes: "麺はやや短めにし、ひき肉と野菜は細かくしてなじませる。", ingredients: [part("pasta", 180, { prep: "やや短めに仕上げる" }), part("beef_mince", 42), part("onion", 20), part("carrot", 12), part("tomato", 28)], seasonings: [part("ketchup", 8), part("consomme", 2), part("butter", 2)], instructions: ["パスタをやわらかめに茹でる。", "具材を細かくしてやわらかく煮る。", "ソースと合わせてしっとり仕上げる。"], nutrition: { energy: 386, protein: 14.8, fat: 8.2, carbs: 61.5, fiber: 3.8, salt: 2.2 } },
+      { id: "single-plus2-west-napolitan-soft-2", name: "ナポリタン", cuisine: "洋食", servingSize: 272, rotationKey: "パスタ", tags: ["パスタ"], description: "ケチャップのやさしい酸味で食べやすくまとめたパスタ主食です。", notes: "麺は短めにし、具材は小さめでやわらかく仕上げる。", ingredients: [part("pasta", 180, { prep: "やや短めに仕上げる" }), part("chicken_breast", 35), part("onion", 18), part("bell_pepper", 10), part("carrot", 10)], seasonings: [part("ketchup", 9), part("consomme", 2), part("butter", 2)], instructions: ["パスタをやわらかめに茹でる。", "具材を食べやすく加熱する。", "ケチャップ味でしっとり仕上げる。"], nutrition: { energy: 378, protein: 14.2, fat: 7.4, carbs: 60.8, fiber: 3.3, salt: 2.1 } },
+      { id: "single-plus2-west-cream-pasta-soft-2", name: "クリームパスタ", cuisine: "洋食", servingSize: 274, rotationKey: "パスタ", tags: ["パスタ"], description: "なめらかなソースでしっとり食べやすく仕上げたパスタ主食です。", notes: "麺は短めにし、ソースはゆるめにして飲み込みやすくする。", ingredients: [part("pasta", 180, { prep: "やや短めに仕上げる" }), part("chicken_breast", 34), part("onion", 15), part("milk", 38)], seasonings: [part("milk", 38), part("butter", 3), part("flour", 4), part("consomme", 1), part("salt", 0.2)], instructions: ["パスタをやわらかめに茹でる。", "具材をやわらかく加熱する。", "クリームソースと合わせてしっとり仕上げる。"], nutrition: { energy: 382, protein: 14.6, fat: 8.7, carbs: 58.9, fiber: 2.3, salt: 1.9 } },
+      { id: "single-plus2-jp-wafu-kinoko-pasta-2", name: "和風きのこパスタ", cuisine: "和食", servingSize: 265, rotationKey: "パスタ", tags: ["パスタ"], description: "だしときのこの旨味を活かした、やさしい和風のパスタ主食です。", notes: "麺は短めにし、きのこは細かくして食べやすくする。", ingredients: [part("pasta", 175, { prep: "やや短めに仕上げる" }), part("mushrooms", 30), part("onion", 15), part("chicken_breast", 28)], seasonings: [part("soy_sauce", 4), part("butter", 2), part("broth", 20, { label: "和風だし" })], instructions: ["パスタをやわらかめに茹でる。", "きのこと具材をやわらかく加熱する。", "和風の味でしっとり仕上げる。"], nutrition: { energy: 371, protein: 14.9, fat: 6.9, carbs: 59.6, fiber: 3.4, salt: 2.0 } },
+      { id: "single-plus2-west-tarako-pasta", name: "たらこパスタ", cuisine: "洋食", servingSize: 260, rotationKey: "パスタ", tags: ["パスタ"], description: "たらこの旨味をやさしくまとめた、食べやすいパスタ主食です。", notes: "麺は短めにし、たらこは全体になじませて塩分が強くなりすぎないようにする。", ingredients: [part("pasta", 175, { prep: "やや短めに仕上げる" }), part("salmon", 25, { label: "たらこ", prep: "全体にほぐしてなじませる" }), part("onion", 12), part("broccoli", 16, { label: "刻みのり風彩り", prep: "やわらかく仕上げる" })], seasonings: [part("butter", 3), part("light_soy", 2), part("broth", 12, { label: "だし" })], instructions: ["パスタをやわらかめに茹でる。", "具材をなじませるように温める。", "全体を和えてしっとり仕上げる。"], nutrition: { energy: 364, protein: 13.8, fat: 7.1, carbs: 58.1, fiber: 2.8, salt: 1.9 } },
+      { id: "single-plus2-west-tuna-spinach-pasta", name: "ツナとほうれん草のパスタ", cuisine: "洋食", servingSize: 268, rotationKey: "パスタ", tags: ["パスタ"], description: "ツナの旨味とほうれん草の彩りを活かした食べやすいパスタ主食です。", notes: "麺は短めにし、ツナは細かくして全体になじませる。", ingredients: [part("pasta", 175, { prep: "やや短めに仕上げる" }), part("salmon", 32, { label: "ツナ", prep: "細かくほぐす" }), part("spinach", 18), part("onion", 14)], seasonings: [part("consomme", 2), part("butter", 2), part("milk", 16)], instructions: ["パスタをやわらかめに茹でる。", "具材を食べやすく加熱する。", "全体を合わせてしっとり仕上げる。"], nutrition: { energy: 372, protein: 15.1, fat: 7.6, carbs: 58.7, fiber: 3.2, salt: 1.8 } },
+      { id: "single-plus2-west-kinoko-tomato-pasta", name: "きのこのトマトパスタ", cuisine: "洋食", servingSize: 270, rotationKey: "パスタ", tags: ["パスタ"], description: "きのこの旨味をトマトでまとめた、やさしい味わいのパスタ主食です。", notes: "麺は短めにし、きのこは小さくして口当たりをやわらかくする。", ingredients: [part("pasta", 180, { prep: "やや短めに仕上げる" }), part("mushrooms", 30), part("tomato", 30), part("onion", 16)], seasonings: [part("ketchup", 7), part("consomme", 2), part("butter", 2)], instructions: ["パスタをやわらかめに茹でる。", "きのこと野菜をやわらかく煮る。", "トマト味でしっとり仕上げる。"], nutrition: { energy: 368, protein: 12.6, fat: 6.8, carbs: 60.4, fiber: 3.7, salt: 2.0 } },
+      { id: "single-plus2-west-chicken-vegetable-soft-pasta", name: "鶏肉と野菜のやわらかパスタ", cuisine: "洋食", servingSize: 275, rotationKey: "パスタ", tags: ["パスタ"], description: "鶏肉と野菜をやわらかく合わせた、しっとり食べやすいパスタ主食です。", notes: "麺は短めにし、鶏肉と野菜は小さめにそろえてやわらかくする。", ingredients: [part("pasta", 180, { prep: "やや短めに仕上げる" }), part("chicken_breast", 38), part("carrot", 12), part("broccoli", 18), part("onion", 16)], seasonings: [part("consomme", 2), part("milk", 18), part("butter", 2)], instructions: ["パスタをやわらかめに茹でる。", "鶏肉と野菜を食べやすく加熱する。", "ソースと合わせてしっとり仕上げる。"], nutrition: { energy: 379, protein: 15.4, fat: 7.5, carbs: 59.3, fiber: 3.5, salt: 1.9 } },
+      { id: "single-plus2-west-pumpkin-cream-pasta-2", name: "かぼちゃのクリームパスタ", cuisine: "洋食", servingSize: 272, rotationKey: "パスタ", tags: ["パスタ"], description: "かぼちゃの甘みを活かし、なめらかに仕上げたパスタ主食です。", notes: "麺は短めにし、かぼちゃはしっかりやわらかくしてソースになじませる。", ingredients: [part("pasta", 180, { prep: "やや短めに仕上げる" }), part("pumpkin", 28), part("onion", 14), part("milk", 36)], seasonings: [part("milk", 36), part("butter", 3), part("flour", 4), part("consomme", 1), part("salt", 0.2)], instructions: ["パスタをやわらかめに茹でる。", "かぼちゃをやわらかく煮る。", "クリームソースと合わせてなめらかに仕上げる。"], nutrition: { energy: 381, protein: 13.2, fat: 8.4, carbs: 60.2, fiber: 3.3, salt: 1.8 } },
+      { id: "single-plus2-west-cabbage-bacon-style-pasta", name: "キャベツとベーコン風パスタ", cuisine: "洋食", servingSize: 270, rotationKey: "パスタ", tags: ["パスタ"], description: "キャベツの甘みとベーコン風の旨味を合わせた食べやすいパスタ主食です。", notes: "麺は短めにし、ベーコン風具材はかたさと塩分に配慮してやわらかく仕上げる。", ingredients: [part("pasta", 178, { prep: "やや短めに仕上げる" }), part("pork_lean", 32, { label: "ベーコン風", prep: "小さくしてやわらかく加熱する" }), part("cabbage", 22), part("onion", 14)], seasonings: [part("consomme", 2), part("butter", 2), part("milk", 12)], instructions: ["パスタをやわらかめに茹でる。", "具材を食べやすくやわらかく加熱する。", "全体を合わせてしっとり仕上げる。"], nutrition: { energy: 376, protein: 14.1, fat: 7.8, carbs: 58.9, fiber: 3.1, salt: 2.0 } },
+      { id: "single-plus2-jp-kitsune-udon-2", name: "きつねうどん", cuisine: "和食", servingSize: 325, rotationKey: "うどん", tags: ["麺類", "うどん"], description: "だしの旨味を活かした、食べやすいうどんの完成主食です。", notes: "麺はやや短めにし、油揚げはやわらかく煮て提供する。", ingredients: [part("udon", 190, { prep: "やや短めにしてやわらかく仕上げる" }), part("tofu", 35, { label: "油揚げ", prep: "やわらかく煮る" }), part("onion", 12, { label: "長ねぎ", prep: "やわらかく煮る" })], seasonings: [part("broth", 220, { label: "だし" }), part("light_soy", 7), part("mirin", 5), part("sugar", 2)], instructions: ["油揚げを甘辛くやわらかく煮る。", "うどんをやわらかめに茹でて短めに整える。", "だしを温めて盛り付ける。"], nutrition: { energy: 368, protein: 11.9, fat: 6.7, carbs: 63.1, fiber: 2.8, salt: 2.5 } },
+      { id: "single-plus2-jp-tanuki-udon-2", name: "たぬきうどん", cuisine: "和食", servingSize: 318, rotationKey: "うどん", tags: ["麺類", "うどん"], description: "だしの風味を活かし、やさしい味わいに仕上げたうどんの完成主食です。", notes: "麺は短めにし、天かすは少量でつゆを含ませて食べやすくする。", ingredients: [part("udon", 190, { prep: "やや短めにしてやわらかく仕上げる" }), part("onion", 12, { label: "天かす", prep: "少量を使用" }), part("komatsuna", 12, { label: "青ねぎ", prep: "やわらかくする" })], seasonings: [part("broth", 220, { label: "だし" }), part("light_soy", 7), part("mirin", 4)], instructions: ["うどんをやわらかめに茹でて短めに整える。", "だしを温めて調味する。", "具をのせて温かく仕上げる。"], nutrition: { energy: 359, protein: 10.7, fat: 6.1, carbs: 62.0, fiber: 2.3, salt: 2.4 } },
+      { id: "single-plus2-jp-tsukimi-udon-2", name: "月見うどん", cuisine: "和食", servingSize: 322, rotationKey: "うどん", tags: ["麺類", "うどん"], description: "卵のやわらかさを活かし、のどごし良く仕上げたうどんの完成主食です。", notes: "卵はやわらかく仕上げ、麺は短めにして提供する。", ingredients: [part("udon", 190, { prep: "やや短めにしてやわらかく仕上げる" }), part("egg", 35, { prep: "やわらかく加熱する" }), part("onion", 10, { label: "長ねぎ", prep: "やわらかく煮る" })], seasonings: [part("broth", 220, { label: "だし" }), part("light_soy", 7), part("mirin", 4)], instructions: ["うどんをやわらかめに茹でて短めに整える。", "だしを温めて調味する。", "卵をやわらかく加熱してのせ、仕上げる。"], nutrition: { energy: 362, protein: 12.8, fat: 5.8, carbs: 62.4, fiber: 1.9, salt: 2.4 } },
+      { id: "single-plus2-jp-kakitama-udon-2", name: "かき玉うどん", cuisine: "和食", servingSize: 328, rotationKey: "うどん", tags: ["麺類", "うどん", "とろみ"], description: "卵でつゆをやさしくまとめた、飲み込みやすいうどんの完成主食です。", notes: "卵はふんわり仕上げ、軽いとろみでつゆをまとわせる。", ingredients: [part("udon", 190, { prep: "やや短めにしてやわらかく仕上げる" }), part("egg", 40), part("onion", 12, { label: "長ねぎ", prep: "やわらかく煮る" })], seasonings: [part("broth", 220, { label: "だし" }), part("light_soy", 7), part("mirin", 4), part("starch", 2)], instructions: ["うどんをやわらかめに茹でて短めに整える。", "だしを温めて軽くとろみをつける。", "溶き卵を流し入れてふんわり仕上げる。"], nutrition: { energy: 371, protein: 13.4, fat: 5.9, carbs: 63.0, fiber: 1.9, salt: 2.5 } },
+      { id: "single-plus2-jp-niku-udon-2", name: "肉うどん", cuisine: "和食", servingSize: 332, rotationKey: "うどん", tags: ["麺類", "うどん"], description: "やわらかい肉とだしの旨味で食べやすく仕上げたうどんの完成主食です。", notes: "肉は薄切りでやわらかく煮含め、長ねぎは十分にやわらかくする。", ingredients: [part("udon", 190, { prep: "やや短めにしてやわらかく仕上げる" }), part("pork_lean", 45, { label: "やわらか肉", prep: "薄切りでやわらかく煮る" }), part("onion", 18, { label: "長ねぎ", prep: "やわらかく煮る" })], seasonings: [part("broth", 220, { label: "だし" }), part("light_soy", 7), part("mirin", 5), part("sugar", 2)], instructions: ["肉を薄切りでやわらかく煮含める。", "うどんをやわらかめに茹でて短めに整える。", "温かいつゆと一緒に盛り付ける。"], nutrition: { energy: 389, protein: 16.1, fat: 8.0, carbs: 61.2, fiber: 2.0, salt: 2.6 } },
+      { id: "single-plus2-jp-tori-nanban-udon-2", name: "鶏南蛮うどん", cuisine: "和食", servingSize: 332, rotationKey: "うどん", tags: ["麺類", "うどん"], description: "鶏肉と長ねぎをやわらかく仕上げた、だしの風味豊かなうどんの完成主食です。", notes: "鶏肉は小さめにし、長ねぎは十分にやわらかく煮る。", ingredients: [part("udon", 190, { prep: "やや短めにしてやわらかく仕上げる" }), part("chicken_thigh", 45, { prep: "小さめに切る" }), part("onion", 20, { label: "長ねぎ", prep: "やわらかく煮る" })], seasonings: [part("broth", 220, { label: "だし" }), part("light_soy", 7), part("mirin", 5)], instructions: ["鶏肉と長ねぎをだしでやわらかく煮る。", "うどんをやわらかめに茹でて短めに整える。", "温かいつゆを注いで仕上げる。"], nutrition: { energy: 384, protein: 16.5, fat: 7.6, carbs: 61.0, fiber: 2.1, salt: 2.6 } },
+      { id: "single-plus2-cn-gomoku-ankake-udon-2", name: "五目あんかけうどん", cuisine: "中華", servingSize: 340, rotationKey: "うどん", tags: ["麺類", "うどん", "とろみ"], description: "具だくさんのあんをかけ、とろみでまとめた食べやすいうどんの完成主食です。", notes: "主食の完成メニューとして扱い、具とうどんを分割しない。具材は小さめにそろえる。", ingredients: [part("udon", 190, { prep: "やや短めにしてやわらかく仕上げる" }), part("chicken_breast", 30, { label: "鶏肉", prep: "小さめに切る" }), part("chinese_cabbage", 20, { label: "白菜", prep: "やわらかく煮る" }), part("carrot", 15, { prep: "細切り" }), part("mushrooms", 12, { label: "しいたけ", prep: "小さめに切る" })], seasonings: [part("broth", 220, { label: "中華だし" }), part("soy_sauce", 7), part("mirin", 3), part("starch", 3)], instructions: ["具材を食べやすい大きさにそろえてやわらかく煮る。", "調味して片栗粉でとろみをつける。", "うどんにあんをかけて仕上げる。"], nutrition: { energy: 396, protein: 15.0, fat: 6.7, carbs: 65.9, fiber: 3.5, salt: 2.7 } },
+      { id: "single-plus2-jp-kinoko-ankake-udon-2", name: "きのこあんかけうどん", cuisine: "和食", servingSize: 324, rotationKey: "うどん", tags: ["麺類", "うどん", "きのこ", "とろみ"], description: "きのこの旨味を活かし、とろみで食べやすくまとめたうどんの完成主食です。", notes: "麺は短めにし、きのこは細かくしてあんになじませる。", ingredients: [part("udon", 190, { prep: "やや短めにしてやわらかく仕上げる" }), part("mushrooms", 28, { label: "きのこ", prep: "食べやすく切る" }), part("tofu", 35), part("komatsuna", 12)], seasonings: [part("broth", 220, { label: "だし" }), part("soy_sauce", 4), part("light_soy", 2), part("starch", 3)], instructions: ["きのこをやわらかく煮る。", "調味して軽いとろみをつける。", "うどんにあんをかけて仕上げる。"], nutrition: { energy: 374, protein: 13.1, fat: 5.3, carbs: 64.2, fiber: 3.0, salt: 2.5 } },
+      { id: "single-plus2-jp-soft-curry-udon", name: "やわらかカレーうどん", cuisine: "和食", servingSize: 338, rotationKey: "うどん", tags: ["麺類", "うどん", "カレー"], description: "辛味を控えめにし、だしの旨味で食べやすく仕上げたカレーうどんの完成主食です。", notes: "麺は短めにし、カレーは辛味を控えめにしてやわらかくまとめる。", ingredients: [part("udon", 190, { prep: "やや短めにしてやわらかく仕上げる" }), part("chicken_thigh", 38), part("onion", 20, { label: "長ねぎ", prep: "やわらかく煮る" }), part("carrot", 12)], seasonings: [part("broth", 220, { label: "だし" }), part("curry_roux", 12), part("mirin", 3), part("starch", 2)], instructions: ["具材をやわらかく煮る。", "だしでのばしたカレーで味を整える。", "うどんにかけて温かく仕上げる。"], nutrition: { energy: 401, protein: 14.2, fat: 8.3, carbs: 66.1, fiber: 2.6, salt: 2.6 } },
+      { id: "single-plus2-jp-wakame-udon-2", name: "わかめうどん", cuisine: "和食", servingSize: 318, rotationKey: "うどん", tags: ["麺類", "うどん"], description: "わかめの風味を活かした、やさしい味わいのうどんの完成主食です。", notes: "麺は短めにし、わかめはやわらかく戻して食べやすくする。", ingredients: [part("udon", 190, { prep: "やや短めにしてやわらかく仕上げる" }), part("wakame", 8, { prep: "やわらかく戻して食べやすく切る" }), part("onion", 10, { label: "長ねぎ", prep: "やわらかく煮る" })], seasonings: [part("broth", 220, { label: "だし" }), part("light_soy", 7), part("mirin", 4)], instructions: ["わかめをやわらかく戻す。", "うどんをやわらかめに茹でて短めに整える。", "だしを温めて盛り付ける。"], nutrition: { energy: 349, protein: 10.8, fat: 4.4, carbs: 62.3, fiber: 2.5, salt: 2.4 } }
     ];
     return definitions.map(dish);
   }
@@ -929,6 +971,51 @@
         recipes.push(createRecipe({ id: `plus-cn-soup-${baseIndex}-${method.key}`, name: `${base.label}${method.label}`, category: "汁物", cuisine: "中華", servingSize: method.servingSize, rotationKey: `中華追加汁物-${method.key}`, tags: ["追加レシピ", "汁物"], description: `${base.label}を使った食べやすい${method.label}。`, ingredients: base.ingredients, seasonings: method.seasonings, instructions: method.instructions }));
       });
     });
+    const misoAdditions = [
+      { id: "plus-jp-miso-extra-tofu-komatsuna", name: "豆腐と小松菜のお味噌汁", ingredients: [part("tofu", 30), part("komatsuna", 18)], description: "だしの旨味を活かした、やわらかく食べやすい定番のお味噌汁です。", notes: "豆腐は小さめの角切りにし、小松菜は短めに切る。" },
+      { id: "plus-jp-miso-extra-tofu-onion", name: "豆腐と玉ねぎのお味噌汁", ingredients: [part("tofu", 30), part("onion", 18)], description: "玉ねぎの甘みが出やすい、やさしい味わいのお味噌汁です。", notes: "玉ねぎは薄切りにしてやわらかく煮る。" },
+      { id: "plus-jp-miso-extra-tofu-cabbage", name: "豆腐とキャベツのお味噌汁", ingredients: [part("tofu", 28), part("cabbage", 20)], description: "キャベツの甘みを活かした、口当たりのやさしいお味噌汁です。", notes: "キャベツはやわらかく煮て、繊維を感じにくくする。" },
+      { id: "plus-jp-miso-extra-tofu-carrot", name: "豆腐とにんじんのお味噌汁", ingredients: [part("tofu", 28), part("carrot", 16)], description: "彩りを添えつつ食べやすく仕上げるお味噌汁です。", notes: "にんじんは薄切りまたは千切りでやわらかく煮る。" },
+      { id: "plus-jp-miso-extra-sweetpotato", name: "さつまいものお味噌汁", ingredients: [part("sweet_potato", 34)], description: "甘みのある具材で、満足感を出しやすいお味噌汁です。", notes: "さつまいもは小さめに切り、やわらかく煮る。" },
+      { id: "plus-jp-miso-extra-sweetpotato-onion", name: "さつまいもと玉ねぎのお味噌汁", ingredients: [part("sweet_potato", 26), part("onion", 16)], description: "甘みのある具材を組み合わせた、やさしい味わいのお味噌汁です。", notes: "玉ねぎは薄切りにし、さつまいもは崩れすぎない程度に煮る。" },
+      { id: "plus-jp-miso-extra-potato-onion", name: "じゃがいもと玉ねぎのお味噌汁", ingredients: [part("potato", 26), part("onion", 16)], description: "定番の組み合わせで食べやすく仕上げるお味噌汁です。", notes: "じゃがいもはひと口大より小さめに切る。" },
+      { id: "plus-jp-miso-extra-potato-komatsuna", name: "じゃがいもと小松菜のお味噌汁", ingredients: [part("potato", 24), part("komatsuna", 14)], description: "だしの旨味を感じやすい、やわらかな具材のお味噌汁です。", notes: "小松菜は短めに切って提供しやすくする。" },
+      { id: "plus-jp-miso-extra-pumpkin-spinach", name: "かぼちゃとほうれん草のお味噌汁", ingredients: [part("pumpkin", 24), part("spinach", 14)], description: "彩りがよく、甘みのある具材でやさしく仕上げるお味噌汁です。", notes: "かぼちゃはやわらかく煮て、ほうれん草は短く切る。" },
+      { id: "plus-jp-miso-extra-pumpkin-onion", name: "かぼちゃと玉ねぎのお味噌汁", ingredients: [part("pumpkin", 24), part("onion", 16)], description: "自然な甘みで食べやすく、満足感も出しやすいお味噌汁です。", notes: "かぼちゃは煮崩れしすぎないよう火加減を調整する。" },
+      { id: "plus-jp-miso-extra-daikon-carrot", name: "大根とにんじんのお味噌汁", ingredients: [part("daikon", 22), part("carrot", 14)], description: "だしの旨味を活かしやすい、定番で安心感のあるお味噌汁です。", notes: "大根とにんじんは薄切りでやわらかく煮る。" },
+      { id: "plus-jp-miso-extra-daikon-komatsuna", name: "大根と小松菜のお味噌汁", ingredients: [part("daikon", 22), part("komatsuna", 14)], description: "やさしい食感と彩りを両立しやすいお味噌汁です。", notes: "大根はやわらかく煮て、小松菜は短めに切る。" },
+      { id: "plus-jp-miso-extra-cabbage-onion", name: "キャベツと玉ねぎのお味噌汁", ingredients: [part("cabbage", 20), part("onion", 16)], description: "野菜の甘みを感じやすく、塩分を上げすぎず満足感を出しやすいお味噌汁です。", notes: "キャベツは食べやすい大きさに切ってやわらかく煮る。" },
+      { id: "plus-jp-miso-extra-hakusai-tofu", name: "白菜と豆腐のお味噌汁", ingredients: [part("chinese_cabbage", 22), part("tofu", 28)], description: "やわらかな白菜と豆腐で食べやすく整えたお味噌汁です。", notes: "白菜は短めに切り、豆腐は小さめの角切りにする。" },
+      { id: "plus-jp-miso-extra-hakusai-mushroom", name: "白菜ときのこのお味噌汁", ingredients: [part("chinese_cabbage", 22), part("mushrooms", 16)], description: "きのこの旨味を活かしながら、やさしい味わいに仕上げるお味噌汁です。", notes: "白菜はやわらかく煮て、きのこは食べやすく切る。" },
+      { id: "plus-jp-miso-extra-mushroom-tofu", name: "きのこと豆腐のお味噌汁", ingredients: [part("mushrooms", 18), part("tofu", 28)], description: "だしときのこの旨味を感じやすい、定番のお味噌汁です。", notes: "豆腐は小さめに切り、きのこはやわらかく煮る。" },
+      { id: "plus-jp-miso-extra-mushroom-komatsuna", name: "きのこと小松菜のお味噌汁", ingredients: [part("mushrooms", 18), part("komatsuna", 14)], description: "旨味と彩りの両方を出しやすいお味噌汁です。", notes: "小松菜は葉先まで短めに切り、きのこはやわらかく加熱する。" },
+      { id: "plus-jp-miso-extra-spinach-onion", name: "ほうれん草と玉ねぎのお味噌汁", ingredients: [part("spinach", 16), part("onion", 16)], description: "彩りがよく、玉ねぎの甘みで食べやすく仕上がるお味噌汁です。", notes: "ほうれん草は短く切り、玉ねぎは透き通るまで煮る。" },
+      { id: "plus-jp-miso-extra-carrot-onion", name: "にんじんと玉ねぎのお味噌汁", ingredients: [part("carrot", 16), part("onion", 16)], description: "やさしい甘みで高齢者向けに提供しやすいお味噌汁です。", notes: "にんじんは薄切りにして口当たりをやわらかくする。" },
+      { id: "plus-jp-miso-extra-daikon-tofu", name: "大根と豆腐のお味噌汁", ingredients: [part("daikon", 22), part("tofu", 28)], description: "定番具材を食べやすく仕上げた、安心感のあるお味噌汁です。", notes: "大根は薄切りでやわらかく煮て、豆腐は崩れないよう静かに加える。" },
+      { id: "plus-jp-miso-extra-cabbage-komatsuna", name: "キャベツと小松菜のお味噌汁", ingredients: [part("cabbage", 18), part("komatsuna", 14)], description: "やわらかな葉物を合わせ、彩りよく仕上げるお味噌汁です。", notes: "キャベツと小松菜は短めに切って提供しやすくする。" },
+      { id: "plus-jp-miso-extra-potato-cabbage", name: "じゃがいもとキャベツのお味噌汁", ingredients: [part("potato", 24), part("cabbage", 18)], description: "じゃがいものやわらかさで満足感を出しやすいお味噌汁です。", notes: "じゃがいもは小さめに切り、キャベツはやわらかく煮る。" }
+    ];
+    misoAdditions.forEach((definition) => {
+      recipes.push(createRecipe({
+        id: definition.id,
+        name: definition.name,
+        category: "汁物",
+        cuisine: "和食",
+        servingSize: 150,
+        rotationKey: "和食追加汁物-miso",
+        tags: ["追加レシピ", "汁物", "味噌汁"],
+        description: definition.description,
+        notes: definition.notes,
+        ingredients: definition.ingredients,
+        seasonings: [part("broth", 120), part("miso", 10)],
+        instructions: ["具材を食べやすい大きさに切る。", "だしでやわらかく煮る。", "味噌を溶いて温かく仕上げる。"]
+      }));
+    });
+    recipes.push(
+      createRecipe({ id: "plus-cn-soup-soft-egg", name: "ふんわり卵スープ", category: "汁物", cuisine: "中華", servingSize: 150, rotationKey: "中華追加汁物-卵", tags: ["追加レシピ", "汁物", "中華"], description: "卵をふんわり仕上げた、やさしい中華風スープ。", notes: "薄くとろみをつけると、冷めにくく飲み込みやすい。", ingredients: [part("egg", 18)], seasonings: [part("broth", 120), part("soy_sauce", 2), part("starch", 1), part("sesame_oil", 1)], instructions: ["鶏ガラスープを温める。", "軽くとろみをつける。", "溶き卵を流し入れてふんわり仕上げる。"] }),
+      createRecipe({ id: "plus-cn-soup-tofu-lettuce", name: "豆腐とレタスのスープ", category: "汁物", cuisine: "中華", servingSize: 150, rotationKey: "中華追加汁物-豆腐", tags: ["追加レシピ", "汁物", "中華"], description: "豆腐とレタスをやさしく仕上げた、軽い中華風スープ。", notes: "レタスは加熱しすぎず、やわらかくなったところで仕上げる。", ingredients: [part("tofu", 30), part("chinese_cabbage", 18, { label: "レタス", prep: "食べやすい大きさにちぎる" })], seasonings: [part("broth", 120), part("soy_sauce", 1), part("salt", 0.2), part("sesame_oil", 1)], instructions: ["スープを温める。", "豆腐を食べやすく切って加える。", "レタスを最後に入れて軽く火を通す。"] }),
+      createRecipe({ id: "plus-cn-soup-wonton", name: "ワンタンスープ", category: "汁物", cuisine: "中華", servingSize: 150, rotationKey: "中華追加汁物-ワンタン", tags: ["追加レシピ", "汁物", "中華"], description: "つるりと食べやすいワンタンが入った中華風スープ。", notes: "ワンタンの具は少なめにし、皮の食感を活かす。", ingredients: [part("flour", 18, { label: "ワンタンの皮", prep: "やわらかく仕上がるサイズに整える" }), part("pork_mince", 12, { label: "ワンタンの具" }), part("chinese_cabbage", 12), part("onion", 8)], seasonings: [part("broth", 120), part("soy_sauce", 2), part("sesame_oil", 1)], instructions: ["スープを整える。", "ワンタンをやわらかく加熱する。", "火を通しすぎず、つるりとした食感で提供する。"] })
+    );
     return recipes;
   }
   function buildAdditionalMainRecipes() {
@@ -985,6 +1072,19 @@
         recipes.push(createRecipe({ id: `plus-cn-main-${proteinIndex}-${method.key}`, name: `${protein.label}${method.label}`, category: "主菜", cuisine: "中華", servingSize: protein.grams + 42, rotationKey: protein.rotationKey, tags: ["追加レシピ", "主菜"], description: `${protein.label}をやわらかく仕上げた中華の主菜。`, ingredients: [part(protein.id, protein.grams), ...method.ingredients], seasonings: method.seasonings, instructions: method.instructions }));
       });
     });
+    recipes.push(
+      createRecipe({ id: "plus-cn-main-soft-mabo-tofu", name: "やわらか麻婆豆腐", category: "主菜", cuisine: "中華", servingSize: 165, rotationKey: "豆腐", tags: ["追加レシピ", "主菜", "中華"], description: "辛味を控えめにし、豆腐を食べやすく仕上げた中華風主菜。", notes: "豆腐は小さめに切り、とろみをしっかりつけて提供する。", ingredients: [part("tofu", 110), part("pork_mince", 25), part("onion", 16), part("green_peas", 8)], seasonings: [part("broth", 22), part("miso", 7), part("soy_sauce", 3), part("starch", 2), part("sesame_oil", 1)], instructions: ["豆腐は小さめの角切りにする。", "ひき肉と調味料をやさしい味で煮る。", "豆腐を加えて崩しすぎないように温める。", "片栗粉でとろみをつけて仕上げる。"] }),
+      createRecipe({ id: "plus-cn-main-whitefish-ankake", name: "白身魚の中華あんかけ", category: "主菜", cuisine: "中華", servingSize: 155, rotationKey: "魚", tags: ["追加レシピ", "主菜", "中華"], description: "白身魚に野菜あんをかけ、しっとり食べやすく仕上げた主菜。", notes: "魚は骨に注意し、あんを多めにしてパサつきを防ぐ。", ingredients: [part("white_fish", 90), part("carrot", 15), part("onion", 18), part("mushrooms", 16)], seasonings: [part("broth", 24), part("soy_sauce", 3), part("oyster_sauce", 2), part("starch", 2)], instructions: ["白身魚は蒸すかやわらかく加熱する。", "人参、玉ねぎ、椎茸をやわらかく煮る。", "だしと調味料であんを作る。", "片栗粉でとろみをつけ、魚にかける。"] }),
+      createRecipe({ id: "plus-cn-main-meatballs-amazu", name: "肉団子の甘酢煮", category: "主菜", cuisine: "中華", servingSize: 160, rotationKey: "鶏", tags: ["追加レシピ", "主菜", "中華"], description: "ふんわり肉団子を甘酢で食べやすく仕上げた中華風主菜。", notes: "鶏ひき肉に豆腐を混ぜ、冷めても固くなりにくくする。", ingredients: [part("chicken_breast", 60, { label: "鶏ひき肉" }), part("tofu", 35), part("onion", 12), part("carrot", 10)], seasonings: [part("broth", 16), part("vinegar", 4), part("sugar", 2), part("soy_sauce", 2), part("starch", 1)], instructions: ["鶏ひき肉と豆腐を混ぜて団子を作る。", "食べやすい大きさで加熱する。", "甘酢だれを作り、団子を煮からめる。", "必要に応じて軽くとろみをつける。"] }),
+      createRecipe({ id: "plus-cn-main-soft-kanitama", name: "ふんわりカニ玉", category: "主菜", cuisine: "中華", servingSize: 150, rotationKey: "卵", tags: ["追加レシピ", "主菜", "中華"], description: "卵をやわらかく仕上げ、あんをかけて食べやすくした主菜。", notes: "卵は火を通しすぎず、やわらかさを残す。", ingredients: [part("egg", 55), part("white_fish", 20, { label: "かに風味具材" }), part("onion", 15), part("green_peas", 8)], seasonings: [part("broth", 18), part("soy_sauce", 2), part("starch", 2)], instructions: ["卵液に具材を合わせる。", "やわらかく火を通して丸くまとめる。", "醤油ベースのあんを作る。", "上からあんをかけて仕上げる。"] }),
+      createRecipe({ id: "plus-cn-main-soft-ebitama", name: "ふんわりエビ玉", category: "主菜", cuisine: "中華", servingSize: 150, rotationKey: "卵", tags: ["追加レシピ", "主菜", "中華"], description: "卵とえびをやわらかくまとめ、あんでしっとり仕上げた主菜。", notes: "えびは小さく切るかやわらかいサイズを使う。", ingredients: [part("egg", 55), part("shrimp", 28), part("onion", 12), part("green_peas", 8)], seasonings: [part("broth", 18), part("soy_sauce", 2), part("starch", 2)], instructions: ["卵液にえびを合わせる。", "やわらかく焼いてまとめる。", "薄い醤油あんを作る。", "上からあんをかける。"] }),
+      createRecipe({ id: "plus-cn-main-shrimp-chili", name: "エビのチリソース炒め", category: "主菜", cuisine: "中華", servingSize: 152, rotationKey: "海鮮", tags: ["追加レシピ", "主菜", "中華"], description: "小さめのえびを甘めのチリソースで食べやすく仕上げた主菜。", notes: "えびは小さめを使用し、ソースはケチャップベースで辛味を控えめにする。", ingredients: [part("shrimp", 70), part("onion", 18), part("tomato", 22), part("green_peas", 8)], seasonings: [part("broth", 12), part("ketchup", 8), part("vinegar", 2), part("sugar", 1.5), part("soy_sauce", 1.5), part("starch", 1)], instructions: ["えびは食べやすい大きさで下処理する。", "ソースを合わせてやさしい味に整える。", "えびを加熱し、ソースをからめる。", "必要に応じて軽くとろみをつける。"] }),
+      createRecipe({ id: "plus-cn-main-chicken-soft-soybeans", name: "鶏肉とやわらか大豆の炒め物", category: "主菜", cuisine: "中華", servingSize: 160, rotationKey: "鶏", tags: ["追加レシピ", "主菜", "中華"], description: "鶏肉とやわらかい大豆を中華風に炒め合わせた食べやすい主菜。", notes: "カシューナッツの代わりにやわらかい大豆を使い、かたさを抑える。", ingredients: [part("chicken_breast", 75), part("tofu", 35, { label: "やわらか大豆" }), part("onion", 16), part("carrot", 10)], seasonings: [part("broth", 14), part("soy_sauce", 2.5), part("oyster_sauce", 2), part("sesame_oil", 1)], instructions: ["鶏肉を食べやすい大きさに切る。", "やわらかい大豆を用意する。", "調味料で炒め合わせる。", "汁気を少し残してしっとり仕上げる。"] }),
+      createRecipe({ id: "plus-cn-main-hoikoro", name: "回鍋肉（ホイコーロー）", category: "主菜", cuisine: "中華", servingSize: 158, rotationKey: "豚", tags: ["追加レシピ", "主菜", "中華"], description: "豚肉とキャベツをやわらかく仕上げた中華風主菜。", notes: "豚肉は薄切り、キャベツはしっかり加熱してやわらかくする。味付けは濃すぎないようにする。", ingredients: [part("pork_lean", 75), part("cabbage", 30), part("onion", 16), part("bell_pepper", 10)], seasonings: [part("broth", 14), part("miso", 6), part("soy_sauce", 2.5), part("sesame_oil", 1)], instructions: ["豚肉を薄切りにする。", "キャベツを食べやすく切る。", "具材をやわらかく炒め煮にする。", "調味料を合わせて仕上げる。"] }),
+      createRecipe({ id: "plus-cn-main-happosai", name: "八宝菜", category: "主菜", cuisine: "中華", servingSize: 165, rotationKey: "中華煮", tags: ["追加レシピ", "主菜", "中華"], description: "具材を食べやすい大きさにそろえ、とろみでまとめた中華風主菜。", notes: "具材の大きさをそろえ、片栗粉でしっかりまとめて食べやすくする。", ingredients: [part("pork_lean", 32), part("shrimp", 24), part("chinese_cabbage", 28), part("carrot", 12), part("mushrooms", 15), part("onion", 12)], seasonings: [part("broth", 24), part("soy_sauce", 3), part("oyster_sauce", 2), part("starch", 2)], instructions: ["具材を食べやすい大きさに切る。", "やわらかく煮る。", "調味料を加える。", "片栗粉でとろみをつける。"] }),
+      createRecipe({ id: "plus-cn-main-atsuage-braise", name: "厚揚げの中華煮", category: "主菜", cuisine: "中華", servingSize: 160, rotationKey: "豆腐", tags: ["追加レシピ", "主菜", "中華"], description: "厚揚げに中華風の味を含ませ、やわらかく仕上げた主菜。", notes: "厚揚げは食べやすい大きさに切り、味をよく含ませる。", ingredients: [part("tofu", 100, { label: "厚揚げ" }), part("chinese_cabbage", 22), part("carrot", 12), part("onion", 15)], seasonings: [part("broth", 22), part("soy_sauce", 3), part("oyster_sauce", 1.5), part("starch", 1.5), part("sesame_oil", 1)], instructions: ["厚揚げを食べやすく切る。", "野菜と一緒にやわらかく煮る。", "中華調味で味を整える。", "軽くとろみをつけて仕上げる。"] }),
+      createRecipe({ id: "plus-cn-main-chinjao-style", name: "チンジャオロース風炒め", category: "主菜", cuisine: "中華", servingSize: 155, rotationKey: "豚", tags: ["追加レシピ", "主菜", "中華"], description: "細切りの肉と野菜をやわらかく炒めた中華風主菜。", notes: "ピーマンと肉は細切りにし、しっかり加熱して食べやすくする。", ingredients: [part("pork_lean", 70), part("bell_pepper", 18), part("onion", 18), part("carrot", 12)], seasonings: [part("broth", 12), part("soy_sauce", 3), part("oyster_sauce", 2), part("sesame_oil", 1)], instructions: ["肉と野菜を細切りにする。", "やわらかくなるまで加熱する。", "調味料で味を整える。", "汁気を少し残して仕上げる。"] })
+    );
     return recipes;
   }
   function buildAdditionalSideRecipes() {
@@ -1041,6 +1141,11 @@
         recipes.push(sideRecipe(`plus-cn-side-${baseIndex}-${method.key}`, method.makeName(base), "中華", base.ingredients, method.seasonings, 70, base.rotationKey, ["追加レシピ", ...(method.tags || [])]));
       });
     });
+    recipes.push(
+      createRecipe({ id: "plus-cn-side-bangbang-harusame", name: "春雨サラダ（バンサンスー）", category: "副菜", cuisine: "中華", servingSize: 78, rotationKey: "春雨サラダ", tags: ["追加レシピ", "副菜", "中華", "和え物"], description: "春雨と野菜を中華だれで和えた、さっぱりした副菜。", notes: "春雨は短めに切り、きゅうりは薄切りにして食べやすくする。", ingredients: [part("chinese_noodles", 30, { label: "春雨", prep: "やわらかく戻して短く切る" }), part("cucumber", 18), part("chicken_breast", 12, { label: "ハム", prep: "細切りにする" }), part("egg", 12, { label: "卵", prep: "薄焼きにして細切りにする" })], seasonings: [part("soy_sauce", 2), part("vinegar", 2), part("sesame_oil", 1), part("sugar", 1)], instructions: ["春雨をやわらかく戻して短く切る。", "きゅうり、ハム、卵を食べやすく切る。", "中華だれで和えて仕上げる。"] }),
+      createRecipe({ id: "plus-cn-side-crushed-cucumber", name: "たたききゅうりの中華和え", category: "副菜", cuisine: "中華", servingSize: 60, rotationKey: "きゅうり", tags: ["追加レシピ", "副菜", "中華", "和え物"], description: "きゅうりをやさしい味の中華だれで和えた副菜。", notes: "きゅうりは皮をむくか薄くして、かたさを抑える。", ingredients: [part("cucumber", 55)], seasonings: [part("soy_sauce", 2), part("sesame_oil", 1), part("vinegar", 1)], instructions: ["きゅうりを食べやすく下処理する。", "調味料を合わせる。", "全体を和えてなじませる。"] }),
+      createRecipe({ id: "plus-cn-side-nasu-hitashi", name: "なすの中華浸し", category: "副菜", cuisine: "中華", servingSize: 68, rotationKey: "なす", tags: ["追加レシピ", "副菜", "中華", "和え物"], description: "とろりとやわらかいなすを中華風だれで仕上げた副菜。", notes: "なすはしっかり加熱し、皮はむくか薄くむいて食べやすくする。", ingredients: [part("tomato", 45, { label: "なす", prep: "食べやすく切ってやわらかく加熱する" }), part("onion", 10)], seasonings: [part("soy_sauce", 2), part("sesame_oil", 1), part("vinegar", 1)], instructions: ["なすを食べやすく切る。", "蒸すかやわらかく加熱する。", "ごま醤油だれに浸して味を含ませる。"] })
+    );
     return recipes;
   }
   function buildAdditionalDessertRecipes() {
@@ -1082,6 +1187,143 @@
       softBases.forEach((base, baseIndex) => {
         recipes.push(createRecipe({ id: `plus-dessert-soft-${flavor.key}-${base.key}`, name: `${flavor.name}${base.label}`, category: "デザート", cuisine: CUISINES[(flavorIndex + baseIndex + 1) % CUISINES.length], servingSize: base.servingSize, rotationKey: base.rotationKey, tags: ["追加レシピ", "デザート", flavor.tag], description: `${flavor.name}を使ったやわらかいデザート。`, ingredients: base.ingredients(flavor), seasonings: base.seasonings(flavor), instructions: base.instructions }));
       });
+    });
+    [
+      {
+        id: "plus-dessert-anko-mizuyokan",
+        name: "水ようかん",
+        servingSize: 72,
+        rotationKey: "和風デザート",
+        tags: ["追加レシピ", "デザート", "和風", "あんこ"],
+        description: "あんこの風味を活かした、やわらかく食べやすい和風デザートです。",
+        notes: "固さを出しすぎず、なめらかで食べやすく仕上げる。",
+        ingredients: [part("azuki_paste", 34)],
+        seasonings: [part("sugar", 4), part("gelatin_powder", 1.5)],
+        instructions: ["材料をよく混ぜる。", "やわらかく固める。", "冷やして提供する。"]
+      },
+      {
+        id: "plus-dessert-anko-kuzumanju",
+        name: "くずまんじゅう",
+        servingSize: 74,
+        rotationKey: "和風デザート",
+        tags: ["追加レシピ", "デザート", "和風", "あんこ"],
+        description: "なめらかなあんを包み、やわらかく仕上げた和風デザートです。",
+        notes: "皮はやわらかく仕上げ、口に残りにくい状態で提供する。",
+        ingredients: [part("jelly_base", 26, { label: "くず風生地" }), part("azuki_paste", 24)],
+        seasonings: [part("sugar", 4), part("gelatin_powder", 1.5)],
+        instructions: ["生地を合わせてなめらかにする。", "あんを包むように整える。", "冷やしてやわらかく仕上げる。"]
+      },
+      {
+        id: "plus-dessert-anko-anmitsu-jelly",
+        name: "あんみつ風ゼリー",
+        servingSize: 82,
+        rotationKey: "和風デザート",
+        tags: ["追加レシピ", "デザート", "和風", "あんこ", "ゼリー"],
+        description: "あんこと寒天風ゼリーを合わせた、食べやすい和風デザートです。",
+        notes: "ゼリーは固めすぎず、果物は小さめにして食べやすくする。",
+        ingredients: [part("jelly_base", 40, { label: "寒天風ゼリー" }), part("azuki_paste", 18), part("mandarin", 12)],
+        seasonings: [part("sugar", 4), part("gelatin_powder", 1.5)],
+        instructions: ["ゼリーをやわらかく整える。", "あんこと果物を合わせる。", "冷やして提供する。"]
+      },
+      {
+        id: "plus-dessert-anko-milk-pudding",
+        name: "あずきミルクプリン",
+        servingSize: 88,
+        rotationKey: "和風デザート",
+        tags: ["追加レシピ", "デザート", "和風", "あんこ", "プリン"],
+        description: "あずきの風味をやさしくまとめた、なめらかなミルクプリンです。",
+        notes: "あずきは全体になじませ、固さを出しすぎないようにする。",
+        ingredients: [part("milk", 55), part("azuki_paste", 16)],
+        seasonings: [part("sugar", 4), part("gelatin_powder", 1.5)],
+        instructions: ["材料をよく混ぜる。", "やわらかく固める。", "冷やして提供する。"]
+      },
+      {
+        id: "plus-dessert-anko-bavarois",
+        name: "小倉ババロア",
+        servingSize: 86,
+        rotationKey: "和風デザート",
+        tags: ["追加レシピ", "デザート", "和風", "あんこ", "ババロア"],
+        description: "小倉あんの風味を活かした、やわらかな和風ババロアです。",
+        notes: "口当たりをなめらかにし、冷やしすぎて固くしない。",
+        ingredients: [part("milk", 50), part("egg", 12), part("azuki_paste", 18)],
+        seasonings: [part("sugar", 5), part("gelatin_powder", 1.5)],
+        instructions: ["材料を混ぜてなめらかにする。", "やわらかく固める。", "冷やして提供する。"]
+      },
+      {
+        id: "plus-dessert-anko-mousse",
+        name: "あんこムース",
+        servingSize: 84,
+        rotationKey: "和風デザート",
+        tags: ["追加レシピ", "デザート", "和風", "あんこ", "ムース"],
+        description: "あんこの風味を活かした、ふんわりやわらかな和風ムースです。",
+        notes: "なめらかに混ぜ、口どけ良く仕上げる。",
+        ingredients: [part("yogurt", 36), part("milk", 18), part("azuki_paste", 20)],
+        seasonings: [part("sugar", 4), part("gelatin_powder", 1.5)],
+        instructions: ["材料をなめらかに混ぜる。", "やわらかく固める。", "冷やして提供する。"]
+      },
+      {
+        id: "plus-dessert-anko-koshian-kanten",
+        name: "こしあん寒天",
+        servingSize: 76,
+        rotationKey: "和風デザート",
+        tags: ["追加レシピ", "デザート", "和風", "あんこ", "寒天"],
+        description: "こしあんの風味をやさしくまとめた、食べやすい寒天風デザートです。",
+        notes: "固めすぎず、スプーンで切れるやわらかさにする。",
+        ingredients: [part("azuki_paste", 30)],
+        seasonings: [part("sugar", 4), part("gelatin_powder", 2)],
+        instructions: ["材料をよく混ぜる。", "やわらかく固める。", "冷やして提供する。"]
+      },
+      {
+        id: "plus-dessert-anko-matcha-pudding",
+        name: "抹茶あずきプリン",
+        servingSize: 88,
+        rotationKey: "和風デザート",
+        tags: ["追加レシピ", "デザート", "和風", "あんこ", "プリン"],
+        description: "抹茶の香りとあずきの風味を合わせた、やさしい和風プリンです。",
+        notes: "抹茶の香りはやわらかく残し、固さを出しすぎないようにする。",
+        ingredients: [part("milk", 52), part("azuki_paste", 14), part("milk", 2, { label: "抹茶", prep: "少量で香りづけする" })],
+        seasonings: [part("sugar", 5), part("gelatin_powder", 1.5)],
+        instructions: ["材料をよく混ぜる。", "やわらかく固める。", "冷やして提供する。"]
+      },
+      {
+        id: "plus-dessert-anko-shiratama-style-jelly",
+        name: "白玉風あんこゼリー",
+        servingSize: 82,
+        rotationKey: "和風デザート",
+        tags: ["追加レシピ", "デザート", "和風", "あんこ", "ゼリー"],
+        description: "白玉風のやわらかい食感をイメージした、食べやすいあんこゼリーです。",
+        notes: "白玉は本物の団子にせず、やわらかいゼリー状で表現する。",
+        ingredients: [part("jelly_base", 42, { label: "白玉風ゼリー" }), part("azuki_paste", 18)],
+        seasonings: [part("sugar", 4), part("gelatin_powder", 1.5)],
+        instructions: ["ゼリー液をやわらかく整える。", "あんこと合わせて盛り付ける。", "冷やして提供する。"]
+      },
+      {
+        id: "plus-dessert-anko-yose",
+        name: "あずき寄せ",
+        servingSize: 78,
+        rotationKey: "和風デザート",
+        tags: ["追加レシピ", "デザート", "和風", "あんこ"],
+        description: "あずきの風味を活かした、口当たりのやさしい和風デザートです。",
+        notes: "やわらかく寄せて、のど越し良く仕上げる。",
+        ingredients: [part("azuki_paste", 24), part("milk", 20)],
+        seasonings: [part("sugar", 4), part("gelatin_powder", 1.5)],
+        instructions: ["材料をよく混ぜる。", "やわらかく固める。", "冷やして提供する。"]
+      }
+    ].forEach((definition) => {
+      recipes.push(createRecipe({
+        id: definition.id,
+        name: definition.name,
+        category: "デザート",
+        cuisine: "和食",
+        servingSize: definition.servingSize,
+        rotationKey: definition.rotationKey,
+        tags: definition.tags,
+        description: definition.description,
+        notes: definition.notes,
+        ingredients: definition.ingredients,
+        seasonings: definition.seasonings,
+        instructions: definition.instructions
+      }));
     });
     return recipes;
   }
@@ -1570,9 +1812,9 @@
     const rows = [...recipe.ingredients.map((item) => ({ ...item, kind: "食材" })), ...recipe.seasonings.map((item) => ({ ...item, kind: "調味料" }))].map((item) => {
       const note = item.kind === "食材" ? item.prep : item.step;
       const noteLabel = item.kind === "食材" ? "下処理" : "工程";
-      return `<tr><td>${item.kind}</td><td><div>${escapeHtml(getFoodLabel(item))}</div>${note ? `<div class="muted">${escapeHtml(`${noteLabel}: ${note}`)}</div>` : ""}</td><td>${formatNumber(item.grams, 0)} g</td><td>${formatNumber(item.grams * servings, 0)} g</td></tr>`;
+      return `<tr><td>${item.kind}</td><td><div>${escapeHtml(getFoodLabel(item))}</div>${note ? `<div class="muted">${escapeHtml(`${noteLabel}: ${note}`)}</div>` : ""}</td><td>${formatNumber(item.grams, 0)} g</td></tr>`;
     }).join("");
-    return `<table class="ingredient-table"><thead><tr><th>区分</th><th>材料・調味料</th><th>1人前</th><th>${servings}人分</th></tr></thead><tbody>${rows}</tbody></table>`;
+    return `<table class="ingredient-table"><thead><tr><th>区分</th><th>材料・調味料</th><th>1人前</th></tr></thead><tbody>${rows}</tbody></table>`;
   };
   renderMetricCards = function (nutrition, note) {
     return `<div class="metrics-grid six">${METRIC_META.map((item) => `<article class="metric-card"><span>${item.label}</span><strong>${formatNumber(nutrition[item.key], item.digits)} ${item.unit}</strong><small>${note}</small></article>`).join("")}</div>`;
@@ -3036,8 +3278,20 @@
     const filterButtons = RECIPE_MASTER_FILTER_OPTIONS.map((option) => `<button type="button" class="button button-secondary recipe-master-filter-button ${option.value === activeFilter ? "is-active" : ""}" data-recipe-filter="${escapeHtml(option.value)}">${escapeHtml(option.label)}</button>`).join("");
     const searchField = `<div class="recipe-master-filter-search"><input id="recipe-master-search" class="recipe-master-search-input" type="search" placeholder="\u6599\u7406\u540d\u3067\u691c\u7d22" value="${escapeHtml(searchInputValue)}"></div>`;
     const addButton = `<div class="recipe-master-filter-actions"><button type="button" class="button button-primary recipe-master-add-button${state.adminRecipeMasterAddState ? ` is-${state.adminRecipeMasterAddState}` : ""}" id="recipe-master-add-button" ${selectedRecipe ? "" : "disabled"}>\u30e1\u30cb\u30e5\u30fc\u8ffd\u52a0</button></div>`;
+    const renderRecipeCard = (recipe) => `<article class="recipe-card ${recipe.id === state.selectedRecipeId ? "is-active" : ""}" data-recipe-card="${recipe.id}"><div class="sub-head"><div><h3>${escapeHtml(recipe.name)}</h3><span class="tag">${escapeHtml(recipe.cuisine)} / ${escapeHtml(recipe.category)}</span></div><span class="pill">${formatNumber(recipe.nutrition.energy, 0)} kcal</span></div></article>`;
+    const cuisineOrder = ["和食", "洋食", "中華"];
+    const cuisineSections = cuisineOrder
+      .map((cuisine) => ({
+        cuisine,
+        recipes: filteredRecipes.filter((recipe) => recipe.cuisine === cuisine)
+      }))
+      .filter((section) => section.recipes.length > 0);
+    const otherCuisineRecipes = filteredRecipes.filter((recipe) => !cuisineOrder.includes(recipe.cuisine));
+    if (otherCuisineRecipes.length) {
+      cuisineSections.push({ cuisine: "その他", recipes: otherCuisineRecipes });
+    }
     const recipeCards = filteredRecipes.length
-      ? filteredRecipes.map((recipe) => `<article class="recipe-card ${recipe.id === state.selectedRecipeId ? "is-active" : ""}" data-recipe-card="${recipe.id}"><div class="sub-head"><div><h3>${escapeHtml(recipe.name)}</h3><span class="tag">${escapeHtml(recipe.cuisine)} / ${escapeHtml(recipe.category)}</span></div><span class="pill">${formatNumber(recipe.nutrition.energy, 0)} kcal</span></div></article>`).join("")
+      ? cuisineSections.map((section) => `<section class="recipe-master-cuisine-group"><div class="recipe-master-cuisine-heading">${escapeHtml(section.cuisine)}</div>${section.recipes.map(renderRecipeCard).join("")}</section>`).join("")
       : `<article class="card"><div class="empty-state">\u8a72\u5f53\u3059\u308b\u6599\u7406\u304c\u3042\u308a\u307e\u305b\u3093\u3002</div></article>`;
     const recipeDetail = state.recipeMasterMode === "create"
       ? renderRecipeMasterCreatePanel()
@@ -3959,6 +4213,7 @@
   syncSelectedRecipe();
   renderAll();
 })();
+
 
 
 
