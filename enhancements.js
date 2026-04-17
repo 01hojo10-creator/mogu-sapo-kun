@@ -25,6 +25,25 @@
     : loadStorage(STORAGE_KEYS.hiddenDefaultRecipeIds, []);
   const EXTRA_STYLE = `
     .catalog-stats { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; }
+    .catalog-panel .section-head {
+      margin-bottom:10px;
+    }
+    .catalog-panel .section-kicker {
+      margin-bottom:2px;
+    }
+    .catalog-stats--compact {
+      gap:8px;
+    }
+    .catalog-stats--compact .metric-card {
+      padding:12px 14px;
+      min-height:auto;
+    }
+    .catalog-stats--compact .metric-card span {
+      margin-bottom:3px;
+    }
+    .catalog-stats--compact .metric-card strong {
+      line-height:1.1;
+    }
       .recipe-master-filter-bar { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-bottom:14px; }
       .recipe-master-filter-actions { margin-left:auto; display:flex; align-items:center; }
       .recipe-master-add-button.is-added {
@@ -85,6 +104,41 @@
       justify-content:flex-end;
       gap:10px;
     }
+    .recipe-master-section-title {
+      grid-column:1 / -1;
+      margin:2px 0 -4px;
+      font-size:0.88rem;
+      font-weight:700;
+      color:#6f533e;
+    }
+    .recipe-master-part-section {
+      grid-column:1 / -1;
+      display:grid;
+      gap:8px;
+    }
+    .recipe-master-part-head {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .recipe-master-part-grid {
+      display:grid;
+      gap:8px;
+    }
+    .recipe-master-part-row {
+      display:grid;
+      grid-template-columns:minmax(0, 1fr) 92px auto;
+      gap:8px;
+    }
+    .recipe-master-part-row input {
+      min-width:0;
+    }
+    .recipe-master-part-add,
+    .recipe-master-part-remove {
+      padding-inline:12px;
+      white-space:nowrap;
+    }
     .recipe-master-ai-row {
       display:flex;
       align-items:center;
@@ -103,6 +157,88 @@
       border-color:rgba(201, 105, 43, 0.38);
       color:#8a4e24;
       box-shadow:none;
+    }
+    .recipe-nutrition-section {
+      padding:12px 14px;
+      border:1px solid rgba(162, 108, 86, 0.14);
+      border-radius:16px;
+      background:rgba(255, 255, 255, 0.72);
+    }
+    .recipe-nutrition-section h4 {
+      margin:0 0 8px;
+    }
+    .recipe-nutrition-list {
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0, 1fr));
+      gap:6px 14px;
+    }
+    .recipe-nutrition-item {
+      display:flex;
+      align-items:baseline;
+      justify-content:space-between;
+      gap:10px;
+      font-size:0.92rem;
+      line-height:1.4;
+      color:#5a483d;
+    }
+    .recipe-nutrition-item strong {
+      color:#2f2621;
+      font-size:0.92rem;
+      white-space:nowrap;
+    }
+    .recipe-ingredient-section {
+      display:grid;
+      gap:8px;
+    }
+    .recipe-ingredient-section h4 {
+      margin:0;
+    }
+    .recipe-ingredient-table {
+      width:100%;
+      border-collapse:collapse;
+    }
+    .recipe-ingredient-table td {
+      padding:8px 0;
+      border-top:1px solid rgba(162, 108, 86, 0.12);
+      vertical-align:top;
+    }
+    .recipe-ingredient-table tr:first-child td {
+      border-top:none;
+    }
+    .recipe-ingredient-group {
+      display:grid;
+      gap:4px;
+    }
+    .recipe-ingredient-group + .recipe-ingredient-group {
+      margin-top:4px;
+    }
+    .recipe-ingredient-group h5 {
+      margin:0;
+      font-size:0.8rem;
+      color:#8b786f;
+    }
+    .recipe-ingredient-group-title {
+      display:inline-flex;
+      align-items:center;
+      width:fit-content;
+      padding:3px 10px;
+      border:1px solid rgba(162, 108, 86, 0.22);
+      border-radius:999px;
+      background:rgba(201, 105, 43, 0.08);
+      color:#6f533e;
+      font-weight:700;
+      letter-spacing:0.03em;
+    }
+    .recipe-ingredient-main {
+      display:grid;
+      gap:4px;
+    }
+    .recipe-ingredient-amount {
+      width:72px;
+      text-align:right;
+      white-space:nowrap;
+      color:#3f2b1e;
+      font-weight:700;
     }
     .recipe-master-detail-actions {
       display:flex;
@@ -241,6 +377,15 @@
       border:1px solid rgba(164,124,92,0.12);
     }
     #admin-view .weekly-editor-save-button {
+      padding:8px 12px;
+    }
+    #admin-view .weekly-editor-day-actions {
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    #admin-view .weekly-editor-shuffle-button {
       padding:8px 12px;
     }
     #admin-view .weekly-editor-save-button.is-saving-day {
@@ -514,14 +659,15 @@
   }
   function part(foodId, grams, meta = {}) {
     if (typeof meta === "string") {
-      return { foodId, grams, prep: meta, step: "", label: "" };
+      return { foodId, grams, prep: meta, step: "", label: "", unit: "g" };
     }
     return {
       foodId,
       grams,
       prep: meta.prep || "",
       step: meta.step || "",
-      label: meta.label || meta.name || ""
+      label: meta.label || meta.name || "",
+      unit: meta.unit || "g"
     };
   }
   function normalizePart(partItem) {
@@ -531,7 +677,8 @@
       grams: Number(partItem.grams || 0),
       prep: partItem.prep || "",
       step: partItem.step || "",
-      label: partItem.label || partItem.name || ""
+      label: partItem.label || partItem.name || "",
+      unit: partItem.unit || "g"
     };
   }
   function normalizeParts(parts) {
@@ -1515,6 +1662,94 @@
       freshFruit: recipe.tags.includes("生フルーツ")
     };
   }
+  const RECIPE_PRIMARY_KEYWORD_WEIGHTS = new Map([
+    ["ブロッコリー", 56], ["かぼちゃ", 56], ["にんじん", 42], ["人参", 42], ["玉ねぎ", 42], ["たまねぎ", 42],
+    ["じゃがいも", 44], ["キャベツ", 44], ["青菜", 40], ["ほうれん草", 40], ["小松菜", 40], ["きのこ", 44],
+    ["しめじ", 40], ["えのき", 40], ["なめこ", 40], ["豆腐", 48], ["大根", 44], ["白菜", 42], ["卵", 42],
+    ["鶏", 40], ["豚", 40], ["鮭", 42], ["白身魚", 42], ["魚", 24], ["さつまいも", 46], ["里芋", 42], ["かぶ", 40],
+    ["りんご", 34], ["バナナ", 34], ["みかん", 34], ["オレンジ", 34], ["白桃", 34], ["もも", 30], ["ぶどう", 34]
+  ]);
+  const RECIPE_FLAVOR_KEYWORD_WEIGHTS = new Map([
+    ["コンソメ", 30], ["味噌", 30], ["みそ", 30], ["中華", 26], ["クリーム", 28], ["カレー", 28], ["トマト", 24],
+    ["甘煮", 22], ["煮", 10], ["和え", 10], ["マヨ", 22], ["マヨネーズ", 22], ["酢", 18], ["しょうゆ", 18],
+    ["醤油", 18], ["塩", 12], ["オイスター", 24], ["甘酢", 22], ["ごま", 16], ["胡麻", 16]
+  ]);
+  function getRecipeOverlapSourceText(recipe) {
+    if (!recipe) return "";
+    return [
+      recipe.name || "",
+      recipe.rotationKey || "",
+      ...(recipe.tags || []),
+      ...normalizeParts(recipe.ingredients || []).map((item) => getFoodLabel(item)),
+      ...normalizeParts(recipe.seasonings || []).map((item) => getFoodLabel(item))
+    ].join(" ").toLowerCase();
+  }
+  function collectRecipeOverlapKeywords(recipe, keywordWeights) {
+    const text = getRecipeOverlapSourceText(recipe);
+    const hits = new Map();
+    keywordWeights.forEach((weight, keyword) => {
+      if (text.includes(String(keyword).toLowerCase())) {
+        hits.set(keyword, weight);
+      }
+    });
+    return hits;
+  }
+  function scoreRecipeOverlap(recipeA, recipeB) {
+    if (!(recipeA && recipeB)) return 0;
+    if (recipeA.id && recipeB.id && recipeA.id === recipeB.id) return 320;
+    if (recipeA.name && recipeB.name && recipeA.name === recipeB.name) return 260;
+    const primaryA = collectRecipeOverlapKeywords(recipeA, RECIPE_PRIMARY_KEYWORD_WEIGHTS);
+    const primaryB = collectRecipeOverlapKeywords(recipeB, RECIPE_PRIMARY_KEYWORD_WEIGHTS);
+    const flavorA = collectRecipeOverlapKeywords(recipeA, RECIPE_FLAVOR_KEYWORD_WEIGHTS);
+    const flavorB = collectRecipeOverlapKeywords(recipeB, RECIPE_FLAVOR_KEYWORD_WEIGHTS);
+    let score = 0;
+    let primaryMatches = 0;
+    let flavorMatches = 0;
+    primaryA.forEach((weight, keyword) => {
+      if (primaryB.has(keyword)) {
+        score += weight;
+        primaryMatches += 1;
+      }
+    });
+    flavorA.forEach((weight, keyword) => {
+      if (flavorB.has(keyword)) {
+        score += weight;
+        flavorMatches += 1;
+      }
+    });
+    if (primaryMatches >= 2) score += (primaryMatches - 1) * 42;
+    if (flavorMatches >= 2) score += (flavorMatches - 1) * 18;
+    if (primaryMatches && flavorMatches) score += 26;
+    return score;
+  }
+  function scoreMenuOverlapPair(map, recipeIdA, recipeIdB, weight = 1) {
+    const recipeA = map.get(recipeIdA);
+    const recipeB = map.get(recipeIdB);
+    return scoreRecipeOverlap(recipeA, recipeB) * weight;
+  }
+  function getIntraDayOverlapPenalty(menu, map = getRecipeMap()) {
+    if (!menu) return 0;
+    let penalty = 0;
+    if (menu.mode === "basic") {
+      penalty += scoreMenuOverlapPair(map, menu.basic.soup, menu.basic.side1, 1.7);
+      penalty += scoreMenuOverlapPair(map, menu.basic.soup, menu.basic.side2, 1.7);
+      penalty += scoreMenuOverlapPair(map, menu.basic.side1, menu.basic.side2, 1.1);
+      penalty += scoreMenuOverlapPair(map, menu.basic.main, menu.basic.soup, 1.0);
+      penalty += scoreMenuOverlapPair(map, menu.basic.main, menu.basic.side1, 0.95);
+      penalty += scoreMenuOverlapPair(map, menu.basic.main, menu.basic.side2, 0.95);
+      penalty += scoreMenuOverlapPair(map, menu.basic.staple, menu.basic.soup, 0.7);
+      penalty += scoreMenuOverlapPair(map, menu.basic.staple, menu.basic.side1, 0.75);
+      penalty += scoreMenuOverlapPair(map, menu.basic.staple, menu.basic.side2, 0.75);
+      penalty += scoreMenuOverlapPair(map, menu.basic.staple, menu.basic.main, 0.55);
+      penalty += scoreMenuOverlapPair(map, menu.basic.dessert, menu.snack, 1.15);
+    } else {
+      penalty += scoreMenuOverlapPair(map, menu.exception.singleDish, menu.exception.extraSoup, 1.5);
+      penalty += scoreMenuOverlapPair(map, menu.exception.singleDish, menu.exception.extraSide, 1.5);
+      penalty += scoreMenuOverlapPair(map, menu.exception.extraSoup, menu.exception.extraSide, 1.15);
+      penalty += scoreMenuOverlapPair(map, menu.exception.extraDessert, menu.snack, 1.15);
+    }
+    return penalty;
+  }
   function getPreferredCuisine(menu, targetCuisine) {
     return getPrimaryRecipeLocal(menu)?.cuisine || targetCuisine;
   }
@@ -1724,6 +1959,7 @@
         if (context.freshFruitDessertCount >= 2) score -= context.freshFruitDessertCount * 14;
       }
     }
+    score -= getIntraDayOverlapPenalty(menu, map);
     return score;
   }
   function updateGenerationContext(menu, context) {
@@ -1816,9 +2052,39 @@
     }).join("");
     return `<table class="ingredient-table"><thead><tr><th>区分</th><th>材料・調味料</th><th>1人前</th></tr></thead><tbody>${rows}</tbody></table>`;
   };
+  function renderRecipeIngredientTable(recipe) {
+    const renderGroupRows = (items, kind) => items.map((item) => {
+      const note = kind === "食材" ? item.prep : item.step;
+      const noteLabel = kind === "食材" ? "下処理" : "工程";
+      return `<tr><td><div class="recipe-ingredient-main"><div>${escapeHtml(getFoodLabel(item))}</div>${note ? `<div class="muted">${escapeHtml(`${noteLabel}: ${note}`)}</div>` : ""}</div></td><td class="recipe-ingredient-amount">${formatNumber(item.grams, 0)} g</td></tr>`;
+    }).join("");
+    const sections = [];
+    if (recipe.ingredients.length) {
+      sections.push(`<div class="recipe-ingredient-group"><h5 class="recipe-ingredient-group-title">食材</h5><table class="recipe-ingredient-table"><tbody>${renderGroupRows(recipe.ingredients, "食材")}</tbody></table></div>`);
+    }
+    if (recipe.seasonings.length) {
+      sections.push(`<div class="recipe-ingredient-group"><h5 class="recipe-ingredient-group-title">調味料</h5><table class="recipe-ingredient-table"><tbody>${renderGroupRows(recipe.seasonings, "調味料")}</tbody></table></div>`);
+    }
+    return `<section class="recipe-ingredient-section"><h4>材料・調味料（1人前）</h4>${sections.join("")}</section>`;
+  }
   renderMetricCards = function (nutrition, note) {
     return `<div class="metrics-grid six">${METRIC_META.map((item) => `<article class="metric-card"><span>${item.label}</span><strong>${formatNumber(nutrition[item.key], item.digits)} ${item.unit}</strong><small>${note}</small></article>`).join("")}</div>`;
   };
+  function renderRecipeNutritionCompact(nutrition) {
+    const safeNutrition = nutrition || emptyNutrition();
+    const nutritionItems = [
+      ["エネルギー", `${formatNumber(safeNutrition.energy, 0)}kcal`],
+      ["たんぱく質", `${formatNumber(safeNutrition.protein, 1)}g`],
+      ["脂質", `${formatNumber(safeNutrition.fat, 1)}g`],
+      ["炭水化物", `${formatNumber(safeNutrition.carbs, 1)}g`],
+      ["食物繊維", `${formatNumber(safeNutrition.fiber, 1)}g`],
+      ["食塩相当量", `${formatNumber(safeNutrition.salt, 1)}g`]
+    ];
+    return `<section class="recipe-nutrition-section"><h4>食品成分</h4><div class="recipe-nutrition-list">${nutritionItems.map(([label, value]) => `<div class="recipe-nutrition-item"><span>${label}</span><strong>${value}</strong></div>`).join("")}</div></section>`;
+  }
+  function renderKitchenNutritionSummary(nutrition) {
+    return `<section><h4>食品成分</h4><div class="metrics-grid six">${METRIC_META.map((item) => `<article class="metric-card"><span>${item.label}</span><strong>${formatNumber(nutrition[item.key], item.digits)} ${item.unit}</strong></article>`).join("")}</div></section>`;
+  }
   renderConditionCards = function (evaluation) {
     const cards = [{ label: "構成", pass: evaluation.structurePass, detail: evaluation.structurePass ? "必要な構成がそろっています。" : "必要な構成が不足しています。" }, { label: "エネルギー", pass: evaluation.energyPass, detail: `${formatNumber(evaluation.totals.energy, 0)} kcal / 目安 500〜600 kcal` }, { label: "塩分", pass: evaluation.saltPass, detail: `${formatNumber(evaluation.totals.salt, 1)} g / 上限 3.0 g` }];
     return cards.map((card) => `<article class="check-card ${card.pass ? "pass" : "fail"}"><span>${card.label}</span><strong>${card.pass ? "適合" : "要調整"}</strong><p class="muted">${card.detail}</p></article>`).join("");
@@ -1933,9 +2199,9 @@
       const cuisineOptions = ["和食", "洋食", "中華"]
         .map((cuisine) => `<option value="${escapeHtml(cuisine)}" ${draft.cuisine === cuisine ? "selected" : ""}>${escapeHtml(cuisine)}</option>`)
         .join("");
-      return `<article class="card recipe-detail"><div class="sub-head"><div><p class="section-kicker">Selected Recipe</p><h3>料理を編集</h3></div><span class="pill">${escapeHtml(recipe.cuisine)} / ${escapeHtml(recipe.category)}</span></div>${state.recipeMasterDraftError ? `<p class="recipe-master-form-error">${escapeHtml(state.recipeMasterDraftError)}</p>` : ""}${renderRecipeMasterAiRow()}<div class="recipe-master-form-grid"><label class="field"><span>料理名</span><input id="recipe-master-draft-name" data-recipe-master-draft="name" type="text" value="${escapeHtml(draft.name)}"></label><label class="field"><span>カテゴリ</span><select id="recipe-master-draft-category" data-recipe-master-draft="category">${categoryOptions}</select></label><label class="field"><span>cuisine</span><select id="recipe-master-draft-cuisine" data-recipe-master-draft="cuisine">${cuisineOptions}</select></label><label class="field"><span>1人前量</span><input id="recipe-master-draft-serving-size" data-recipe-master-draft="servingSize" type="number" min="1" step="1" value="${escapeHtml(draft.servingSize)}"></label><label class="field is-full"><span>説明</span><textarea id="recipe-master-draft-description" data-recipe-master-draft="description">${escapeHtml(draft.description)}</textarea></label><label class="field is-full"><span>メモ / 注意点</span><textarea id="recipe-master-draft-notes" data-recipe-master-draft="notes">${escapeHtml(draft.notes)}</textarea></label><label class="field is-full"><span>作業指示</span><textarea id="recipe-master-draft-steps" data-recipe-master-draft="steps">${escapeHtml(draft.steps)}</textarea></label><label class="field"><span>エネルギー</span><input id="recipe-master-draft-energy" data-recipe-master-draft="energy" type="number" step="1" value="${escapeHtml(draft.energy)}"></label><label class="field"><span>塩分</span><input id="recipe-master-draft-salt" data-recipe-master-draft="salt" type="number" step="0.1" value="${escapeHtml(draft.salt)}"></label></div><div class="recipe-master-form-actions"><button type="button" class="button button-secondary" id="recipe-master-cancel-button">キャンセル</button><button type="button" class="button button-primary" id="recipe-master-save-button">保存</button></div></article>`;
+      return `<article class="card recipe-detail"><div class="sub-head"><div><p class="section-kicker">Selected Recipe</p><h3>料理を編集</h3></div><span class="pill">${escapeHtml(recipe.cuisine)} / ${escapeHtml(recipe.category)}</span></div>${state.recipeMasterDraftError ? `<p class="recipe-master-form-error">${escapeHtml(state.recipeMasterDraftError)}</p>` : ""}<div class="recipe-master-form-grid"><label class="field"><span>料理名</span><input id="recipe-master-draft-name" data-recipe-master-draft="name" type="text" value="${escapeHtml(draft.name)}"></label><label class="field"><span>カテゴリ</span><select id="recipe-master-draft-category" data-recipe-master-draft="category">${categoryOptions}</select></label><label class="field"><span>cuisine</span><select id="recipe-master-draft-cuisine" data-recipe-master-draft="cuisine">${cuisineOptions}</select></label><label class="field"><span>1人前量</span><input id="recipe-master-draft-serving-size" data-recipe-master-draft="servingSize" type="number" min="1" step="1" value="${escapeHtml(draft.servingSize)}"></label><label class="field is-full"><span>提供方法</span><textarea id="recipe-master-draft-notes" data-recipe-master-draft="notes">${escapeHtml(draft.notes)}</textarea></label>${renderRecipeMasterPartEditor("ingredient", "食材", draft.ingredientRows || [])}${renderRecipeMasterPartEditor("seasoning", "調味料", draft.seasoningRows || [])}<div class="recipe-master-section-title">食品成分</div><label class="field"><span>エネルギー</span><input id="recipe-master-draft-energy" data-recipe-master-draft="energy" type="number" step="1" value="${escapeHtml(draft.energy)}"></label><label class="field"><span>たんぱく質</span><input id="recipe-master-draft-protein" data-recipe-master-draft="protein" type="number" step="0.1" value="${escapeHtml(draft.protein || "0")}"></label><label class="field"><span>脂質</span><input id="recipe-master-draft-fat" data-recipe-master-draft="fat" type="number" step="0.1" value="${escapeHtml(draft.fat || "0")}"></label><label class="field"><span>炭水化物</span><input id="recipe-master-draft-carbs" data-recipe-master-draft="carbs" type="number" step="0.1" value="${escapeHtml(draft.carbs || "0")}"></label><label class="field"><span>食物繊維</span><input id="recipe-master-draft-fiber" data-recipe-master-draft="fiber" type="number" step="0.1" value="${escapeHtml(draft.fiber || "0")}"></label><label class="field"><span>食塩相当量</span><input id="recipe-master-draft-salt" data-recipe-master-draft="salt" type="number" step="0.1" value="${escapeHtml(draft.salt)}"></label><label class="field is-full"><span>作業指示</span><textarea id="recipe-master-draft-steps" data-recipe-master-draft="steps">${escapeHtml(draft.steps)}</textarea></label></div><div class="recipe-master-form-actions"><button type="button" class="button button-secondary" id="recipe-master-cancel-button">キャンセル</button><button type="button" class="button button-primary" id="recipe-master-save-button">保存</button></div></article>`;
     }
-    return `<article class="card recipe-detail"><div class="sub-head"><div><p class="section-kicker">Selected Recipe</p><h3>${escapeHtml(recipe.name)}</h3></div><span class="pill">${escapeHtml(recipe.cuisine)} / ${escapeHtml(recipe.category)}</span></div><div class="tag-row"><span class="tag">rotation ${escapeHtml(recipe.rotationKey)}</span>${recipe.tags.map((tag) => `<span class="pill">${escapeHtml(tag)}</span>`).join("")}</div><p class="muted">1人前 ${formatNumber(recipe.servingSize, 0)} g / エネルギー ${formatNumber(recipe.nutrition.energy, 0)} kcal / 塩分 ${formatNumber(recipe.nutrition.salt, 1)} g</p>${recipe.notes ? `<p class="muted">${escapeHtml(recipe.notes)}</p>` : ""}<div class="stack">${renderIngredientTable(recipe, state.settings.kitchenServings)}${renderMetricCards(recipe.nutrition, "食品成分表ベース")}<div><h4>作業指示</h4><ol class="detail-list">${recipe.instructions.map((step) => `<li>${escapeHtml(step)}</li>`).join("")}</ol></div></div><div class="recipe-master-detail-actions"><button type="button" class="button button-secondary" id="recipe-master-edit-button">編集</button><button type="button" class="button button-secondary" id="recipe-master-delete-button">削除</button></div></article>`;
+    return `<article class="card recipe-detail"><div class="sub-head"><div><p class="section-kicker">Selected Recipe</p><h3>${escapeHtml(recipe.name)}</h3></div><span class="pill">${escapeHtml(recipe.cuisine)} / ${escapeHtml(recipe.category)}</span></div><div class="tag-row"><span class="tag">rotation ${escapeHtml(recipe.rotationKey)}</span>${recipe.tags.map((tag) => `<span class="pill">${escapeHtml(tag)}</span>`).join("")}</div>${recipe.notes ? `<div><h4>提供方法</h4><p class="muted">${escapeHtml(recipe.notes)}</p></div>` : ""}<div class="stack">${renderRecipeIngredientTable(recipe)}${renderRecipeNutritionCompact(recipe.nutrition)}<div><h4>作業指示</h4><ol class="detail-list">${recipe.instructions.map((step) => `<li>${escapeHtml(step)}</li>`).join("")}</ol></div></div><div class="recipe-master-detail-actions"><button type="button" class="button button-secondary" id="recipe-master-edit-button">編集</button><button type="button" class="button button-secondary" id="recipe-master-delete-button">削除</button></div></article>`;
   };
   renderSlotSelect = function (dayKey, mode, field, label, currentValue, recipes, optional = false) {
     return `<label class="field"><span>${label}</span><select data-menu-day="${dayKey}" data-menu-mode="${mode}" data-menu-field="${field}"><option value="">${optional ? "追加しない" : "選択してください"}</option>${recipes.map((recipe) => `<option value="${recipe.id}" ${recipe.id === currentValue ? "selected" : ""}>${escapeHtml(recipe.name)} (${escapeHtml(recipe.cuisine)})</option>`).join("")}</select></label>`;
@@ -2339,6 +2605,84 @@
   function isCustomRecipeId(recipeId) {
     return normalizeCustomRecipes(state.customRecipes || []).some((recipe) => recipe.id === recipeId);
   }
+  function normalizeRecipeMasterPartRows(parts) {
+    return normalizeParts(parts || []).map((partItem) => ({
+      label: getFoodLabel(partItem),
+      grams: partItem.grams ? String(formatNumber(partItem.grams, 0)) : ""
+    }));
+  }
+  function parseRecipeMasterTags(value) {
+    return String(value || "")
+      .split(/[\r\n,、・]/)
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+  function buildRecipeMasterPartsFromRows(baseParts, rows, kind) {
+    const normalizedBase = normalizeParts(baseParts || []);
+    return rows
+      .map((row, index) => {
+        const basePart = normalizedBase[index] || {};
+        const label = `${row?.label || ""}`.trim();
+        const gramsValue = Number(row?.grams || 0);
+        if (!label) return null;
+        const safeLabel = label || `${kind}-${index + 1}`;
+        return {
+          ...basePart,
+          foodId: basePart.foodId || `custom-${kind}-${index + 1}-${safeLabel.replace(/[^\w\u3040-\u30ff\u4e00-\u9faf]+/g, "-")}`,
+          label: safeLabel,
+          grams: Number.isFinite(gramsValue) ? gramsValue : 0,
+          unit: "g",
+          prep: kind === "ingredient" ? (basePart.prep || "") : "",
+          step: kind === "seasoning" ? (basePart.step || "") : ""
+        };
+      })
+      .filter(Boolean);
+  }
+  function collectRecipeMasterPartRowsFromDom(kind) {
+    const rows = new Map();
+    Array.from(document.querySelectorAll(`[data-recipe-master-part-kind="${kind}"]`)).forEach((input) => {
+      const index = Number(input.dataset.recipeMasterPartIndex || 0);
+      const field = input.dataset.recipeMasterPartField || "";
+      if (!rows.has(index)) rows.set(index, { label: "", grams: "" });
+      rows.get(index)[field] = input.value || "";
+    });
+    return Array.from(rows.entries())
+      .sort((a, b) => a[0] - b[0])
+      .map(([, row]) => ({
+        label: `${row.label || ""}`.trim(),
+        grams: `${row.grams || ""}`.trim()
+      }))
+      .filter((row) => row.label || row.grams);
+  }
+  function createRecipeMasterPartRowMarkup(kind, title, index, row = {}) {
+    return `<div class="recipe-master-part-row" data-recipe-master-part-row="${kind}"><input type="text" data-recipe-master-part-kind="${kind}" data-recipe-master-part-index="${index}" data-recipe-master-part-field="label" placeholder="${title}名" value="${escapeHtml(row.label || "")}"><input type="number" min="0" step="1" data-recipe-master-part-kind="${kind}" data-recipe-master-part-index="${index}" data-recipe-master-part-field="grams" placeholder="g" value="${escapeHtml(row.grams || "")}"><button type="button" class="button button-secondary recipe-master-part-remove" data-recipe-master-part-remove="${kind}">削除</button></div>`;
+  }
+  function renderRecipeMasterPartEditor(kind, title, rows) {
+    const editorRows = rows && rows.length ? [...rows] : [{ label: "", grams: "" }];
+    return `<div class="recipe-master-part-section" data-recipe-master-part-section="${kind}"><div class="recipe-master-part-head"><h4>${title}</h4><button type="button" class="button button-secondary recipe-master-part-add" data-recipe-master-part-add="${kind}" data-recipe-master-part-title="${title}">${title}を追加</button></div><div class="recipe-master-part-grid" data-recipe-master-part-grid="${kind}">${editorRows.map((row, index) => createRecipeMasterPartRowMarkup(kind, title, index, row)).join("")}</div></div>`;
+  }
+  function appendRecipeMasterPartRow(kind, title) {
+    const grid = document.querySelector(`[data-recipe-master-part-grid="${kind}"]`);
+    if (!grid) return;
+    const indices = Array.from(grid.querySelectorAll(`[data-recipe-master-part-kind="${kind}"]`))
+      .map((input) => Number(input.dataset.recipeMasterPartIndex || 0));
+    const nextIndex = indices.length ? Math.max(...indices) + 1 : 0;
+    grid.insertAdjacentHTML("beforeend", createRecipeMasterPartRowMarkup(kind, title, nextIndex));
+  }
+  function removeRecipeMasterPartRow(button) {
+    const row = button.closest('[data-recipe-master-part-row]');
+    const kind = button.dataset.recipeMasterPartRemove || "";
+    const grid = row?.closest(`[data-recipe-master-part-grid="${kind}"]`);
+    if (!row || !grid) return;
+    const rows = Array.from(grid.querySelectorAll('[data-recipe-master-part-row]'));
+    if (rows.length <= 1) {
+      row.querySelectorAll('input').forEach((input) => {
+        input.value = "";
+      });
+      return;
+    }
+    row.remove();
+  }
   function createRecipeDraftFromRecipe(recipe) {
     return {
       name: recipe?.name || "",
@@ -2346,18 +2690,65 @@
       cuisine: recipe?.cuisine || "和食",
       description: recipe?.description || "",
       notes: recipe?.notes || "",
+      rotationKey: recipe?.rotationKey || recipe?.name || "",
+      tags: Array.isArray(recipe?.tags) ? recipe.tags.join("・") : "",
       servingSize: String(recipe?.servingSize || recipe?.servingWeight || 100),
+      ingredientRows: normalizeRecipeMasterPartRows(recipe?.ingredients || []),
+      seasoningRows: normalizeRecipeMasterPartRows(recipe?.seasonings || []),
+      ingredients: normalizeParts(recipe?.ingredients || []).map((partItem) => {
+        const base = `${getFoodLabel(partItem)}${partItem.grams ? ` ${formatNumber(partItem.grams, 0)}g` : ""}`;
+        return partItem.prep ? `${base} / ${partItem.prep}` : base;
+      }).join("\n"),
+      seasonings: normalizeParts(recipe?.seasonings || []).map((partItem) => {
+        const base = `${getFoodLabel(partItem)}${partItem.grams ? ` ${formatNumber(partItem.grams, 0)}g` : ""}`;
+        return partItem.step ? `${base} / ${partItem.step}` : base;
+      }).join("\n"),
       steps: Array.isArray(recipe?.instructions) ? recipe.instructions.join("\n") : (Array.isArray(recipe?.steps) ? recipe.steps.join("\n") : ""),
       energy: String(Number(recipe?.nutrition?.energy || recipe?.nutrition?.kcal || 0)),
+      protein: String(Number(recipe?.nutrition?.protein || 0)),
+      fat: String(Number(recipe?.nutrition?.fat || 0)),
+      carbs: String(Number(recipe?.nutrition?.carbs || 0)),
+      fiber: String(Number(recipe?.nutrition?.fiber || 0)),
       salt: String(Number(recipe?.nutrition?.salt || 0))
     };
+  }
+  function parseRecipeMasterDraftParts(value, kind) {
+    return String(value || "")
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter(Boolean)
+      .map((line, index) => {
+        const [rawMain, rawNote = ""] = line.split(/\s*\/\s*/, 2);
+        const trimmedMain = rawMain.trim();
+        const amountMatch = trimmedMain.match(/^(.*?)(?:\s+|　)?(\d+(?:\.\d+)?)\s*g$/i);
+        const label = (amountMatch ? amountMatch[1] : trimmedMain).trim();
+        const grams = amountMatch ? Number(amountMatch[2]) : 0;
+        const safeLabel = label || `${kind}-${index + 1}`;
+        return {
+          foodId: `custom-${kind}-${index + 1}-${safeLabel.replace(/[^\w\u3040-\u30ff\u4e00-\u9faf]+/g, "-")}`,
+          grams: Number.isFinite(grams) ? grams : 0,
+          prep: kind === "ingredient" ? rawNote.trim() : "",
+          step: kind === "seasoning" ? rawNote.trim() : "",
+          label: safeLabel
+        };
+      });
   }
   function buildRecipeMasterEditedRecipeFromDraft(baseRecipe, draft) {
     const normalizedName = (draft.name || "").trim();
     const servingSize = Math.max(1, Number(draft.servingSize || baseRecipe?.servingSize || baseRecipe?.servingWeight || 100));
     const energy = Number(draft.energy || 0);
+    const protein = Number(draft.protein || 0);
+    const fat = Number(draft.fat || 0);
+    const carbs = Number(draft.carbs || 0);
+    const fiber = Number(draft.fiber || 0);
     const salt = Number(draft.salt || 0);
     const stepsArray = (draft.steps || "").split(/\r?\n/).map((step) => step.trim()).filter(Boolean);
+    const ingredients = Array.isArray(draft.ingredientRows)
+      ? buildRecipeMasterPartsFromRows(baseRecipe.ingredients, draft.ingredientRows, "ingredient")
+      : parseRecipeMasterDraftParts(draft.ingredients, "ingredient");
+    const seasonings = Array.isArray(draft.seasoningRows)
+      ? buildRecipeMasterPartsFromRows(baseRecipe.seasonings, draft.seasoningRows, "seasoning")
+      : parseRecipeMasterDraftParts(draft.seasonings, "seasoning");
     return {
       ...baseRecipe,
       id: baseRecipe.id,
@@ -2366,18 +2757,22 @@
       cuisine: draft.cuisine,
       description: draft.description || "",
       notes: draft.notes || "",
-      ingredients: normalizeParts(baseRecipe.ingredients || []).map((partItem) => ({ ...partItem })),
-      seasonings: normalizeParts(baseRecipe.seasonings || []).map((partItem) => ({ ...partItem })),
+      ingredients,
+      seasonings,
       instructions: stepsArray.length ? stepsArray : ["手順未設定"],
       steps: stepsArray.length ? stepsArray : ["手順未設定"],
       servingSize,
       servings: Number(baseRecipe.servings || 1),
       servingWeight: servingSize,
-      rotationKey: baseRecipe.rotationKey || normalizedName,
-      tags: Array.isArray(baseRecipe.tags) ? [...baseRecipe.tags] : [],
+      rotationKey: (draft.rotationKey || "").trim() || baseRecipe.rotationKey || normalizedName,
+      tags: parseRecipeMasterTags(draft.tags),
       nutrition: {
         ...(baseRecipe.nutrition || emptyNutrition()),
         energy,
+        protein,
+        fat,
+        carbs,
+        fiber,
         kcal: energy,
         salt
       }
@@ -2843,7 +3238,7 @@
         if (!recipe) return "";
         return `<tr><td>${escapeHtml(slotLabels.join(" / "))}</td><td>${escapeHtml(recipe.name)}</td><td>${formatNumber(recipe.servingSize, 0)} g</td><td>${formatPartLines(recipe.ingredients, state.settings.kitchenServings, "ingredient")}</td><td>${formatPartLines(recipe.seasonings, state.settings.kitchenServings, "seasoning")}</td><td>${escapeHtml(recipe.instructions.join(" / "))}</td><td>${formatNumber(recipe.nutrition.energy, 0)} kcal<br>塩分 ${formatNumber(recipe.nutrition.salt, 1)} g</td></tr>`;
       }).join("") || '<tr><td colspan="7">献立が未設定です。</td></tr>';
-      return `<article class="panel kitchen-day-sheet page-print-break"><div class="section-head"><div><p class="section-kicker">${WEEKDAY_LABELS[dayKey]}曜日</p><h2>${formatDate(dayMenu.date)} 調理士向け指示書</h2></div></div><div class="kitchen-page-stack"><div class="kitchen-day-meta"><table class="kitchen-summary-table"><tbody>${summaryRows}</tbody></table>${renderMetricCards(evaluation.totals, "昼食全体")}</div><table class="kitchen-day-table"><thead><tr><th>献立枠</th><th>料理名</th><th>1人前量</th><th>材料</th><th>調味料</th><th>作業指示</th><th>栄養価</th></tr></thead><tbody>${recipeRows}</tbody></table></div></article>`;
+      return `<article class="panel kitchen-day-sheet page-print-break"><div class="section-head"><div><p class="section-kicker">${WEEKDAY_LABELS[dayKey]}曜日</p><h2>${formatDate(dayMenu.date)} 調理士向け指示書</h2></div></div><div class="kitchen-page-stack"><div class="kitchen-day-meta"><table class="kitchen-summary-table"><tbody>${summaryRows}</tbody></table>${renderKitchenNutritionSummary(evaluation.totals)}</div><table class="kitchen-day-table"><thead><tr><th>献立枠</th><th>料理名</th><th>1人前量</th><th>材料</th><th>調味料</th><th>作業指示</th><th>栄養価</th></tr></thead><tbody>${recipeRows}</tbody></table></div></article>`;
     }).join("");
     elements.kitchenView.innerHTML = `<article class="panel kitchen-intro"><div class="section-head"><div><p class="section-kicker">Kitchen Sheets</p><h2>調理師向け 5日分指示書</h2></div></div></article>${sheets}`;
   };
@@ -2851,7 +3246,7 @@
     const week = getWeekMenus(state.settings.weekStart); const recipes = getAllRecipes(); const foods = getAllFoods(); const selectedRecipe = recipes.find((recipe) => recipe.id === state.selectedRecipeId) || null; const catalog = summarizeCatalog(recipes); const byCategory = (category) => recipes.filter((recipe) => recipe.category === category).sort((a, b) => a.name.localeCompare(b.name, 'ja'));
     const historyCount = Object.keys(state.menuHistory || {}).length;
     const editorCards = WEEKDAY_KEYS.map((dayKey) => { const dayMenu = week[dayKey]; const evaluation = evaluateDayMenu(dayMenu); return `<article class="menu-card"><div class="sub-head"><div><p class="section-kicker">${WEEKDAY_LABELS[dayKey]}曜日</p><h3>${formatDate(dayMenu.date)}</h3></div><span class="pill">${dayMenu.mode === "basic" ? "通常献立" : "例外献立"}</span></div><div class="stack"><label class="field"><span>献立タイプ</span><select data-menu-day="${dayKey}" data-menu-field="mode"><option value="basic" ${dayMenu.mode === "basic" ? "selected" : ""}>通常献立</option><option value="exception" ${dayMenu.mode === "exception" ? "selected" : ""}>例外献立</option></select></label><div class="grid-two">${renderSlotSelect(dayKey, "basic", "staple", "主食", dayMenu.basic.staple, byCategory("主食"))}${renderSlotSelect(dayKey, "basic", "soup", "汁物", dayMenu.basic.soup, byCategory("汁物"))}${renderSlotSelect(dayKey, "basic", "main", "主菜", dayMenu.basic.main, byCategory("主菜"))}${renderSlotSelect(dayKey, "basic", "side1", "副菜1", dayMenu.basic.side1, byCategory("副菜"))}${renderSlotSelect(dayKey, "basic", "side2", "副菜2", dayMenu.basic.side2, byCategory("副菜"))}${renderSlotSelect(dayKey, "basic", "dessert", "デザート", dayMenu.basic.dessert, byCategory("デザート"))}</div><div class="grid-two">${renderSlotSelect(dayKey, "exception", "singleDish", "単品料理", dayMenu.exception.singleDish, byCategory("単品料理"))}${renderSlotSelect(dayKey, "exception", "extraSoup", "追加汁物", dayMenu.exception.extraSoup, byCategory("汁物"), true)}${renderSlotSelect(dayKey, "exception", "extraSide", "追加副菜", dayMenu.exception.extraSide, byCategory("副菜"), true)}${renderSlotSelect(dayKey, "exception", "extraDessert", "追加デザート", dayMenu.exception.extraDessert, byCategory("デザート"), true)}</div><div class="grid-two">${renderSlotSelect(dayKey, "snack", "snack", "3時のおやつ", dayMenu.snack, byCategory("おやつ"))}</div><label class="field"><span>メモ</span><textarea data-menu-day="${dayKey}" data-menu-field="memo">${escapeHtml(dayMenu.memo || "")}</textarea></label><div class="check-grid">${renderConditionCards(evaluation)}</div></div></article>`; }).join("");
-    elements.adminView.innerHTML = `<article class="panel"><div class="section-head"><div><p class="section-kicker">Admin</p><h2>管理画面</h2></div></div><div class="toolbar"><label class="field"><span>週の開始日</span><input id="admin-week-start" type="date" value="${escapeHtml(state.settings.weekStart)}"></label><label class="field"><span>調理人数</span><input id="admin-kitchen-servings" type="number" min="1" step="1" value="${escapeHtml(state.settings.kitchenServings)}"></label><label class="field"><span>誕生日週ルールを第3週に適用</span><input id="admin-birthday-week" type="checkbox" ${isBirthdayRuleEnabled() ? "checked" : ""}></label><button type="button" class="button button-primary" id="auto-generate-button">自動で5日分の献立を作成</button></div><p class="print-note">3週目ルール ${isThirdWeekRuleWeek(state.settings.weekStart) ? "適用中: 主食はお赤飯固定" : "対象外"} / 誕生日週ルール ${!isBirthdayRuleEnabled() ? "OFF" : (isThirdWeekRuleWeek(state.settings.weekStart) ? "適用中: 第3週のため お赤飯 + ケーキ" : "待機中: 第3週のみ適用")}</p></article><article class="panel"><div class="section-head"><div><p class="section-kicker">Catalog</p><h2>料理マスタ概要</h2></div></div><div class="catalog-stats"><article class="metric-card"><span>総料理数</span><strong>${catalog.total}</strong><small>自動献立対象</small></article><article class="metric-card"><span>和食 / 洋食 / 中華</span><strong>${catalog.byCuisine["和食"]} / ${catalog.byCuisine["洋食"]} / ${catalog.byCuisine["中華"]}</strong><small>料理候補数</small></article><article class="metric-card"><span>副菜数</span><strong>${catalog.byCategory["副菜"]}</strong><small>偏り回避に使用</small></article><article class="metric-card"><span>デザート / おやつ</span><strong>${catalog.byCategory["デザート"]} / ${catalog.byCategory["おやつ"]}</strong><small>3週間重複禁止対象</small></article></div></article><article class="panel"><div class="section-head"><div><p class="section-kicker">Weekly Editor</p><h2>5日分献立編集</h2></div></div><div class="weekly-grid">${editorCards}</div></article><article class="panel"><div class="section-head"><div><p class="section-kicker">Recipe Master</p><h2>料理一覧</h2></div></div><div class="detail-grid"><div class="recipe-list">${recipes.map((recipe) => `<article class="recipe-card ${recipe.id === state.selectedRecipeId ? "is-active" : ""}" data-recipe-card="${recipe.id}"><div class="sub-head"><div><h3>${escapeHtml(recipe.name)}</h3><span class="tag">${escapeHtml(recipe.cuisine)} / ${escapeHtml(recipe.category)}</span></div><span class="pill">${formatNumber(recipe.nutrition.energy, 0)} kcal</span></div><p class="muted">rotation ${escapeHtml(recipe.rotationKey)} / ${escapeHtml(recipe.tags.join("・"))}</p></article>`).join("")}</div>${renderRecipeDetailPanel(selectedRecipe)}</div></article><article class="panel"><div class="section-head"><div><p class="section-kicker">Food Master</p><h2>食品マスタ</h2></div><p class="section-note">食品成分表ベースの100gあたり栄養価です。</p></div><div class="food-list">${foods.map((food) => `<article class="card"><div class="sub-head"><strong>${escapeHtml(food.name)}</strong><span class="pill">100g</span></div><p class="muted">エネルギー ${formatNumber(food.nutrients.energy, 0)} kcal / たんぱく質 ${formatNumber(food.nutrients.protein, 1)} g / 脂質 ${formatNumber(food.nutrients.fat, 1)} g / 炭水化物 ${formatNumber(food.nutrients.carbs, 1)} g / 食物繊維 ${formatNumber(food.nutrients.fiber, 1)} g / 塩分 ${formatNumber(food.nutrients.salt, 1)} g</p></article>`).join("")}</div></article>`;
+    elements.adminView.innerHTML = `<article class="panel"><div class="section-head"><div><p class="section-kicker">Admin</p><h2>管理画面</h2></div></div><div class="toolbar"><label class="field"><span>週の開始日</span><input id="admin-week-start" type="date" value="${escapeHtml(state.settings.weekStart)}"></label><label class="field"><span>調理人数</span><input id="admin-kitchen-servings" type="number" min="1" step="1" value="${escapeHtml(state.settings.kitchenServings)}"></label><label class="field"><span>誕生日週ルールを第3週に適用</span><input id="admin-birthday-week" type="checkbox" ${isBirthdayRuleEnabled() ? "checked" : ""}></label><button type="button" class="button button-primary" id="auto-generate-button">自動で5日分の献立を作成</button></div><p class="print-note">3週目ルール ${isThirdWeekRuleWeek(state.settings.weekStart) ? "適用中: 主食はお赤飯固定" : "対象外"} / 誕生日週ルール ${!isBirthdayRuleEnabled() ? "OFF" : (isThirdWeekRuleWeek(state.settings.weekStart) ? "適用中: 第3週のため お赤飯 + ケーキ" : "待機中: 第3週のみ適用")}</p></article><article class="panel catalog-panel"><div class="section-head"><div><p class="section-kicker">Catalog</p><h2>料理マスタ概要</h2></div></div><div class="catalog-stats catalog-stats--compact"><article class="metric-card"><span>総料理数</span><strong>${catalog.total}</strong></article><article class="metric-card"><span>和食 / 洋食 / 中華</span><strong>${catalog.byCuisine["和食"]} / ${catalog.byCuisine["洋食"]} / ${catalog.byCuisine["中華"]}</strong></article><article class="metric-card"><span>副菜数</span><strong>${catalog.byCategory["副菜"]}</strong></article><article class="metric-card"><span>デザート / おやつ</span><strong>${catalog.byCategory["デザート"]} / ${catalog.byCategory["おやつ"]}</strong></article></div></article><article class="panel"><div class="section-head"><div><p class="section-kicker">Weekly Editor</p><h2>5日分献立編集</h2></div></div><div class="weekly-grid">${editorCards}</div></article><article class="panel"><div class="section-head"><div><p class="section-kicker">Recipe Master</p><h2>料理一覧</h2></div></div><div class="detail-grid"><div class="recipe-list">${recipes.map((recipe) => `<article class="recipe-card ${recipe.id === state.selectedRecipeId ? "is-active" : ""}" data-recipe-card="${recipe.id}"><div class="sub-head"><div><h3>${escapeHtml(recipe.name)}</h3><span class="tag">${escapeHtml(recipe.cuisine)} / ${escapeHtml(recipe.category)}</span></div><span class="pill">${formatNumber(recipe.nutrition.energy, 0)} kcal</span></div><p class="muted">rotation ${escapeHtml(recipe.rotationKey)} / ${escapeHtml(recipe.tags.join("・"))}</p></article>`).join("")}</div>${renderRecipeDetailPanel(selectedRecipe)}</div></article><article class="panel"><div class="section-head"><div><p class="section-kicker">Food Master</p><h2>食品マスタ</h2></div><p class="section-note">食品成分表ベースの100gあたり栄養価です。</p></div><div class="food-list">${foods.map((food) => `<article class="card"><div class="sub-head"><strong>${escapeHtml(food.name)}</strong><span class="pill">100g</span></div><p class="muted">エネルギー ${formatNumber(food.nutrients.energy, 0)} kcal / たんぱく質 ${formatNumber(food.nutrients.protein, 1)} g / 脂質 ${formatNumber(food.nutrients.fat, 1)} g / 炭水化物 ${formatNumber(food.nutrients.carbs, 1)} g / 食物繊維 ${formatNumber(food.nutrients.fiber, 1)} g / 塩分 ${formatNumber(food.nutrients.salt, 1)} g</p></article>`).join("")}</div></article>`;
     bindAdminViewEvents();
   };
   collectWeekDraftFromDom = function () {
@@ -2979,6 +3374,17 @@
       const filteredRecipes = getRecipeMasterFilteredRecipes(getAllRecipes(), getRecipeMasterFilterValue(), getRecipeMasterSearchValue());
       state.selectedRecipeId = filteredRecipes[0]?.id || getAllRecipes()[0]?.id || null;
       renderAll();
+    });
+    document.querySelector('.recipe-detail')?.addEventListener('click', (event) => {
+      const addButton = event.target.closest('[data-recipe-master-part-add]');
+      if (addButton) {
+        appendRecipeMasterPartRow(addButton.dataset.recipeMasterPartAdd || "", addButton.dataset.recipeMasterPartTitle || "");
+        return;
+      }
+      const removeButton = event.target.closest('[data-recipe-master-part-remove]');
+      if (removeButton) {
+        removeRecipeMasterPartRow(removeButton);
+      }
     });
     const syncRecipeMasterDraft = () => {
       if (state.recipeMasterMode !== "create" && state.recipeMasterMode !== "edit") return;
@@ -3140,22 +3546,44 @@
       cuisine: "和食",
       description: "",
       notes: "",
-      servingSize: "100",
+      rotationKey: "",
+      tags: "",
+      servingSize: "0",
+      ingredientRows: [],
+      seasoningRows: [],
+      ingredients: "",
+      seasonings: "",
       steps: "",
       energy: "0",
+      protein: "0",
+      fat: "0",
+      carbs: "0",
+      fiber: "0",
       salt: "0"
     };
   }
   function collectRecipeMasterDraftFromDom() {
+    const ingredientRows = collectRecipeMasterPartRowsFromDom("ingredient");
+    const seasoningRows = collectRecipeMasterPartRowsFromDom("seasoning");
     return {
       name: document.querySelector('#recipe-master-draft-name')?.value || "",
       category: document.querySelector('#recipe-master-draft-category')?.value || "",
       cuisine: document.querySelector('#recipe-master-draft-cuisine')?.value || "",
-      description: document.querySelector('#recipe-master-draft-description')?.value || "",
+      description: state.recipeMasterDraft?.description || "",
       notes: document.querySelector('#recipe-master-draft-notes')?.value || "",
+      rotationKey: state.recipeMasterDraft?.rotationKey || "",
+      tags: state.recipeMasterDraft?.tags || "",
       servingSize: document.querySelector('#recipe-master-draft-serving-size')?.value || "",
+      ingredientRows,
+      seasoningRows,
+      ingredients: document.querySelector('#recipe-master-draft-ingredients')?.value || "",
+      seasonings: document.querySelector('#recipe-master-draft-seasonings')?.value || "",
       steps: document.querySelector('#recipe-master-draft-steps')?.value || "",
       energy: document.querySelector('#recipe-master-draft-energy')?.value || "",
+      protein: document.querySelector('#recipe-master-draft-protein')?.value || "",
+      fat: document.querySelector('#recipe-master-draft-fat')?.value || "",
+      carbs: document.querySelector('#recipe-master-draft-carbs')?.value || "",
+      fiber: document.querySelector('#recipe-master-draft-fiber')?.value || "",
       salt: document.querySelector('#recipe-master-draft-salt')?.value || ""
     };
   }
@@ -3163,8 +3591,18 @@
     const normalizedName = (draft.name || "").trim();
     const servingSize = Math.max(1, Number(draft.servingSize || 100));
     const energy = Number(draft.energy || 0);
+    const protein = Number(draft.protein || 0);
+    const fat = Number(draft.fat || 0);
+    const carbs = Number(draft.carbs || 0);
+    const fiber = Number(draft.fiber || 0);
     const salt = Number(draft.salt || 0);
     const stepsArray = (draft.steps || "").split(/\r?\n/).map((step) => step.trim()).filter(Boolean);
+    const ingredients = Array.isArray(draft.ingredientRows)
+      ? buildRecipeMasterPartsFromRows([], draft.ingredientRows, "ingredient")
+      : parseRecipeMasterDraftParts(draft.ingredients, "ingredient");
+    const seasonings = Array.isArray(draft.seasoningRows)
+      ? buildRecipeMasterPartsFromRows([], draft.seasoningRows, "seasoning")
+      : parseRecipeMasterDraftParts(draft.seasonings, "seasoning");
     return {
       id: `custom-recipe-${Date.now()}`,
       name: normalizedName,
@@ -3172,28 +3610,28 @@
       cuisine: draft.cuisine,
       description: draft.description || "",
       notes: draft.notes || "",
-      ingredients: [],
-      seasonings: [],
+      ingredients,
+      seasonings,
       instructions: stepsArray.length ? stepsArray : ["手順未設定"],
       steps: stepsArray.length ? stepsArray : ["手順未設定"],
       servingSize,
       servings: 1,
       servingWeight: servingSize,
-      rotationKey: normalizedName,
-      tags: ["custom"],
+      rotationKey: (draft.rotationKey || "").trim() || normalizedName,
+      tags: [...new Set(["custom", ...parseRecipeMasterTags(draft.tags)])],
       nutrition: {
         energy,
-        protein: 0,
-        fat: 0,
-        carbs: 0,
-        fiber: 0,
+        protein,
+        fat,
+        carbs,
+        fiber,
         salt,
         kcal: energy
       }
     };
   }
   function renderRecipeMasterAiRow() {
-    return `<div class="recipe-master-ai-row"><p class="recipe-master-ai-note">AI下書き。内容確認後に保存してください。</p><button type="button" class="button button-secondary recipe-master-ai-button${state.recipeMasterAiLoading ? " is-loading" : ""}" id="recipe-master-ai-button" ${state.recipeMasterAiLoading ? "disabled" : ""}>${state.recipeMasterAiLoading ? "AI入力中..." : "AI"}</button></div>`;
+    return `<div class="recipe-master-ai-row"><p class="recipe-master-ai-note">AI下書き。内容確認後に保存してください。</p><button type="button" class="button button-secondary recipe-master-ai-button${state.recipeMasterAiLoading ? " is-loading" : ""}" id="recipe-master-ai-button" ${state.recipeMasterAiLoading ? "disabled" : ""}>${state.recipeMasterAiLoading ? "AIで下書き作成中..." : "AIで下書き作成"}</button></div>`;
   }
   const RECIPE_MASTER_AI_ENDPOINT = "/api/recipe-autofill";
   function readRecipeMasterAiErrorMessage(payload) {
@@ -3238,6 +3676,22 @@
     const steps = Array.isArray(aiResult?.steps)
       ? aiResult.steps.map((step) => `${step || ""}`.trim()).filter(Boolean).join("\n")
       : (typeof aiResult?.steps === "string" ? aiResult.steps.trim() : "");
+    const stringifyParts = (parts) => {
+      if (Array.isArray(parts)) {
+        return parts.map((item) => {
+          if (typeof item === "string") return item.trim();
+          if (!item || typeof item !== "object") return "";
+          const label = `${item.label || item.name || item.food || ""}`.trim();
+          const grams = Number(item.grams || item.amount || 0);
+          const note = `${item.prep || item.step || item.note || ""}`.trim();
+          const base = label ? `${label}${Number.isFinite(grams) && grams > 0 ? ` ${Math.round(grams)}g` : ""}` : "";
+          return base ? `${base}${note ? ` / ${note}` : ""}` : "";
+        }).filter(Boolean).join("\n");
+      }
+      return typeof parts === "string" ? parts.trim() : "";
+    };
+    const ingredients = stringifyParts(aiResult?.ingredients);
+    const seasonings = stringifyParts(aiResult?.seasonings);
     return {
       ...nextDraft,
       category: allowedCategories.has(category) ? category : nextDraft.category,
@@ -3245,6 +3699,8 @@
       servingSize: Number.isFinite(servingSize) && servingSize > 0 ? `${Math.round(servingSize)}` : nextDraft.servingSize,
       description: description || nextDraft.description,
       notes: notes || nextDraft.notes,
+      ingredients: ingredients || nextDraft.ingredients,
+      seasonings: seasonings || nextDraft.seasonings,
       steps: steps || nextDraft.steps,
       energy: Number.isFinite(energy) ? `${Math.round(energy)}` : nextDraft.energy,
       salt: Number.isFinite(salt) ? `${Math.round(salt * 10) / 10}` : nextDraft.salt
@@ -3258,7 +3714,7 @@
     const cuisineOptions = ["和食", "洋食", "中華"]
       .map((cuisine) => `<option value="${escapeHtml(cuisine)}" ${draft.cuisine === cuisine ? "selected" : ""}>${escapeHtml(cuisine)}</option>`)
       .join("");
-    return `<article class="card recipe-detail"><div class="sub-head"><div><p class="section-kicker">New Selected Recipe</p><h3>新しいメニューを追加</h3></div><span class="pill">customRecipes</span></div>${state.recipeMasterDraftError ? `<p class="recipe-master-form-error">${escapeHtml(state.recipeMasterDraftError)}</p>` : ""}${renderRecipeMasterAiRow()}<div class="recipe-master-form-grid"><label class="field"><span>料理名</span><input id="recipe-master-draft-name" data-recipe-master-draft="name" type="text" value="${escapeHtml(draft.name)}"></label><label class="field"><span>カテゴリ</span><select id="recipe-master-draft-category" data-recipe-master-draft="category">${categoryOptions}</select></label><label class="field"><span>cuisine</span><select id="recipe-master-draft-cuisine" data-recipe-master-draft="cuisine">${cuisineOptions}</select></label><label class="field"><span>1人前量</span><input id="recipe-master-draft-serving-size" data-recipe-master-draft="servingSize" type="number" min="1" step="1" value="${escapeHtml(draft.servingSize)}"></label><label class="field is-full"><span>説明</span><textarea id="recipe-master-draft-description" data-recipe-master-draft="description">${escapeHtml(draft.description)}</textarea></label><label class="field is-full"><span>メモ / 注意点</span><textarea id="recipe-master-draft-notes" data-recipe-master-draft="notes">${escapeHtml(draft.notes)}</textarea></label><label class="field is-full"><span>手順</span><textarea id="recipe-master-draft-steps" data-recipe-master-draft="steps">${escapeHtml(draft.steps)}</textarea></label><label class="field"><span>エネルギー</span><input id="recipe-master-draft-energy" data-recipe-master-draft="energy" type="number" step="1" value="${escapeHtml(draft.energy)}"></label><label class="field"><span>塩分</span><input id="recipe-master-draft-salt" data-recipe-master-draft="salt" type="number" step="0.1" value="${escapeHtml(draft.salt)}"></label></div><div class="recipe-master-form-actions"><button type="button" class="button button-secondary" id="recipe-master-cancel-button">キャンセル</button><button type="button" class="button button-primary" id="recipe-master-save-button">追加保存</button></div></article>`;
+    return `<article class="card recipe-detail"><div class="sub-head"><div><p class="section-kicker">New Selected Recipe</p><h3>新しいメニューを追加</h3></div><span class="pill">customRecipes</span></div>${state.recipeMasterDraftError ? `<p class="recipe-master-form-error">${escapeHtml(state.recipeMasterDraftError)}</p>` : ""}<div class="recipe-master-form-grid"><label class="field"><span>料理名</span><input id="recipe-master-draft-name" data-recipe-master-draft="name" type="text" value="${escapeHtml(draft.name)}"></label><label class="field"><span>カテゴリ</span><select id="recipe-master-draft-category" data-recipe-master-draft="category">${categoryOptions}</select></label><label class="field"><span>cuisine</span><select id="recipe-master-draft-cuisine" data-recipe-master-draft="cuisine">${cuisineOptions}</select></label><label class="field"><span>1人前量</span><input id="recipe-master-draft-serving-size" data-recipe-master-draft="servingSize" type="number" min="1" step="1" value="${escapeHtml(draft.servingSize)}"></label><label class="field is-full"><span>提供方法</span><textarea id="recipe-master-draft-notes" data-recipe-master-draft="notes">${escapeHtml(draft.notes)}</textarea></label>${renderRecipeMasterPartEditor("ingredient", "食材", draft.ingredientRows || [])}${renderRecipeMasterPartEditor("seasoning", "調味料", draft.seasoningRows || [])}<div class="recipe-master-section-title">食品成分</div><label class="field"><span>エネルギー</span><input id="recipe-master-draft-energy" data-recipe-master-draft="energy" type="number" step="1" value="${escapeHtml(draft.energy)}"></label><label class="field"><span>たんぱく質</span><input id="recipe-master-draft-protein" data-recipe-master-draft="protein" type="number" step="0.1" value="${escapeHtml(draft.protein || "0")}"></label><label class="field"><span>脂質</span><input id="recipe-master-draft-fat" data-recipe-master-draft="fat" type="number" step="0.1" value="${escapeHtml(draft.fat || "0")}"></label><label class="field"><span>炭水化物</span><input id="recipe-master-draft-carbs" data-recipe-master-draft="carbs" type="number" step="0.1" value="${escapeHtml(draft.carbs || "0")}"></label><label class="field"><span>食物繊維</span><input id="recipe-master-draft-fiber" data-recipe-master-draft="fiber" type="number" step="0.1" value="${escapeHtml(draft.fiber || "0")}"></label><label class="field"><span>食塩相当量</span><input id="recipe-master-draft-salt" data-recipe-master-draft="salt" type="number" step="0.1" value="${escapeHtml(draft.salt)}"></label><label class="field is-full"><span>作業指示</span><textarea id="recipe-master-draft-steps" data-recipe-master-draft="steps">${escapeHtml(draft.steps)}</textarea></label></div><div class="recipe-master-form-actions"><button type="button" class="button button-secondary" id="recipe-master-cancel-button">キャンセル</button><button type="button" class="button button-primary" id="recipe-master-save-button">追加保存</button></div></article>`;
   }
   function getRecipeMasterFilteredRecipes(recipes, filterValue, searchValue) {
     const normalizedSearch = (searchValue || "").trim().toLocaleLowerCase("ja");
@@ -3300,6 +3756,92 @@
         : `<article class="card recipe-detail"><div class="empty-state">\u6599\u7406\u3092\u9078\u3076\u3068\u8a73\u7d30\u304c\u8868\u793a\u3055\u308c\u307e\u3059\u3002</div></article>`);
     return `<div class="section-head"><div><p class="section-kicker">Recipe Master</p><h2>\u6599\u7406\u4e00\u89a7</h2></div></div><div class="recipe-master-filter-bar">${filterButtons}${searchField}${addButton}</div><div class="detail-grid"><div class="recipe-list">${recipeCards}</div>${recipeDetail}</div>`;
   }
+  function pickWeeklyEditorShuffleRecipe(recipes, currentValue, excludeIds = []) {
+    if (!Array.isArray(recipes) || !recipes.length) {
+      return currentValue || null;
+    }
+    const freshPool = recipes.filter((recipe) => recipe.id !== currentValue && !excludeIds.includes(recipe.id));
+    if (freshPool.length) {
+      return freshPool[Math.floor(Math.random() * freshPool.length)].id;
+    }
+    const relaxedPool = recipes.filter((recipe) => recipe.id !== currentValue);
+    if (relaxedPool.length) {
+      return relaxedPool[Math.floor(Math.random() * relaxedPool.length)].id;
+    }
+    return recipes[Math.floor(Math.random() * recipes.length)].id;
+  }
+  function buildWeeklyEditorShuffledDayMenuCandidate(dayMenu) {
+    const recipes = getAllRecipes();
+    const byCategory = (category) => recipes.filter((recipe) => recipe.category === category);
+    const stapleRecipes = recipes.filter((recipe) => recipe.category === "主食" || recipe.category === "単品料理");
+    const nextDayMenu = {
+      ...dayMenu,
+      basic: { ...dayMenu.basic },
+      exception: { ...dayMenu.exception }
+    };
+    if (dayMenu.mode === "exception") {
+      nextDayMenu.exception.singleDish = pickWeeklyEditorShuffleRecipe(stapleRecipes, dayMenu.exception.singleDish);
+      nextDayMenu.exception.extraSoup = pickWeeklyEditorShuffleRecipe(byCategory("汁物"), dayMenu.exception.extraSoup);
+      nextDayMenu.exception.extraSide = pickWeeklyEditorShuffleRecipe(byCategory("副菜"), dayMenu.exception.extraSide);
+      nextDayMenu.exception.extraDessert = pickWeeklyEditorShuffleRecipe(byCategory("デザート"), dayMenu.exception.extraDessert);
+      return nextDayMenu;
+    }
+    const usedIds = [];
+    nextDayMenu.basic.staple = pickWeeklyEditorShuffleRecipe(stapleRecipes, dayMenu.basic.staple, usedIds);
+    if (nextDayMenu.basic.staple) usedIds.push(nextDayMenu.basic.staple);
+    nextDayMenu.basic.soup = pickWeeklyEditorShuffleRecipe(byCategory("汁物"), dayMenu.basic.soup, usedIds);
+    if (nextDayMenu.basic.soup) usedIds.push(nextDayMenu.basic.soup);
+    nextDayMenu.basic.main = pickWeeklyEditorShuffleRecipe(byCategory("主菜"), dayMenu.basic.main, usedIds);
+    if (nextDayMenu.basic.main) usedIds.push(nextDayMenu.basic.main);
+    nextDayMenu.basic.side1 = pickWeeklyEditorShuffleRecipe(byCategory("副菜"), dayMenu.basic.side1, usedIds);
+    if (nextDayMenu.basic.side1) usedIds.push(nextDayMenu.basic.side1);
+    nextDayMenu.basic.side2 = pickWeeklyEditorShuffleRecipe(byCategory("副菜"), dayMenu.basic.side2, usedIds);
+    if (nextDayMenu.basic.side2) usedIds.push(nextDayMenu.basic.side2);
+    nextDayMenu.basic.dessert = pickWeeklyEditorShuffleRecipe(byCategory("デザート"), dayMenu.basic.dessert, usedIds);
+    nextDayMenu.snack = pickWeeklyEditorShuffleRecipe(byCategory("おやつ"), dayMenu.snack);
+    return nextDayMenu;
+  }
+  function scoreWeeklyEditorShuffledDayMenu(dayMenu) {
+    const evaluation = evaluateDayMenu(dayMenu);
+    return getIntraDayOverlapPenalty(dayMenu)
+      + (evaluation.structurePass ? 0 : 999999)
+      + Math.abs(evaluation.totals.energy - 550) * 0.35
+      + Math.max(0, evaluation.totals.salt - 3.0) * 120;
+  }
+  function buildWeeklyEditorShuffledDayMenu(dayMenu) {
+    let bestMenu = null;
+    let bestScore = Number.POSITIVE_INFINITY;
+    for (let attempt = 0; attempt < 12; attempt += 1) {
+      const candidate = buildWeeklyEditorShuffledDayMenuCandidate(dayMenu);
+      const score = scoreWeeklyEditorShuffledDayMenu(candidate);
+      if (score < bestScore) {
+        bestScore = score;
+        bestMenu = candidate;
+      }
+    }
+    return bestMenu || buildWeeklyEditorShuffledDayMenuCandidate(dayMenu);
+  }
+  function applyWeeklyEditorShuffledDayMenu(dayKey, dayMenu) {
+    const setInputValue = (selector, value) => {
+      const input = document.querySelector(selector);
+      if (input) {
+        input.value = value || "";
+      }
+    };
+    setInputValue(`[data-menu-day="${dayKey}"][data-menu-field="mode"]`, dayMenu.mode);
+    setInputValue(`[data-menu-day="${dayKey}"][data-menu-mode="basic"][data-menu-field="staple"]`, dayMenu.basic.staple);
+    setInputValue(`[data-menu-day="${dayKey}"][data-menu-mode="basic"][data-menu-field="soup"]`, dayMenu.basic.soup);
+    setInputValue(`[data-menu-day="${dayKey}"][data-menu-mode="basic"][data-menu-field="main"]`, dayMenu.basic.main);
+    setInputValue(`[data-menu-day="${dayKey}"][data-menu-mode="basic"][data-menu-field="side1"]`, dayMenu.basic.side1);
+    setInputValue(`[data-menu-day="${dayKey}"][data-menu-mode="basic"][data-menu-field="side2"]`, dayMenu.basic.side2);
+    setInputValue(`[data-menu-day="${dayKey}"][data-menu-mode="basic"][data-menu-field="dessert"]`, dayMenu.basic.dessert);
+    setInputValue(`[data-menu-day="${dayKey}"][data-menu-mode="exception"][data-menu-field="singleDish"]`, dayMenu.exception.singleDish);
+    setInputValue(`[data-menu-day="${dayKey}"][data-menu-mode="exception"][data-menu-field="extraSoup"]`, dayMenu.exception.extraSoup);
+    setInputValue(`[data-menu-day="${dayKey}"][data-menu-mode="exception"][data-menu-field="extraSide"]`, dayMenu.exception.extraSide);
+    setInputValue(`[data-menu-day="${dayKey}"][data-menu-mode="exception"][data-menu-field="extraDessert"]`, dayMenu.exception.extraDessert);
+    setInputValue(`[data-menu-day="${dayKey}"][data-menu-field="snack"]`, dayMenu.snack);
+    setInputValue(`[data-menu-day="${dayKey}"][data-menu-field="memo"]`, dayMenu.memo);
+  }
   function renderWeeklyEditorPanel(week, recipes) {
     const byCategory = (category) => recipes.filter((recipe) => recipe.category === category).sort((a, b) => a.name.localeCompare(b.name, "ja"));
     const getWeeklyEditorStapleGroupLabel = (recipe) => {
@@ -3336,58 +3878,20 @@
     };
     const renderWeeklyEditorSlotSelect = (dayKey, mode, field, label, currentValue, items, optional = false) => `<label class="field">${label ? `<span>${label}</span>` : ""}<select data-menu-day="${dayKey}" data-menu-mode="${mode}" data-menu-field="${field}"><option value="">${optional ? "追加しない" : "選択してください"}</option>${renderWeeklyEditorSlotOptions(items, currentValue, field)}</select></label>`;
     const renderWeeklyEditorPlaceholderField = (label) => `<label class="field"><span>${label}</span><select disabled><option value="">選択してください</option></select></label>`;
-    const isAutoGenerateLoading = Boolean(state.adminAutoGenerateLoading);
-    const autoGenerateButtonStyle = isAutoGenerateLoading && state.adminAutoGenerateButtonSize
-      ? ` style="width:${state.adminAutoGenerateButtonSize.width}px;height:${state.adminAutoGenerateButtonSize.height}px;"`
-      : "";
-    const settingsMarkup = `<div class="weekly-editor-settings"><div class="toolbar"><label class="field"><span>週の開始日</span><input id="admin-week-start" type="date" value="${escapeHtml(state.settings.weekStart)}"></label><label class="field"><span>調理人数</span><input id="admin-kitchen-servings" type="number" min="1" step="1" value="${escapeHtml(state.settings.kitchenServings)}"></label><label class="field"><span>誕生日週ルールを第3週に適用</span><input id="admin-birthday-week" type="checkbox" ${isBirthdayRuleEnabled() ? "checked" : ""}></label><button type="button" class="button button-primary${isAutoGenerateLoading ? " is-generating" : ""}" id="auto-generate-button" ${isAutoGenerateLoading ? "disabled" : ""}${autoGenerateButtonStyle}>${isAutoGenerateLoading ? "生成中..." : "自動で5日分の献立を作成"}</button></div><p class="print-note">3週目ルール ${isThirdWeekRuleWeek(state.settings.weekStart) ? "適用中: 主食はお赤飯" : "対象外"} / 誕生日週ルール ${!isBirthdayRuleEnabled() ? "OFF" : (isThirdWeekRuleWeek(state.settings.weekStart) ? "適用中: 第3週のため お赤飯 + ケーキ" : "待機中: 第3週のみ適用")}</p></div>`;
+    const settingsMarkup = `<div class="weekly-editor-settings"><div class="toolbar"><label class="field"><span>週の開始日</span><input id="admin-week-start" type="date" value="${escapeHtml(state.settings.weekStart)}"></label><label class="field"><span>誕生日週ルールを第3週に適用</span><input id="admin-birthday-week" type="checkbox" ${isBirthdayRuleEnabled() ? "checked" : ""}></label></div><p class="print-note">3週目ルール ${isThirdWeekRuleWeek(state.settings.weekStart) ? "適用中: 主食はお赤飯" : "対象外"} / 誕生日週ルール ${!isBirthdayRuleEnabled() ? "OFF" : (isThirdWeekRuleWeek(state.settings.weekStart) ? "適用中: 第3週のため お赤飯 + ケーキ" : "待機中: 第3週のみ適用")}</p></div>`;
     const cards = WEEKDAY_KEYS.map((dayKey) => {
       const dayMenu = week[dayKey];
       const stapleItems = groupWeeklyEditorStapleItems(recipes.filter((recipe) => recipe.category === "主食" || recipe.category === "単品料理"));
       const unifiedFields = dayMenu.mode === "basic"
         ? `${renderWeeklyEditorSlotSelect(dayKey, "basic", "staple", "主食", dayMenu.basic.staple, stapleItems)}${renderWeeklyEditorSlotSelect(dayKey, "basic", "soup", "汁物", dayMenu.basic.soup, byCategory("汁物"))}${renderWeeklyEditorSlotSelect(dayKey, "basic", "main", "主菜", dayMenu.basic.main, byCategory("主菜"))}${renderWeeklyEditorSlotSelect(dayKey, "basic", "side1", "副菜1", dayMenu.basic.side1, byCategory("副菜"))}${renderWeeklyEditorSlotSelect(dayKey, "basic", "side2", "副菜2", dayMenu.basic.side2, byCategory("副菜"))}${renderWeeklyEditorSlotSelect(dayKey, "basic", "dessert", "デザート", dayMenu.basic.dessert, byCategory("デザート"))}`
         : `${renderWeeklyEditorSlotSelect(dayKey, "exception", "singleDish", "主食", dayMenu.exception.singleDish, stapleItems)}${renderWeeklyEditorSlotSelect(dayKey, "exception", "extraSoup", "汁物", dayMenu.exception.extraSoup, byCategory("汁物"), true)}${renderWeeklyEditorPlaceholderField("主菜")}${renderWeeklyEditorSlotSelect(dayKey, "exception", "extraSide", "副菜1", dayMenu.exception.extraSide, byCategory("副菜"), true)}${renderWeeklyEditorPlaceholderField("副菜2")}${renderWeeklyEditorSlotSelect(dayKey, "exception", "extraDessert", "デザート", dayMenu.exception.extraDessert, byCategory("デザート"), true)}`;
-      return `<article class="menu-card weekly-editor-day-card" data-weekly-card="${dayKey}"><div class="weekly-editor-day-head"><div class="weekly-editor-day-meta"><div><p class="section-kicker">${WEEKDAY_LABELS[dayKey]}曜日</p><h3>${formatDate(dayMenu.date)}</h3></div><button type="button" class="button button-secondary weekly-editor-save-button${state.adminWeeklySavedDayKey === dayKey ? " is-saving-day" : ""}" data-save-day="${dayKey}">保存</button></div><input type="hidden" data-menu-day="${dayKey}" data-menu-field="mode" value="${escapeHtml(dayMenu.mode)}"></div><div class="weekly-editor-card-body"><section class="weekly-editor-card-section"><div class="weekly-editor-fields">${unifiedFields}</div></section><section class="weekly-editor-card-section"><p class="weekly-editor-section-title">3時のおやつ</p><div class="weekly-editor-fields">${renderWeeklyEditorSlotSelect(dayKey, "snack", "snack", "", dayMenu.snack, byCategory("おやつ"))}</div></section><section class="weekly-editor-card-section"><p class="weekly-editor-section-title">メモ</p><label class="field"><textarea data-menu-day="${dayKey}" data-menu-field="memo">${escapeHtml(dayMenu.memo || "")}</textarea></label></section></div></article>`;
+      return `<article class="menu-card weekly-editor-day-card" data-weekly-card="${dayKey}"><div class="weekly-editor-day-head"><div class="weekly-editor-day-meta"><div><p class="section-kicker">${WEEKDAY_LABELS[dayKey]}曜日</p><h3>${formatDate(dayMenu.date)}</h3></div><div class="weekly-editor-day-actions"><button type="button" class="button button-secondary weekly-editor-save-button${state.adminWeeklySavedDayKey === dayKey ? " is-saving-day" : ""}" data-save-day="${dayKey}">保存</button><button type="button" class="button button-secondary weekly-editor-shuffle-button" data-shuffle-day="${dayKey}">シャッフル</button></div></div><input type="hidden" data-menu-day="${dayKey}" data-menu-field="mode" value="${escapeHtml(dayMenu.mode)}"></div><div class="weekly-editor-card-body"><section class="weekly-editor-card-section"><div class="weekly-editor-fields">${unifiedFields}</div></section><section class="weekly-editor-card-section"><p class="weekly-editor-section-title">3時のおやつ</p><div class="weekly-editor-fields">${renderWeeklyEditorSlotSelect(dayKey, "snack", "snack", "", dayMenu.snack, byCategory("おやつ"))}</div></section><section class="weekly-editor-card-section"><p class="weekly-editor-section-title">メモ</p><label class="field"><textarea data-menu-day="${dayKey}" data-menu-field="memo">${escapeHtml(dayMenu.memo || "")}</textarea></label></section></div></article>`;
     }).join("");
     return `<div class="section-head weekly-editor-head"><div><p class="section-kicker">Weekly Editor</p><h2>5日分献立編集</h2></div>${settingsMarkup}</div><div class="weekly-editor-scroll"><div class="weekly-editor-card-grid">${cards}</div></div>`;
   }
   function bindWeeklyEditorPanelEvents() {
     document.querySelector('#admin-week-start')?.addEventListener('change', (event) => { state.settings.weekStart = event.target.value || mondayString(new Date()); ensureWeekExists(state.settings.weekStart); saveStorage(STORAGE_KEYS.settings, state.settings); renderAll(); });
-    document.querySelector('#admin-kitchen-servings')?.addEventListener('change', (event) => { state.settings.kitchenServings = Math.max(1, Number(event.target.value || 1)); saveStorage(STORAGE_KEYS.settings, state.settings); renderAll(); });
     document.querySelector('#admin-birthday-week')?.addEventListener('change', (event) => { setBirthdayWeekRuleEnabled(event.target.checked); saveStorage(STORAGE_KEYS.settings, state.settings); renderAll(); });
-    document.querySelector('#auto-generate-button')?.addEventListener('click', () => {
-      if (state.adminAutoGenerateLoading) return;
-      const button = document.querySelector('#auto-generate-button');
-      const startedAt = Date.now();
-      if (button) {
-        const rect = button.getBoundingClientRect();
-        state.adminAutoGenerateButtonSize = {
-          width: Math.round(rect.width),
-          height: Math.round(rect.height)
-        };
-      }
-      state.adminAutoGenerateLoading = true;
-      if (button) {
-        button.disabled = true;
-        button.classList.add('is-generating');
-        if (state.adminAutoGenerateButtonSize) {
-          button.style.width = `${state.adminAutoGenerateButtonSize.width}px`;
-          button.style.height = `${state.adminAutoGenerateButtonSize.height}px`;
-        }
-        button.textContent = '生成中...';
-      }
-      window.setTimeout(() => {
-        try {
-          regenerateWeekFromScratch(state.settings.weekStart);
-        } finally {
-          window.setTimeout(() => {
-            state.adminAutoGenerateLoading = false;
-            state.adminAutoGenerateButtonSize = null;
-            renderAdminView();
-          }, Math.max(0, 1000 - (Date.now() - startedAt)));
-        }
-      }, 0);
-    });
     Array.from(document.querySelectorAll('[data-save-day]')).forEach((button) => {
       button.addEventListener('click', () => {
         const dayKey = button.dataset.saveDay;
@@ -3418,6 +3922,17 @@
         saveStorage(STORAGE_KEYS.settings, state.settings);
         renderAll();
         scheduleDaySaveFlashClear();
+      });
+    });
+    Array.from(document.querySelectorAll('[data-shuffle-day]')).forEach((button) => {
+      button.addEventListener('click', () => {
+        const dayKey = button.dataset.shuffleDay;
+        if (!dayKey) return;
+        const draftWeek = collectWeekDraftFromDom();
+        const currentDayMenu = draftWeek[dayKey];
+        if (!currentDayMenu) return;
+        const nextDayMenu = buildWeeklyEditorShuffledDayMenu(currentDayMenu);
+        applyWeeklyEditorShuffledDayMenu(dayKey, nextDayMenu);
       });
     });
   }
