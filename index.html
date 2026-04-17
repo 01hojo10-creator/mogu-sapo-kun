@@ -1636,8 +1636,15 @@ function formatWeekLabel(weekStart) {
               <div>
                 <p class="section-kicker">${WEEKDAY_LABELS[dayKey]}曜日</p>
                 <h3>${formatDate(dayMenu.date)}</h3>
-              </div>
-              <span class="pill-muted pill">${dayMenu.mode === "basic" ? "基本献立" : "例外献立"}</span>
+              </div>　　　
+              <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+  <span class="pill-muted pill">${dayMenu.mode === "basic" ? "基本献立" : "例外献立"}</span>
+  <button
+    type="button"
+    class="button"
+    data-shuffle-day="${dayKey}"
+  >シャッフル</button>
+</div>
             </div>
             <div class="stack">
               <label class="field">
@@ -1679,18 +1686,18 @@ function formatWeekLabel(weekStart) {
               <h2>管理画面</h2>
             </div>
             <p class="section-note">5日分の献立を確認し、食数や内容を編集できます。</p>
-          </div>
-          <div class="toolbar">
-            <label class="field">
-              <span>週の開始日</span>
-              <input id="admin-week-start" type="date" value="${escapeHtml(state.settings.weekStart)}">
-            </label>
-            <label class="field">
-              <span>調理人数</span>
-              <input id="admin-kitchen-servings" type="number" min="1" step="1" value="${escapeHtml(state.settings.kitchenServings)}">
-            </label>
-            <button type="button" class="button button-primary" id="save-week-button">この週を保存</button>
-          </div>
+          </div>　
+<div class="toolbar">
+  <label class="field">
+    <span>週の開始日</span>
+    <input id="admin-week-start" type="date" value="${escapeHtml(state.settings.weekStart)}">
+  </label>
+  <label class="field">
+    <span>調理人数</span>
+    <input id="admin-kitchen-servings" type="number" min="1" step="1" value="${escapeHtml(state.settings.kitchenServings)}">
+  </label>
+  <button type="button" class="button button-primary" id="save-week-button">この週を保存</button>
+</div>
         </article>
 
         <article class="panel">
@@ -1808,7 +1815,14 @@ function formatWeekLabel(weekStart) {
           }
         });
       });
+const shuffleButtons = Array.from(document.querySelectorAll("[data-shuffle-day]"));
 
+shuffleButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    const dayKey = button.dataset.shuffleDay;
+    console.log("shuffle day:", dayKey);
+  });
+});
       saveWeekButton?.addEventListener("click", () => {
         const nextWeek = collectWeekDraftFromDom();
         state.weeklyMenus[state.settings.weekStart] = nextWeek;
