@@ -783,68 +783,68 @@
   }
   function buildJapaneseSides() {
     return [
-      sideRecipe("jp-side-spinach-ohitashi", "ほうれん草のおひたし", "和食", [part("spinach", 60)], [part("soy_sauce", 2)], 60, "青菜", ["定番"]),
-      sideRecipe("jp-side-spinach-goma", "ほうれん草の胡麻和え", "和食", [part("spinach", 55)], [part("soy_sauce", 2), part("sesame", 4), part("sugar", 1)], 60, "青菜", ["胡麻"]),
-      sideRecipe("jp-side-spinach-nibitashi", "ほうれん草の煮びたし", "和食", [part("spinach", 55)], [part("broth", 15), part("soy_sauce", 2)], 65, "青菜", ["煮びたし"]),
-      sideRecipe("jp-side-komatsuna-ohitashi", "小松菜のおひたし", "和食", [part("komatsuna", 60)], [part("soy_sauce", 2)], 60, "青菜", ["定番"]),
-      sideRecipe("jp-side-komatsuna-goma", "小松菜の胡麻和え", "和食", [part("komatsuna", 55)], [part("soy_sauce", 2), part("sesame", 4)], 60, "青菜", ["胡麻"]),
-      sideRecipe("jp-side-komatsuna-nibitashi", "小松菜の煮びたし", "和食", [part("komatsuna", 55)], [part("broth", 15), part("soy_sauce", 2)], 65, "青菜", ["煮びたし"]),
-      sideRecipe("jp-side-daikon-soft", "大根のやわらか煮", "和食", [part("daikon", 70)], [part("broth", 20), part("soy_sauce", 2), part("mirin", 2)], 75, "根菜", ["煮物"]),
-      sideRecipe("jp-side-daikon-soboro", "大根のそぼろ煮", "和食", [part("daikon", 65), part("pork_mince", 18)], [part("broth", 20), part("soy_sauce", 2), part("starch", 1)], 80, "根菜", ["そぼろ"]),
-      sideRecipe("jp-side-daikon-ponzu", "大根のぽん酢和え", "和食", [part("daikon", 60)], [part("ponzu", 3)], 60, "根菜", ["さっぱり"]),
-      sideRecipe("jp-side-pumpkin-nimono", "かぼちゃ煮", "和食", [part("pumpkin", 70)], [part("soy_sauce", 2), part("mirin", 2), part("sugar", 1)], 75, "かぼちゃ", ["煮物"]),
-      sideRecipe("jp-side-pumpkin-ama", "かぼちゃの甘煮", "和食", [part("pumpkin", 70)], [part("sugar", 2), part("broth", 10)], 75, "かぼちゃ", ["甘め"]),
-      sideRecipe("jp-side-pumpkin-goma", "かぼちゃの胡麻煮", "和食", [part("pumpkin", 65)], [part("soy_sauce", 2), part("sesame", 3)], 70, "かぼちゃ", ["胡麻"]),
-      sideRecipe("jp-side-potato-korogashi", "じゃがいもの煮ころがし", "和食", [part("potato", 70)], [part("soy_sauce", 2), part("mirin", 2), part("sugar", 1)], 75, "じゃがいも", ["煮物"]),
-      sideRecipe("jp-side-potato-soboro", "じゃがいものそぼろ煮", "和食", [part("potato", 65), part("chicken_breast", 15)], [part("broth", 18), part("soy_sauce", 2), part("starch", 1)], 80, "じゃがいも", ["そぼろ"]),
-      sideRecipe("jp-side-sweetpotato-nimono", "さつまいもの甘煮", "和食", [part("sweet_potato", 55)], [part("sugar", 2), part("broth", 10)], 60, "さつまいも", ["甘煮"])
+      sideRecipe("jp-side-spinach-ohitashi", "ほうれん草のおひたし", "和食", [part("spinach", 60)], [part("soy_sauce", 2)], 60, "青菜", ["定番", "副菜区分:和え物"]),
+      sideRecipe("jp-side-spinach-goma", "ほうれん草の胡麻和え", "和食", [part("spinach", 55)], [part("soy_sauce", 2), part("sesame", 4), part("sugar", 1)], 60, "青菜", ["胡麻", "副菜区分:和え物"]),
+      sideRecipe("jp-side-spinach-nibitashi", "ほうれん草の煮びたし", "和食", [part("spinach", 55)], [part("broth", 15), part("soy_sauce", 2)], 65, "青菜", ["煮びたし", "副菜区分:煮物"]),
+      sideRecipe("jp-side-komatsuna-ohitashi", "小松菜のおひたし", "和食", [part("komatsuna", 60)], [part("soy_sauce", 2)], 60, "青菜", ["定番", "副菜区分:和え物"]),
+      sideRecipe("jp-side-komatsuna-goma", "小松菜の胡麻和え", "和食", [part("komatsuna", 55)], [part("soy_sauce", 2), part("sesame", 4)], 60, "青菜", ["胡麻", "副菜区分:和え物"]),
+      sideRecipe("jp-side-komatsuna-nibitashi", "小松菜の煮びたし", "和食", [part("komatsuna", 55)], [part("broth", 15), part("soy_sauce", 2)], 65, "青菜", ["煮びたし", "副菜区分:煮物"]),
+      sideRecipe("jp-side-daikon-soft", "大根のやわらか煮", "和食", [part("daikon", 70)], [part("broth", 20), part("soy_sauce", 2), part("mirin", 2)], 75, "根菜", ["煮物", "副菜区分:煮物"]),
+      sideRecipe("jp-side-daikon-soboro", "大根のそぼろ煮", "和食", [part("daikon", 65), part("pork_mince", 18)], [part("broth", 20), part("soy_sauce", 2), part("starch", 1)], 80, "根菜", ["そぼろ", "副菜区分:煮物"]),
+      sideRecipe("jp-side-daikon-ponzu", "大根のぽん酢和え", "和食", [part("daikon", 60)], [part("ponzu", 3)], 60, "根菜", ["さっぱり", "副菜区分:酢の物"]),
+      sideRecipe("jp-side-pumpkin-nimono", "かぼちゃ煮", "和食", [part("pumpkin", 70)], [part("soy_sauce", 2), part("mirin", 2), part("sugar", 1)], 75, "かぼちゃ", ["煮物", "副菜区分:煮物"]),
+      sideRecipe("jp-side-pumpkin-ama", "かぼちゃの甘煮", "和食", [part("pumpkin", 70)], [part("sugar", 2), part("broth", 10)], 75, "かぼちゃ", ["甘め", "副菜区分:煮物"]),
+      sideRecipe("jp-side-pumpkin-goma", "かぼちゃの胡麻煮", "和食", [part("pumpkin", 65)], [part("soy_sauce", 2), part("sesame", 3)], 70, "かぼちゃ", ["胡麻", "副菜区分:煮物"]),
+      sideRecipe("jp-side-potato-korogashi", "じゃがいもの煮ころがし", "和食", [part("potato", 70)], [part("soy_sauce", 2), part("mirin", 2), part("sugar", 1)], 75, "じゃがいも", ["煮物", "副菜区分:煮物"]),
+      sideRecipe("jp-side-potato-soboro", "じゃがいものそぼろ煮", "和食", [part("potato", 65), part("chicken_breast", 15)], [part("broth", 18), part("soy_sauce", 2), part("starch", 1)], 80, "じゃがいも", ["そぼろ", "副菜区分:煮物"]),
+      sideRecipe("jp-side-sweetpotato-nimono", "さつまいもの甘煮", "和食", [part("sweet_potato", 55)], [part("sugar", 2), part("broth", 10)], 60, "さつまいも", ["甘煮", "副菜区分:煮物"])
     ];
   }
   function buildWesternSides() {
     return [
-      sideRecipe("west-side-potato-salad", "ポテトサラダ", "洋食", [part("potato", 60), part("cucumber", 15), part("carrot", 10)], [part("mayonnaise", 7)], 85, "サラダ", ["定番"]),
-      sideRecipe("west-side-potato-cheese", "じゃがいものチーズ焼き", "洋食", [part("potato", 60), part("cheese", 10)], [part("consomme", 1)], 75, "じゃがいも", ["チーズ"]),
-      sideRecipe("west-side-potato-consomme", "じゃがいものコンソメ煮", "洋食", [part("potato", 65), part("onion", 12)], [part("consomme", 2)], 80, "じゃがいも", ["煮込み"]),
-      sideRecipe("west-side-cabbage-coleslaw", "コールスロー", "洋食", [part("cabbage", 45), part("corn", 12), part("cucumber", 10)], [part("mayonnaise", 6), part("vinegar", 2)], 75, "キャベツ", ["サラダ"]),
-      sideRecipe("west-side-cabbage-butter", "キャベツのバターソテー", "洋食", [part("cabbage", 60), part("onion", 10)], [part("butter", 3), part("consomme", 1)], 75, "キャベツ", ["ソテー"]),
-      sideRecipe("west-side-cabbage-cream", "キャベツのクリーム煮", "洋食", [part("cabbage", 55), part("onion", 10)], [part("milk", 24), part("butter", 2), part("flour", 2), part("consomme", 0.8), part("salt", 0.1), part("pepper", 0.05)], 75, "キャベツ", ["クリーム"]),
-      sideRecipe("west-side-broccoli-salad", "ブロッコリーサラダ", "洋食", [part("broccoli", 55), part("corn", 12)], [part("mayonnaise", 5)], 75, "ブロッコリー", ["サラダ"]),
-      sideRecipe("west-side-broccoli-saute", "ブロッコリーソテー", "洋食", [part("broccoli", 60), part("onion", 10)], [part("butter", 2), part("consomme", 1)], 75, "ブロッコリー", ["ソテー"]),
-      sideRecipe("west-side-broccoli-consomme", "ブロッコリーのコンソメ煮", "洋食", [part("broccoli", 60), part("carrot", 10)], [part("consomme", 2)], 75, "ブロッコリー", ["煮込み"]),
-      sideRecipe("west-side-pumpkin-salad", "かぼちゃサラダ", "洋食", [part("pumpkin", 60), part("cucumber", 10)], [part("mayonnaise", 5)], 75, "かぼちゃ", ["サラダ"]),
-      sideRecipe("west-side-pumpkin-butter", "かぼちゃのバター煮", "洋食", [part("pumpkin", 65)], [part("butter", 2), part("sugar", 1)], 70, "かぼちゃ", ["やわらか"]),
-      sideRecipe("west-side-pumpkin-cream", "かぼちゃのクリーム和え", "洋食", [part("pumpkin", 60)], [part("milk", 18), part("butter", 1.5), part("flour", 1.5), part("salt", 0.1), part("pepper", 0.05)], 70, "かぼちゃ", ["クリーム"]),
-      sideRecipe("west-side-carrot-glace", "にんじんグラッセ", "洋食", [part("carrot", 55)], [part("butter", 2), part("sugar", 1)], 60, "にんじん", ["定番"]),
-      sideRecipe("west-side-carrot-salad", "にんじんサラダ", "洋食", [part("carrot", 50), part("cucumber", 10)], [part("mayonnaise", 4), part("vinegar", 2)], 65, "にんじん", ["サラダ"]),
-      sideRecipe("west-side-sweetpotato-salad", "さつまいもサラダ", "洋食", [part("sweet_potato", 45), part("cucumber", 8)], [part("mayonnaise", 4)], 60, "さつまいも", ["サラダ"])
+      sideRecipe("west-side-potato-salad", "ポテトサラダ", "洋食", [part("potato", 60), part("cucumber", 15), part("carrot", 10)], [part("mayonnaise", 7)], 85, "サラダ", ["定番", "副菜区分:サラダ・漬物"]),
+      sideRecipe("west-side-potato-cheese", "じゃがいものチーズ焼き", "洋食", [part("potato", 60), part("cheese", 10)], [part("consomme", 1)], 75, "じゃがいも", ["チーズ", "副菜区分:焼き物"]),
+      sideRecipe("west-side-potato-consomme", "じゃがいものコンソメ煮", "洋食", [part("potato", 65), part("onion", 12)], [part("consomme", 2)], 80, "じゃがいも", ["煮込み", "副菜区分:煮物"]),
+      sideRecipe("west-side-cabbage-coleslaw", "コールスロー", "洋食", [part("cabbage", 45), part("corn", 12), part("cucumber", 10)], [part("mayonnaise", 6), part("vinegar", 2)], 75, "キャベツ", ["サラダ", "副菜区分:サラダ・漬物"]),
+      sideRecipe("west-side-cabbage-butter", "キャベツのバターソテー", "洋食", [part("cabbage", 60), part("onion", 10)], [part("butter", 3), part("consomme", 1)], 75, "キャベツ", ["ソテー", "副菜区分:炒め物"]),
+      sideRecipe("west-side-cabbage-cream", "キャベツのクリーム煮", "洋食", [part("cabbage", 55), part("onion", 10)], [part("milk", 24), part("butter", 2), part("flour", 2), part("consomme", 0.8), part("salt", 0.1), part("pepper", 0.05)], 75, "キャベツ", ["クリーム", "副菜区分:煮物"]),
+      sideRecipe("west-side-broccoli-salad", "ブロッコリーサラダ", "洋食", [part("broccoli", 55), part("corn", 12)], [part("mayonnaise", 5)], 75, "ブロッコリー", ["サラダ", "副菜区分:サラダ・漬物"]),
+      sideRecipe("west-side-broccoli-saute", "ブロッコリーソテー", "洋食", [part("broccoli", 60), part("onion", 10)], [part("butter", 2), part("consomme", 1)], 75, "ブロッコリー", ["ソテー", "副菜区分:炒め物"]),
+      sideRecipe("west-side-broccoli-consomme", "ブロッコリーのコンソメ煮", "洋食", [part("broccoli", 60), part("carrot", 10)], [part("consomme", 2)], 75, "ブロッコリー", ["煮込み", "副菜区分:煮物"]),
+      sideRecipe("west-side-pumpkin-salad", "かぼちゃサラダ", "洋食", [part("pumpkin", 60), part("cucumber", 10)], [part("mayonnaise", 5)], 75, "かぼちゃ", ["サラダ", "副菜区分:サラダ・漬物"]),
+      sideRecipe("west-side-pumpkin-butter", "かぼちゃのバター煮", "洋食", [part("pumpkin", 65)], [part("butter", 2), part("sugar", 1)], 70, "かぼちゃ", ["やわらか", "副菜区分:煮物"]),
+      sideRecipe("west-side-pumpkin-cream", "かぼちゃのクリーム和え", "洋食", [part("pumpkin", 60)], [part("milk", 18), part("butter", 1.5), part("flour", 1.5), part("salt", 0.1), part("pepper", 0.05)], 70, "かぼちゃ", ["クリーム", "副菜区分:和え物"]),
+      sideRecipe("west-side-carrot-glace", "にんじんグラッセ", "洋食", [part("carrot", 55)], [part("butter", 2), part("sugar", 1)], 60, "にんじん", ["定番", "副菜区分:炒め物"]),
+      sideRecipe("west-side-carrot-salad", "にんじんサラダ", "洋食", [part("carrot", 50), part("cucumber", 10)], [part("mayonnaise", 4), part("vinegar", 2)], 65, "にんじん", ["サラダ", "副菜区分:サラダ・漬物"]),
+      sideRecipe("west-side-sweetpotato-salad", "さつまいもサラダ", "洋食", [part("sweet_potato", 45), part("cucumber", 8)], [part("mayonnaise", 4)], 60, "さつまいも", ["サラダ", "副菜区分:サラダ・漬物"])
     ];
   }
   function buildChineseSides() {
     return [
-      sideRecipe("cn-side-beansprout-namul", "もやしナムル", "中華", [part("bean_sprouts", 60)], [part("sesame_oil", 2), part("soy_sauce", 2)], 60, "ナムル", ["定番"]),
-      sideRecipe("cn-side-beansprout-oyster", "もやしのオイスター煮", "中華", [part("bean_sprouts", 60), part("carrot", 10)], [part("oyster_sauce", 2), part("broth", 10)], 70, "ナムル", ["煮物"]),
-      sideRecipe("cn-side-beansprout-sweet", "もやしの甘酢和え", "中華", [part("bean_sprouts", 55), part("cucumber", 10)], [part("vinegar", 3), part("sugar", 1), part("soy_sauce", 1)], 65, "ナムル", ["甘酢"]),
-      sideRecipe("cn-side-komatsuna-chinese", "青菜の中華和え", "中華", [part("komatsuna", 60)], [part("sesame_oil", 2), part("soy_sauce", 2)], 60, "青菜", ["和え物"]),
-      sideRecipe("cn-side-komatsuna-oyster", "青菜のオイスター煮", "中華", [part("komatsuna", 55), part("onion", 10)], [part("oyster_sauce", 2), part("broth", 10)], 70, "青菜", ["煮物"]),
-      sideRecipe("cn-side-komatsuna-namul", "青菜ナムル", "中華", [part("komatsuna", 55)], [part("sesame_oil", 2), part("salt", 0.2)], 60, "青菜", ["ナムル"]),
-      sideRecipe("cn-side-cabbage-chinese", "白菜の中華煮", "中華", [part("chinese_cabbage", 65), part("carrot", 10)], [part("broth", 12), part("soy_sauce", 2), part("starch", 1)], 80, "白菜", ["煮物"]),
-      sideRecipe("cn-side-cabbage-oyster", "白菜のオイスター和え", "中華", [part("chinese_cabbage", 60)], [part("oyster_sauce", 2), part("sesame_oil", 1)], 65, "白菜", ["和え物"]),
-      sideRecipe("cn-side-cabbage-vinegar", "白菜の甘酢和え", "中華", [part("chinese_cabbage", 55), part("cucumber", 10)], [part("vinegar", 3), part("sugar", 1)], 65, "白菜", ["甘酢"]),
-      sideRecipe("cn-side-cucumber-vinegar", "きゅうりの甘酢和え", "中華", [part("cucumber", 50), part("corn", 10)], [part("vinegar", 3), part("sugar", 1), part("soy_sauce", 1)], 60, "きゅうり", ["甘酢"]),
-      sideRecipe("cn-side-cucumber-namul", "きゅうりナムル", "中華", [part("cucumber", 50)], [part("sesame_oil", 2), part("salt", 0.2)], 55, "きゅうり", ["ナムル"]),
-      sideRecipe("cn-side-cucumber-shrimp", "えび入り中華サラダ", "中華", [part("cucumber", 40), part("shrimp", 18), part("corn", 10)], [part("mayonnaise", 4), part("vinegar", 1)], 70, "きゅうり", ["サラダ"]),
-      sideRecipe("cn-side-carrot-namul", "にんじんナムル", "中華", [part("carrot", 50)], [part("sesame_oil", 2), part("soy_sauce", 1)], 55, "にんじん", ["ナムル"]),
-      sideRecipe("cn-side-carrot-oyster", "にんじんの中華煮", "中華", [part("carrot", 50), part("onion", 10)], [part("oyster_sauce", 2), part("broth", 10)], 65, "にんじん", ["煮物"]),
-      sideRecipe("cn-side-carrot-sweet", "にんじんの甘酢和え", "中華", [part("carrot", 45), part("cucumber", 10)], [part("vinegar", 3), part("sugar", 1)], 60, "にんじん", ["甘酢"])
+      sideRecipe("cn-side-beansprout-namul", "もやしナムル", "中華", [part("bean_sprouts", 60)], [part("sesame_oil", 2), part("soy_sauce", 2)], 60, "ナムル", ["定番", "副菜区分:和え物"]),
+      sideRecipe("cn-side-beansprout-oyster", "もやしのオイスター煮", "中華", [part("bean_sprouts", 60), part("carrot", 10)], [part("oyster_sauce", 2), part("broth", 10)], 70, "ナムル", ["煮物", "副菜区分:煮物"]),
+      sideRecipe("cn-side-beansprout-sweet", "もやしの甘酢和え", "中華", [part("bean_sprouts", 55), part("cucumber", 10)], [part("vinegar", 3), part("sugar", 1), part("soy_sauce", 1)], 65, "ナムル", ["甘酢", "副菜区分:酢の物"]),
+      sideRecipe("cn-side-komatsuna-chinese", "青菜の中華和え", "中華", [part("komatsuna", 60)], [part("sesame_oil", 2), part("soy_sauce", 2)], 60, "青菜", ["和え物", "副菜区分:和え物"]),
+      sideRecipe("cn-side-komatsuna-oyster", "青菜のオイスター煮", "中華", [part("komatsuna", 55), part("onion", 10)], [part("oyster_sauce", 2), part("broth", 10)], 70, "青菜", ["煮物", "副菜区分:煮物"]),
+      sideRecipe("cn-side-komatsuna-namul", "青菜ナムル", "中華", [part("komatsuna", 55)], [part("sesame_oil", 2), part("salt", 0.2)], 60, "青菜", ["ナムル", "副菜区分:和え物"]),
+      sideRecipe("cn-side-cabbage-chinese", "白菜の中華煮", "中華", [part("chinese_cabbage", 65), part("carrot", 10)], [part("broth", 12), part("soy_sauce", 2), part("starch", 1)], 80, "白菜", ["煮物", "副菜区分:煮物"]),
+      sideRecipe("cn-side-cabbage-oyster", "白菜のオイスター和え", "中華", [part("chinese_cabbage", 60)], [part("oyster_sauce", 2), part("sesame_oil", 1)], 65, "白菜", ["和え物", "副菜区分:和え物"]),
+      sideRecipe("cn-side-cabbage-vinegar", "白菜の甘酢和え", "中華", [part("chinese_cabbage", 55), part("cucumber", 10)], [part("vinegar", 3), part("sugar", 1)], 65, "白菜", ["甘酢", "副菜区分:酢の物"]),
+      sideRecipe("cn-side-cucumber-vinegar", "きゅうりの甘酢和え", "中華", [part("cucumber", 50), part("corn", 10)], [part("vinegar", 3), part("sugar", 1), part("soy_sauce", 1)], 60, "きゅうり", ["甘酢", "副菜区分:酢の物"]),
+      sideRecipe("cn-side-cucumber-namul", "きゅうりナムル", "中華", [part("cucumber", 50)], [part("sesame_oil", 2), part("salt", 0.2)], 55, "きゅうり", ["ナムル", "副菜区分:和え物"]),
+      sideRecipe("cn-side-cucumber-shrimp", "えび入り中華サラダ", "中華", [part("cucumber", 40), part("shrimp", 18), part("corn", 10)], [part("mayonnaise", 4), part("vinegar", 1)], 70, "きゅうり", ["サラダ", "副菜区分:サラダ・漬物"]),
+      sideRecipe("cn-side-carrot-namul", "にんじんナムル", "中華", [part("carrot", 50)], [part("sesame_oil", 2), part("soy_sauce", 1)], 55, "にんじん", ["ナムル", "副菜区分:和え物"]),
+      sideRecipe("cn-side-carrot-oyster", "にんじんの中華煮", "中華", [part("carrot", 50), part("onion", 10)], [part("oyster_sauce", 2), part("broth", 10)], 65, "にんじん", ["煮物", "副菜区分:煮物"]),
+      sideRecipe("cn-side-carrot-sweet", "にんじんの甘酢和え", "中華", [part("carrot", 45), part("cucumber", 10)], [part("vinegar", 3), part("sugar", 1)], 60, "にんじん", ["甘酢", "副菜区分:酢の物"])
     ];
   }
   function buildExtraSides() {
     return [
-      sideRecipe("mix-side-lotus-kinpira", "れんこんきんぴら", "和食", [part("lotus_root", 55), part("carrot", 10)], [part("soy_sauce", 2), part("mirin", 2), part("sesame_oil", 1)], 70, "根菜", ["追加副菜"]),
-      sideRecipe("mix-side-burdock-soft", "ごぼうのやわらか煮", "和食", [part("burdock", 45), part("carrot", 10)], [part("broth", 12), part("soy_sauce", 2)], 60, "根菜", ["追加副菜"]),
-      sideRecipe("mix-side-tomato-marina", "トマトマリネ", "洋食", [part("tomato", 60), part("onion", 10)], [part("vinegar", 2), part("sugar", 1)], 70, "トマト", ["追加副菜"]),
-      sideRecipe("mix-side-corn-butter", "コーンバター", "洋食", [part("corn", 45)], [part("butter", 2), part("consomme", 1)], 50, "コーン", ["追加副菜"]),
-      sideRecipe("mix-side-tofu-chinese", "豆腐の中華サラダ", "中華", [part("tofu", 55), part("cucumber", 10)], [part("soy_sauce", 2), part("sesame_oil", 1), part("vinegar", 1)], 70, "豆腐", ["追加副菜"])
+      sideRecipe("mix-side-lotus-kinpira", "れんこんきんぴら", "和食", [part("lotus_root", 55), part("carrot", 10)], [part("soy_sauce", 2), part("mirin", 2), part("sesame_oil", 1)], 70, "根菜", ["追加副菜", "副菜区分:炒め物"]),
+      sideRecipe("mix-side-burdock-soft", "ごぼうのやわらか煮", "和食", [part("burdock", 45), part("carrot", 10)], [part("broth", 12), part("soy_sauce", 2)], 60, "根菜", ["追加副菜", "副菜区分:煮物"]),
+      sideRecipe("mix-side-tomato-marina", "トマトマリネ", "洋食", [part("tomato", 60), part("onion", 10)], [part("vinegar", 2), part("sugar", 1)], 70, "トマト", ["追加副菜", "副菜区分:酢の物"]),
+      sideRecipe("mix-side-corn-butter", "コーンバター", "洋食", [part("corn", 45)], [part("butter", 2), part("consomme", 1)], 50, "コーン", ["追加副菜", "副菜区分:炒め物"]),
+      sideRecipe("mix-side-tofu-chinese", "豆腐の中華サラダ", "中華", [part("tofu", 55), part("cucumber", 10)], [part("soy_sauce", 2), part("sesame_oil", 1), part("vinegar", 1)], 70, "豆腐", ["追加副菜", "副菜区分:豆腐・卵"])
     ];
   }
   function buildSingleDishes() {
@@ -1289,11 +1289,154 @@
       });
     });
     recipes.push(
-      createRecipe({ id: "plus-cn-side-bangbang-harusame", name: "春雨サラダ（バンサンスー）", category: "副菜", cuisine: "中華", servingSize: 78, rotationKey: "春雨サラダ", tags: ["追加レシピ", "副菜", "中華", "和え物"], description: "春雨と野菜を中華だれで和えた、さっぱりした副菜。", notes: "春雨は短めに切り、きゅうりは薄切りにして食べやすくする。", ingredients: [part("chinese_noodles", 30, { label: "春雨", prep: "やわらかく戻して短く切る" }), part("cucumber", 18), part("chicken_breast", 12, { label: "ハム", prep: "細切りにする" }), part("egg", 12, { label: "卵", prep: "薄焼きにして細切りにする" })], seasonings: [part("soy_sauce", 2), part("vinegar", 2), part("sesame_oil", 1), part("sugar", 1)], instructions: ["春雨をやわらかく戻して短く切る。", "きゅうり、ハム、卵を食べやすく切る。", "中華だれで和えて仕上げる。"] }),
-      createRecipe({ id: "plus-cn-side-crushed-cucumber", name: "たたききゅうりの中華和え", category: "副菜", cuisine: "中華", servingSize: 60, rotationKey: "きゅうり", tags: ["追加レシピ", "副菜", "中華", "和え物"], description: "きゅうりをやさしい味の中華だれで和えた副菜。", notes: "きゅうりは皮をむくか薄くして、かたさを抑える。", ingredients: [part("cucumber", 55)], seasonings: [part("soy_sauce", 2), part("sesame_oil", 1), part("vinegar", 1)], instructions: ["きゅうりを食べやすく下処理する。", "調味料を合わせる。", "全体を和えてなじませる。"] }),
-      createRecipe({ id: "plus-cn-side-nasu-hitashi", name: "なすの中華浸し", category: "副菜", cuisine: "中華", servingSize: 68, rotationKey: "なす", tags: ["追加レシピ", "副菜", "中華", "和え物"], description: "とろりとやわらかいなすを中華風だれで仕上げた副菜。", notes: "なすはしっかり加熱し、皮はむくか薄くむいて食べやすくする。", ingredients: [part("tomato", 45, { label: "なす", prep: "食べやすく切ってやわらかく加熱する" }), part("onion", 10)], seasonings: [part("soy_sauce", 2), part("sesame_oil", 1), part("vinegar", 1)], instructions: ["なすを食べやすく切る。", "蒸すかやわらかく加熱する。", "ごま醤油だれに浸して味を含ませる。"] })
+      createRecipe({ id: "plus-cn-side-bangbang-harusame", name: "春雨サラダ（バンサンスー）", category: "副菜", cuisine: "中華", servingSize: 78, rotationKey: "春雨サラダ", tags: ["追加レシピ", "副菜", "中華", "和え物", "副菜区分:サラダ・漬物"], description: "春雨と野菜を中華だれで和えた、さっぱりした副菜。", notes: "春雨は短めに切り、きゅうりは薄切りにして食べやすくする。", ingredients: [part("chinese_noodles", 30, { label: "春雨", prep: "やわらかく戻して短く切る" }), part("cucumber", 18), part("chicken_breast", 12, { label: "ハム", prep: "細切りにする" }), part("egg", 12, { label: "卵", prep: "薄焼きにして細切りにする" })], seasonings: [part("soy_sauce", 2), part("vinegar", 2), part("sesame_oil", 1), part("sugar", 1)], instructions: ["春雨をやわらかく戻して短く切る。", "きゅうり、ハム、卵を食べやすく切る。", "中華だれで和えて仕上げる。"] }),
+      createRecipe({ id: "plus-cn-side-crushed-cucumber", name: "たたききゅうりの中華和え", category: "副菜", cuisine: "中華", servingSize: 60, rotationKey: "きゅうり", tags: ["追加レシピ", "副菜", "中華", "和え物", "副菜区分:和え物"], description: "きゅうりをやさしい味の中華だれで和えた副菜。", notes: "きゅうりは皮をむくか薄くして、かたさを抑える。", ingredients: [part("cucumber", 55)], seasonings: [part("soy_sauce", 2), part("sesame_oil", 1), part("vinegar", 1)], instructions: ["きゅうりを食べやすく下処理する。", "調味料を合わせる。", "全体を和えてなじませる。"] }),
+      createRecipe({ id: "plus-cn-side-nasu-hitashi", name: "なすの中華浸し", category: "副菜", cuisine: "中華", servingSize: 68, rotationKey: "なす", tags: ["追加レシピ", "副菜", "中華", "和え物", "副菜区分:和え物"], description: "とろりとやわらかいなすを中華風だれで仕上げた副菜。", notes: "なすはしっかり加熱し、皮はむくか薄くむいて食べやすくする。", ingredients: [part("tomato", 45, { label: "なす", prep: "食べやすく切ってやわらかく加熱する" }), part("onion", 10)], seasonings: [part("soy_sauce", 2), part("sesame_oil", 1), part("vinegar", 1)], instructions: ["なすを食べやすく切る。", "蒸すかやわらかく加熱する。", "ごま醤油だれに浸して味を含ませる。"] })
     );
     return recipes;
+  }
+  const SIDE_DISH_GROUP_ORDER = ["煮物", "和え物", "炒め物", "酢の物", "蒸し物", "焼き物", "揚げ物", "豆腐・卵", "海藻・きのこ", "サラダ・漬物"];
+  function buildRequestedSideRecipes() {
+    const groupedDefinitions = {
+      "煮物": [
+        { id: "nimono-potato", name: "じゃがいもの煮物", ingredients: [part("potato", 68)], seasonings: [part("broth", 16), part("soy_sauce", 2), part("mirin", 2)], servingSize: 76, rotationKey: "じゃがいも" },
+        { id: "nimono-onion-beef", name: "玉ねぎと牛肉の煮物", ingredients: [part("onion", 44), part("beef_mince", 20, { label: "牛肉" })], seasonings: [part("broth", 18), part("soy_sauce", 2), part("mirin", 2)], servingSize: 78, rotationKey: "玉ねぎ" },
+        { id: "nimono-hakusai-tofu", name: "白菜と豆腐の煮物", ingredients: [part("chinese_cabbage", 42), part("tofu", 28)], seasonings: [part("broth", 18), part("soy_sauce", 2)], servingSize: 74, rotationKey: "白菜" },
+        { id: "nimono-koimo", name: "小芋の煮物", ingredients: [part("potato", 60, { label: "小芋" })], seasonings: [part("broth", 16), part("soy_sauce", 2), part("mirin", 2)], servingSize: 70, rotationKey: "小芋" },
+        { id: "nimono-kabu", name: "かぶの煮物", ingredients: [part("daikon", 60, { label: "かぶ" })], seasonings: [part("broth", 16), part("light_soy", 2)], servingSize: 70, rotationKey: "かぶ" },
+        { id: "nimono-fuki", name: "ふきの煮物", ingredients: [part("komatsuna", 50, { label: "ふき" })], seasonings: [part("broth", 16), part("soy_sauce", 2)], servingSize: 62, rotationKey: "ふき" },
+        { id: "nimono-kusao", name: "草生の煮物", ingredients: [part("komatsuna", 52, { label: "草生" })], seasonings: [part("broth", 16), part("soy_sauce", 2)], servingSize: 64, rotationKey: "草生" },
+        { id: "nimono-tofu-yasai", name: "豆腐と野菜の炊き合わせ", ingredients: [part("tofu", 30), part("carrot", 15), part("daikon", 20)], seasonings: [part("broth", 18), part("light_soy", 2)], servingSize: 78, rotationKey: "豆腐" },
+        { id: "nimono-ingen-carrot", name: "いんげんと人参の煮物", ingredients: [part("komatsuna", 32, { label: "いんげん" }), part("carrot", 18)], seasonings: [part("broth", 16), part("soy_sauce", 2)], servingSize: 66, rotationKey: "いんげん" },
+        { id: "nimono-atsuage-daikon", name: "厚揚げと大根の煮物", ingredients: [part("tofu", 35, { label: "厚揚げ" }), part("daikon", 24)], seasonings: [part("broth", 18), part("soy_sauce", 2), part("mirin", 2)], servingSize: 80, rotationKey: "厚揚げ" },
+        { id: "nimono-koridofu", name: "凍り豆腐の煮物", ingredients: [part("tofu", 34, { label: "凍り豆腐" }), part("carrot", 12)], seasonings: [part("broth", 18), part("soy_sauce", 2)], servingSize: 68, rotationKey: "凍り豆腐" },
+        { id: "nimono-harusame", name: "春雨の煮物", ingredients: [part("chinese_noodles", 24, { label: "春雨" }), part("carrot", 12), part("chinese_cabbage", 18)], seasonings: [part("broth", 18), part("soy_sauce", 2)], servingSize: 72, rotationKey: "春雨" },
+        { id: "nimono-pork-daikon", name: "豚バラ大根", ingredients: [part("pork_lean", 24, { label: "豚バラ肉" }), part("daikon", 38)], seasonings: [part("broth", 18), part("soy_sauce", 2), part("mirin", 2)], servingSize: 82, rotationKey: "大根" },
+        { id: "nimono-pimanikuzume", name: "ピーマンの肉詰め煮", ingredients: [part("bell_pepper", 34), part("beef_mince", 22, { label: "肉だね" })], seasonings: [part("broth", 14), part("soy_sauce", 2), part("starch", 1)], servingSize: 70, rotationKey: "ピーマン" },
+        { id: "nimono-shirataki", name: "白滝の煮物", ingredients: [part("chinese_noodles", 26, { label: "白滝" }), part("carrot", 10), part("onion", 10)], seasonings: [part("broth", 16), part("soy_sauce", 2)], servingSize: 64, rotationKey: "白滝" }
+      ],
+      "和え物": [
+        { id: "ae-spinach-carrot-goma", name: "ほうれん草と人参のごま和え", ingredients: [part("spinach", 36), part("carrot", 16)], seasonings: [part("soy_sauce", 2), part("sesame", 4), part("sugar", 1)], servingSize: 62, rotationKey: "青菜" },
+        { id: "ae-cucumber-wakame", name: "きゅうりとわかめの和え物", ingredients: [part("cucumber", 36), part("wakame", 8)], seasonings: [part("vinegar", 2), part("soy_sauce", 1)], servingSize: 54, rotationKey: "きゅうり" },
+        { id: "ae-celery-okaka", name: "セロリのおかか和え", ingredients: [part("cucumber", 42, { label: "セロリ" })], seasonings: [part("soy_sauce", 2)], servingSize: 52, rotationKey: "セロリ" },
+        { id: "ae-kabunoha-ohitashi", name: "かぶの葉のお浸し", ingredients: [part("komatsuna", 50, { label: "かぶの葉" })], seasonings: [part("soy_sauce", 2)], servingSize: 54, rotationKey: "青菜" },
+        { id: "ae-nanohana-ohitashi", name: "菜の花のお浸し", ingredients: [part("komatsuna", 50, { label: "菜の花" })], seasonings: [part("soy_sauce", 2)], servingSize: 54, rotationKey: "菜の花" },
+        { id: "ae-asparagus-goma", name: "アスパラのごま和え", ingredients: [part("komatsuna", 46, { label: "アスパラ" })], seasonings: [part("soy_sauce", 2), part("sesame", 3)], servingSize: 56, rotationKey: "アスパラ" },
+        { id: "ae-daikon-ume", name: "大根の梅和え", ingredients: [part("daikon", 50)], seasonings: [part("vinegar", 2), part("sugar", 1), part("soy_sauce", 1)], servingSize: 58, rotationKey: "大根" },
+        { id: "ae-renkon-shiraae", name: "れんこんの白和え", ingredients: [part("lotus_root", 34), part("tofu", 24)], seasonings: [part("soy_sauce", 1.5), part("sesame", 2)], servingSize: 64, rotationKey: "れんこん" },
+        { id: "ae-hijiki-daizu", name: "ひじきと大豆の和え物", ingredients: [part("wakame", 10, { label: "ひじき" }), part("tofu", 24, { label: "大豆" }), part("carrot", 10)], seasonings: [part("soy_sauce", 2), part("mirin", 1)], servingSize: 60, rotationKey: "ひじき" },
+        { id: "ae-mizuna", name: "水菜の和え物", ingredients: [part("komatsuna", 48, { label: "水菜" })], seasonings: [part("soy_sauce", 2)], servingSize: 54, rotationKey: "水菜" },
+        { id: "ae-nagaimo-ume", name: "長芋の梅和え", ingredients: [part("potato", 46, { label: "長芋" })], seasonings: [part("vinegar", 2), part("soy_sauce", 1)], servingSize: 56, rotationKey: "長芋" },
+        { id: "ae-enoki-mitsuba", name: "えのきと三つ葉の和え物", ingredients: [part("mushrooms", 28, { label: "えのき" }), part("komatsuna", 16, { label: "三つ葉" })], seasonings: [part("soy_sauce", 2)], servingSize: 54, rotationKey: "きのこ" },
+        { id: "ae-tofu-hakusai-shiraae", name: "豆腐と白菜の白和え", ingredients: [part("tofu", 28), part("chinese_cabbage", 24)], seasonings: [part("soy_sauce", 1.5), part("sesame", 2)], servingSize: 64, rotationKey: "豆腐" }
+      ],
+      "炒め物": [
+        { id: "itame-broccoli", name: "ブロッコリーの炒め物", ingredients: [part("broccoli", 54), part("onion", 10)], seasonings: [part("soy_sauce", 1.5), part("sesame_oil", 1)], servingSize: 64, rotationKey: "ブロッコリー", cuisine: "洋食" },
+        { id: "itame-paprika-piman", name: "パプリカとピーマンの炒め物", ingredients: [part("bell_pepper", 26, { label: "パプリカ" }), part("bell_pepper", 22)], seasonings: [part("soy_sauce", 1.5), part("sesame_oil", 1)], servingSize: 58, rotationKey: "ピーマン", cuisine: "中華" },
+        { id: "itame-naganegi", name: "長ねぎの炒め物", ingredients: [part("onion", 50, { label: "長ねぎ" })], seasonings: [part("soy_sauce", 1.5), part("sesame_oil", 1)], servingSize: 56, rotationKey: "長ねぎ" },
+        { id: "itame-chingensai-tofu", name: "チンゲン菜と豆腐の炒め物", ingredients: [part("komatsuna", 34, { label: "チンゲン菜" }), part("tofu", 24)], seasonings: [part("soy_sauce", 1.5), part("sesame_oil", 1)], servingSize: 66, rotationKey: "チンゲン菜", cuisine: "中華" },
+        { id: "itame-satsumaimo-bacon", name: "さつまいもとベーコンの炒め物", ingredients: [part("sweet_potato", 44), part("pork_lean", 12, { label: "ベーコン" })], seasonings: [part("consomme", 1), part("butter", 1.5)], servingSize: 66, rotationKey: "さつまいも", cuisine: "洋食" },
+        { id: "itame-gobo-carrot-kinpira", name: "ごぼうと人参のきんぴら", ingredients: [part("burdock", 34), part("carrot", 16)], seasonings: [part("soy_sauce", 2), part("mirin", 1.5), part("sesame_oil", 1)], servingSize: 58, rotationKey: "ごぼう" },
+        { id: "itame-hakusai-buta", name: "白菜と豚肉の炒め物", ingredients: [part("chinese_cabbage", 34), part("pork_lean", 18)], seasonings: [part("soy_sauce", 1.5), part("sesame_oil", 1)], servingSize: 68, rotationKey: "白菜", cuisine: "中華" },
+        { id: "itame-pumpkin-shimeji", name: "かぼちゃとしめじの炒め物", ingredients: [part("pumpkin", 38), part("mushrooms", 16, { label: "しめじ" })], seasonings: [part("soy_sauce", 1.5), part("butter", 1)], servingSize: 62, rotationKey: "かぼちゃ" },
+        { id: "itame-asparagus-bacon", name: "アスパラとベーコン炒め", ingredients: [part("komatsuna", 34, { label: "アスパラ" }), part("pork_lean", 12, { label: "ベーコン" })], seasonings: [part("consomme", 1), part("butter", 1.5)], servingSize: 58, rotationKey: "アスパラ", cuisine: "洋食" },
+        { id: "itame-chingensai-oyster", name: "チンゲン菜のオイスター炒め", ingredients: [part("komatsuna", 44, { label: "チンゲン菜" })], seasonings: [part("oyster_sauce", 2), part("sesame_oil", 1)], servingSize: 54, rotationKey: "チンゲン菜", cuisine: "中華" },
+        { id: "itame-satsumaimo-amakara", name: "さつまいもの甘辛炒め", ingredients: [part("sweet_potato", 46)], seasonings: [part("soy_sauce", 1.5), part("sugar", 1.5), part("sesame_oil", 1)], servingSize: 56, rotationKey: "さつまいも" },
+        { id: "itame-ingen-goma", name: "いんげんのごま炒め", ingredients: [part("komatsuna", 42, { label: "いんげん" })], seasonings: [part("soy_sauce", 1.5), part("sesame", 3)], servingSize: 52, rotationKey: "いんげん" },
+        { id: "itame-onion-tuna", name: "玉ねぎとツナの炒め煮", ingredients: [part("onion", 42), part("white_fish", 14, { label: "ツナ" })], seasonings: [part("soy_sauce", 1.5), part("broth", 8)], servingSize: 60, rotationKey: "玉ねぎ" }
+      ],
+      "酢の物": [
+        { id: "su-kabu-amazu", name: "かぶの甘酢漬け", ingredients: [part("daikon", 48, { label: "かぶ" })], seasonings: [part("vinegar", 3), part("sugar", 1)], servingSize: 52, rotationKey: "かぶ" },
+        { id: "su-zucchini-marine", name: "ズッキーニのマリネ", ingredients: [part("cucumber", 46, { label: "ズッキーニ" })], seasonings: [part("vinegar", 2), part("salt", 0.2)], servingSize: 50, rotationKey: "ズッキーニ", cuisine: "洋食" },
+        { id: "su-celery-amazu", name: "セロリの甘酢漬け", ingredients: [part("cucumber", 44, { label: "セロリ" })], seasonings: [part("vinegar", 3), part("sugar", 1)], servingSize: 48, rotationKey: "セロリ" },
+        { id: "su-myoga-amazu", name: "みょうがの甘酢漬け", ingredients: [part("onion", 40, { label: "みょうが" })], seasonings: [part("vinegar", 3), part("sugar", 1)], servingSize: 44, rotationKey: "みょうが" },
+        { id: "su-daikon-carrot", name: "大根と人参の甘酢和え", ingredients: [part("daikon", 34), part("carrot", 16)], seasonings: [part("vinegar", 3), part("sugar", 1)], servingSize: 56, rotationKey: "大根" },
+        { id: "su-tomato-amazu", name: "トマトの甘酢和え", ingredients: [part("tomato", 52)], seasonings: [part("vinegar", 2), part("sugar", 1)], servingSize: 54, rotationKey: "トマト" },
+        { id: "su-piman-marine", name: "ピーマンのマリネ", ingredients: [part("bell_pepper", 46)], seasonings: [part("vinegar", 2), part("salt", 0.2)], servingSize: 48, rotationKey: "ピーマン", cuisine: "洋食" },
+        { id: "su-cucumber-nanban", name: "きゅうりの南蛮酢和え", ingredients: [part("cucumber", 46)], seasonings: [part("vinegar", 3), part("sugar", 1), part("soy_sauce", 0.8)], servingSize: 50, rotationKey: "きゅうり" },
+        { id: "su-onion-marine", name: "玉ねぎのマリネ", ingredients: [part("onion", 48)], seasonings: [part("vinegar", 2), part("salt", 0.2)], servingSize: 50, rotationKey: "玉ねぎ", cuisine: "洋食" }
+      ],
+      "蒸し物": [
+        { id: "mushi-pumpkin-chakin", name: "かぼちゃの茶巾蒸し", ingredients: [part("pumpkin", 48)], seasonings: [part("salt", 0.1)], servingSize: 54, rotationKey: "かぼちゃ" },
+        { id: "mushi-satoimo", name: "さといもの蒸し煮", ingredients: [part("potato", 50, { label: "さといも" })], seasonings: [part("broth", 8), part("soy_sauce", 1)], servingSize: 58, rotationKey: "里芋" },
+        { id: "mushi-chicken-yasai", name: "鶏と野菜の蒸し物", ingredients: [part("chicken_breast", 20), part("carrot", 14), part("chinese_cabbage", 22)], seasonings: [part("salt", 0.2), part("broth", 8)], servingSize: 68, rotationKey: "蒸し物" },
+        { id: "mushi-hakusai-ankake", name: "白菜の蒸し物（あんかけ）", ingredients: [part("chinese_cabbage", 44)], seasonings: [part("broth", 10), part("light_soy", 1.5), part("starch", 1)], servingSize: 58, rotationKey: "白菜" },
+        { id: "mushi-cabbage-ponzu", name: "蒸しキャベツのポン酢がけ", ingredients: [part("cabbage", 48)], seasonings: [part("ponzu", 2)], servingSize: 54, rotationKey: "キャベツ" },
+        { id: "mushi-carrot", name: "にんじんの蒸し物", ingredients: [part("carrot", 46)], seasonings: [part("salt", 0.1)], servingSize: 50, rotationKey: "にんじん" },
+        { id: "mushi-tofu-yasai", name: "豆腐と野菜の蒸し煮", ingredients: [part("tofu", 26), part("carrot", 12), part("chinese_cabbage", 20)], seasonings: [part("broth", 8), part("light_soy", 1.5)], servingSize: 62, rotationKey: "豆腐" }
+      ],
+      "焼き物": [
+        { id: "yaki-piman", name: "焼きピーマン", ingredients: [part("bell_pepper", 48)], seasonings: [part("soy_sauce", 1.5)], servingSize: 50, rotationKey: "ピーマン" },
+        { id: "yaki-corn-butter", name: "焼きとうもろこし（バター醤油）", ingredients: [part("corn", 48)], seasonings: [part("butter", 1.5), part("soy_sauce", 1)], servingSize: 52, rotationKey: "とうもろこし", cuisine: "洋食" },
+        { id: "yaki-nasu", name: "焼きなす", ingredients: [part("tomato", 46, { label: "なす" })], seasonings: [part("soy_sauce", 1.5)], servingSize: 48, rotationKey: "なす" },
+        { id: "yaki-potato", name: "焼きじゃがいも", ingredients: [part("potato", 52)], seasonings: [part("salt", 0.2)], servingSize: 56, rotationKey: "じゃがいも" },
+        { id: "yaki-atsuage-shoga", name: "厚揚げの生姜醤油焼き", ingredients: [part("tofu", 34, { label: "厚揚げ" })], seasonings: [part("soy_sauce", 2)], servingSize: 42, rotationKey: "厚揚げ" },
+        { id: "yaki-renkon-amakara", name: "れんこんの甘辛焼き", ingredients: [part("lotus_root", 40)], seasonings: [part("soy_sauce", 1.5), part("sugar", 1)], servingSize: 46, rotationKey: "れんこん" },
+        { id: "yaki-satsumaimo-dengaku", name: "さつまいもの田楽", ingredients: [part("sweet_potato", 46)], seasonings: [part("miso", 4), part("sugar", 1)], servingSize: 54, rotationKey: "さつまいも" },
+        { id: "yaki-onion-grill", name: "玉ねぎのグリル", ingredients: [part("onion", 48)], seasonings: [part("salt", 0.2)], servingSize: 52, rotationKey: "玉ねぎ", cuisine: "洋食" },
+        { id: "yaki-zucchini-grill", name: "ズッキーニのグリル", ingredients: [part("cucumber", 46, { label: "ズッキーニ" })], seasonings: [part("salt", 0.2)], servingSize: 48, rotationKey: "ズッキーニ", cuisine: "洋食" },
+        { id: "yaki-paprika-marine", name: "焼きパプリカのマリネ", ingredients: [part("bell_pepper", 46, { label: "パプリカ" })], seasonings: [part("vinegar", 2), part("salt", 0.2)], servingSize: 50, rotationKey: "パプリカ", cuisine: "洋食" },
+        { id: "yaki-atsuage-miso", name: "焼き厚揚げ（味噌のせ）", ingredients: [part("tofu", 34, { label: "厚揚げ" })], seasonings: [part("miso", 4)], servingSize: 42, rotationKey: "厚揚げ" }
+      ],
+      "揚げ物": [
+        { id: "age-tofu-champuru", name: "豆腐チャンプルー風", ingredients: [part("tofu", 30), part("chinese_cabbage", 18), part("egg", 14)], seasonings: [part("soy_sauce", 1.5)], servingSize: 62, rotationKey: "豆腐" },
+        { id: "age-pumpkin", name: "かぼちゃの揚げだし", ingredients: [part("pumpkin", 42)], seasonings: [part("broth", 10), part("light_soy", 1.5)], servingSize: 50, rotationKey: "かぼちゃ" },
+        { id: "age-nasu", name: "なすの揚げ浸し", ingredients: [part("tomato", 44, { label: "なす" })], seasonings: [part("broth", 10), part("soy_sauce", 1.5)], servingSize: 48, rotationKey: "なす" },
+        { id: "age-gobo", name: "ごぼうの素揚げ", ingredients: [part("burdock", 34)], seasonings: [part("salt", 0.2)], servingSize: 38, rotationKey: "ごぼう" },
+        { id: "age-renkon", name: "れんこんチップス", ingredients: [part("lotus_root", 32)], seasonings: [part("salt", 0.2)], servingSize: 36, rotationKey: "れんこん" },
+        { id: "age-daikon", name: "大根の煮物揚げ", ingredients: [part("daikon", 42)], seasonings: [part("broth", 8), part("soy_sauce", 1.2)], servingSize: 46, rotationKey: "大根" }
+      ],
+      "豆腐・卵": [
+        { id: "tofu-ankake", name: "豆腐のあんかけ", ingredients: [part("tofu", 34), part("carrot", 10)], seasonings: [part("broth", 10), part("light_soy", 1.5), part("starch", 1)], servingSize: 56, rotationKey: "豆腐" },
+        { id: "tofu-misosoup", name: "豆腐のみそ汁", ingredients: [part("tofu", 32)], seasonings: [part("broth", 14), part("miso", 4)], servingSize: 50, rotationKey: "豆腐", cuisine: "和食" },
+        { id: "tofu-isobe-age", name: "豆腐の磯辺揚げ", ingredients: [part("tofu", 32)], seasonings: [part("salt", 0.2)], servingSize: 40, rotationKey: "豆腐" },
+        { id: "egg-scramble-yasai", name: "スクランブルエッグ（野菜入り）", ingredients: [part("egg", 26), part("onion", 12), part("carrot", 10)], seasonings: [part("milk", 6), part("salt", 0.2)], servingSize: 54, rotationKey: "卵", cuisine: "洋食" },
+        { id: "egg-hijiki", name: "ひじき入り卵焼き", ingredients: [part("egg", 28), part("wakame", 8, { label: "ひじき" })], seasonings: [part("soy_sauce", 1.2), part("sugar", 0.8)], servingSize: 50, rotationKey: "卵" },
+        { id: "egg-tofu-yasai", name: "豆腐と野菜の卵とじ", ingredients: [part("tofu", 26), part("egg", 18), part("onion", 12), part("carrot", 10)], seasonings: [part("broth", 10), part("soy_sauce", 1.5)], servingSize: 62, rotationKey: "豆腐" },
+        { id: "egg-spinach-itame", name: "卵とほうれん草の炒め物", ingredients: [part("egg", 22), part("spinach", 24)], seasonings: [part("soy_sauce", 1.2), part("sesame_oil", 1)], servingSize: 54, rotationKey: "卵" },
+        { id: "tofu-hamburg", name: "豆腐ハンバーグ", ingredients: [part("tofu", 30), part("beef_mince", 16)], seasonings: [part("soy_sauce", 1.2)], servingSize: 58, rotationKey: "豆腐" },
+        { id: "tofu-atsuimo-mushi", name: "豆腐と厚芋の蒸し物", ingredients: [part("tofu", 28), part("potato", 24, { label: "厚芋" })], seasonings: [part("broth", 8), part("light_soy", 1.2)], servingSize: 60, rotationKey: "豆腐" }
+      ],
+      "海藻・きのこ": [
+        { id: "kaiso-shiitake-amakara", name: "しいたけの甘辛煮", ingredients: [part("mushrooms", 34, { label: "しいたけ" })], seasonings: [part("soy_sauce", 1.5), part("sugar", 1)], servingSize: 40, rotationKey: "しいたけ" },
+        { id: "kaiso-enoki-ae", name: "えのきの和え物", ingredients: [part("mushrooms", 34, { label: "えのき" })], seasonings: [part("soy_sauce", 1.5)], servingSize: 40, rotationKey: "えのき" },
+        { id: "kaiso-kinoko-tsukudani", name: "きのこの佃煮", ingredients: [part("mushrooms", 32)], seasonings: [part("soy_sauce", 1.5), part("sugar", 1)], servingSize: 38, rotationKey: "きのこ" },
+        { id: "kaiso-wakame-tofu", name: "わかめと豆腐の和え物", ingredients: [part("wakame", 8), part("tofu", 26)], seasonings: [part("soy_sauce", 1.2)], servingSize: 42, rotationKey: "わかめ" },
+        { id: "kaiso-maitake-itameni", name: "まいたけの炒め煮", ingredients: [part("mushrooms", 34, { label: "まいたけ" })], seasonings: [part("soy_sauce", 1.5), part("broth", 8)], servingSize: 40, rotationKey: "まいたけ" },
+        { id: "kaiso-hijiki-salad", name: "ひじきのサラダ（ドレッシング）", ingredients: [part("wakame", 8, { label: "ひじき" }), part("cucumber", 18), part("carrot", 10)], seasonings: [part("vinegar", 2), part("salt", 0.2)], servingSize: 46, rotationKey: "ひじき", cuisine: "洋食" },
+        { id: "kaiso-kinoko-marine", name: "きのこのマリネ（洋風）", ingredients: [part("mushrooms", 34)], seasonings: [part("vinegar", 2), part("salt", 0.2)], servingSize: 40, rotationKey: "きのこ", cuisine: "洋食" }
+      ],
+      "サラダ・漬物": [
+        { id: "salad-cucumber-asazuke", name: "きゅうりの浅漬け", ingredients: [part("cucumber", 44)], seasonings: [part("salt", 0.2)], servingSize: 46, rotationKey: "きゅうり" },
+        { id: "salad-hakusai-asazuke", name: "白菜の浅漬け", ingredients: [part("chinese_cabbage", 44)], seasonings: [part("salt", 0.2)], servingSize: 46, rotationKey: "白菜" },
+        { id: "salad-daikon-tsukemono", name: "大根の漬け物", ingredients: [part("daikon", 44)], seasonings: [part("salt", 0.2)], servingSize: 46, rotationKey: "大根" },
+        { id: "salad-cabbage-asazuke", name: "キャベツの浅漬け", ingredients: [part("cabbage", 44)], seasonings: [part("salt", 0.2)], servingSize: 46, rotationKey: "キャベツ" },
+        { id: "salad-coleslaw", name: "コールスローサラダ", ingredients: [part("cabbage", 34), part("corn", 10), part("cucumber", 10)], seasonings: [part("mayonnaise", 4), part("vinegar", 1.5)], servingSize: 60, rotationKey: "キャベツ", cuisine: "洋食" },
+        { id: "salad-potato", name: "ポテトサラダ", ingredients: [part("potato", 42), part("cucumber", 10), part("carrot", 10)], seasonings: [part("mayonnaise", 5)], servingSize: 68, rotationKey: "じゃがいも", cuisine: "洋食" },
+        { id: "salad-macaroni", name: "マカロニサラダ", ingredients: [part("pasta", 26, { label: "マカロニ" }), part("cucumber", 10), part("carrot", 10)], seasonings: [part("mayonnaise", 5)], servingSize: 58, rotationKey: "マカロニ", cuisine: "洋食" },
+        { id: "salad-tomato", name: "トマトサラダ", ingredients: [part("tomato", 50)], seasonings: [part("vinegar", 1.5), part("salt", 0.2)], servingSize: 54, rotationKey: "トマト", cuisine: "洋食" },
+        { id: "salad-broccoli", name: "ブロッコリーサラダ", ingredients: [part("broccoli", 44), part("corn", 10)], seasonings: [part("mayonnaise", 4)], servingSize: 58, rotationKey: "ブロッコリー", cuisine: "洋食" },
+        { id: "salad-harusame", name: "春雨サラダ", ingredients: [part("chinese_noodles", 24, { label: "春雨" }), part("cucumber", 12), part("carrot", 10)], seasonings: [part("vinegar", 2), part("soy_sauce", 1.2), part("sesame_oil", 1)], servingSize: 54, rotationKey: "春雨", cuisine: "中華" }
+      ]
+    };
+    const createGroupedSideRecipe = (group, definition) => createRecipe({
+      id: `requested-side-${definition.id}`,
+      name: definition.name,
+      category: "副菜",
+      cuisine: definition.cuisine || "和食",
+      description: definition.description || `${group}として提供しやすい副菜。`,
+      notes: definition.notes || "食べやすい大きさで、やわらかく仕上げる。",
+      ingredients: definition.ingredients,
+      seasonings: definition.seasonings,
+      instructions: definition.instructions || ["材料を食べやすく整える。", "やわらかく加熱または和えて仕上げる。"],
+      steps: definition.instructions || ["材料を食べやすく整える。", "やわらかく加熱または和えて仕上げる。"],
+      servingSize: definition.servingSize || 60,
+      servings: 1,
+      servingWeight: definition.servingSize || 60,
+      rotationKey: definition.rotationKey || group,
+      tags: ["追加レシピ", "副菜", group, `副菜区分:${group}`]
+    });
+    return SIDE_DISH_GROUP_ORDER.flatMap((group) => (groupedDefinitions[group] || []).map((definition) => createGroupedSideRecipe(group, definition)));
   }
   function buildAdditionalDessertRecipes() {
     const fruitFlavors = [
@@ -1474,6 +1617,60 @@
     });
     return recipes;
   }
+  function buildRequestedLunchDesserts() {
+    const dessert = (definition) => createRecipe({
+      id: `requested-dessert-${definition.id}`,
+      name: definition.name,
+      category: "デザート",
+      cuisine: definition.cuisine,
+      servingSize: definition.servingSize,
+      rotationKey: definition.rotationKey,
+      tags: ["追加レシピ", "デザート", ...(definition.tags || [])],
+      description: definition.description || "昼食後に出しやすい、食べやすいデザートです。",
+      notes: definition.notes || "固さを出しすぎず、食べやすく仕上げる。",
+      ingredients: definition.ingredients,
+      seasonings: definition.seasonings || [],
+      instructions: definition.instructions || ["材料を合わせる。", "食べやすく仕上げる。", "提供しやすい温度で出す。"]
+    });
+    return [
+      { id: "mizuyokan", name: "水羊羹", cuisine: "和食", servingSize: 78, rotationKey: "和風デザート", tags: ["和スイーツ"], ingredients: [part("azuki_paste", 30)], seasonings: [part("sugar", 4), part("gelatin_powder", 1.5)], instructions: ["材料をよく混ぜる。", "やわらかく固める。", "冷やして提供する。"] },
+      { id: "warabimochi", name: "わらび餅", cuisine: "和食", servingSize: 76, rotationKey: "和風デザート", tags: ["和スイーツ"], ingredients: [part("jelly_base", 42, { label: "わらび餅生地" })], seasonings: [part("sugar", 4)], instructions: ["やわらかい生地に整える。", "食べやすい大きさに分ける。", "冷やして提供する。"] },
+      { id: "matcha-jelly", name: "抹茶ゼリー", cuisine: "和食", servingSize: 82, rotationKey: "和風デザート", tags: ["和スイーツ", "ゼリー"], ingredients: [part("milk", 4, { label: "抹茶" })], seasonings: [part("sugar", 5), part("gelatin_powder", 2)], instructions: ["抹茶をなめらかに溶く。", "やわらかく固める。", "冷やして提供する。"] },
+      { id: "daifuku", name: "大福", cuisine: "和食", servingSize: 74, rotationKey: "和風デザート", tags: ["和スイーツ"], ingredients: [part("jelly_base", 26, { label: "大福生地" }), part("azuki_paste", 22)], seasonings: [part("sugar", 4)], instructions: ["生地をやわらかく整える。", "あんを包む。", "食べやすく提供する。"] },
+      { id: "mitarashi-dango", name: "みたらし団子", cuisine: "和食", servingSize: 72, rotationKey: "和風デザート", tags: ["和スイーツ"], ingredients: [part("flour", 18, { label: "やわらか団子" })], seasonings: [part("soy_sauce", 1.5), part("sugar", 4)], instructions: ["やわらかい団子生地を整える。", "みたらしあんをからめる。", "食べやすく提供する。"] },
+      { id: "sakuramochi", name: "桜餅", cuisine: "和食", servingSize: 76, rotationKey: "和風デザート", tags: ["和スイーツ"], ingredients: [part("soft_rice", 30, { label: "桜餅生地" }), part("azuki_paste", 20)], seasonings: [part("sugar", 4)], instructions: ["生地をやわらかく整える。", "あんを包む。", "食べやすく提供する。"] },
+      { id: "uiro", name: "ういろう", cuisine: "和食", servingSize: 74, rotationKey: "和風デザート", tags: ["和スイーツ"], ingredients: [part("flour", 18), part("milk", 12)], seasonings: [part("sugar", 5)], instructions: ["材料をよく混ぜる。", "やわらかく蒸し固める。", "食べやすく切って提供する。"] },
+      { id: "imo-yokan", name: "芋ようかん", cuisine: "和食", servingSize: 80, rotationKey: "和風デザート", tags: ["和スイーツ"], ingredients: [part("sweet_potato", 42)], seasonings: [part("sugar", 4), part("gelatin_powder", 1.5)], instructions: ["さつまいもをなめらかに整える。", "やわらかく固める。", "食べやすく切って提供する。"] },
+      { id: "madeleine", name: "マドレーヌ", cuisine: "洋食", servingSize: 72, rotationKey: "焼き菓子", tags: ["焼き菓子"], ingredients: [part("flour", 20), part("egg", 12), part("milk", 12)], seasonings: [part("sugar", 6), part("butter", 3), part("baking_powder", 1)], instructions: ["生地を合わせる。", "しっとり焼き上げる。", "食べやすく提供する。"] },
+      { id: "financier", name: "フィナンシェ", cuisine: "洋食", servingSize: 70, rotationKey: "焼き菓子", tags: ["焼き菓子"], ingredients: [part("flour", 18), part("egg", 10), part("milk", 10)], seasonings: [part("sugar", 6), part("butter", 3)], instructions: ["生地をなめらかに整える。", "しっとり焼き上げる。", "食べやすく提供する。"] },
+      { id: "scone", name: "スコーン", cuisine: "洋食", servingSize: 72, rotationKey: "焼き菓子", tags: ["焼き菓子"], ingredients: [part("flour", 22), part("milk", 14)], seasonings: [part("sugar", 5), part("butter", 3), part("baking_powder", 1)], instructions: ["生地をまとめる。", "やわらかめに焼き上げる。", "食べやすく提供する。"] },
+      { id: "vanilla-ice", name: "バニラアイスクリーム", cuisine: "洋食", servingSize: 78, rotationKey: "冷たいデザート", tags: ["冷たいスイーツ"], ingredients: [part("milk", 55)], seasonings: [part("sugar", 6)], instructions: ["なめらかに整える。", "冷やして仕上げる。", "少量で提供する。"] },
+      { id: "sorbet", name: "ソルベ（シャーベット）", cuisine: "洋食", servingSize: 76, rotationKey: "冷たいデザート", tags: ["冷たいスイーツ"], ingredients: [part("orange", 26, { label: "果汁" })], seasonings: [part("sugar", 5)], instructions: ["果汁を整える。", "なめらかに冷やし固める。", "食べやすく提供する。"] },
+      { id: "parfait", name: "パフェ", cuisine: "洋食", servingSize: 86, rotationKey: "冷たいデザート", tags: ["冷たいスイーツ"], ingredients: [part("yogurt", 35), part("banana", 18), part("jelly_base", 18, { label: "ゼリー" })], seasonings: [part("sugar", 4)], instructions: ["材料を層にして盛り付ける。", "冷やして提供する。"] },
+      { id: "mousse", name: "ムース", cuisine: "洋食", servingSize: 82, rotationKey: "冷たいデザート", tags: ["冷たいスイーツ"], ingredients: [part("yogurt", 36), part("milk", 18)], seasonings: [part("sugar", 5), part("gelatin_powder", 1.5)], instructions: ["材料をなめらかに混ぜる。", "やわらかく固める。", "冷やして提供する。"] },
+      { id: "gelato", name: "ジェラート", cuisine: "洋食", servingSize: 76, rotationKey: "冷たいデザート", tags: ["冷たいスイーツ"], ingredients: [part("milk", 50)], seasonings: [part("sugar", 5)], instructions: ["なめらかに整える。", "冷やして仕上げる。", "食べやすく提供する。"] },
+      { id: "kakigori", name: "かき氷", cuisine: "洋食", servingSize: 70, rotationKey: "冷たいデザート", tags: ["冷たいスイーツ"], ingredients: [part("jelly_base", 40, { label: "かき氷風氷菓" })], seasonings: [part("sugar", 5)], instructions: ["口当たりをやわらかく整える。", "冷たすぎない状態で提供する。"] },
+      { id: "frozen-yogurt", name: "フローズンヨーグルト", cuisine: "洋食", servingSize: 80, rotationKey: "冷たいデザート", tags: ["冷たいスイーツ"], ingredients: [part("yogurt", 55), part("milk", 12)], seasonings: [part("sugar", 4)], instructions: ["なめらかに混ぜる。", "冷やしてやわらかく仕上げる。", "食べやすく提供する。"] },
+      { id: "ice-monaka", name: "アイスモナカ", cuisine: "洋食", servingSize: 78, rotationKey: "冷たいデザート", tags: ["冷たいスイーツ"], ingredients: [part("milk", 42, { label: "アイス" }), part("flour", 8, { label: "モナカ皮" })], seasonings: [part("sugar", 4)], instructions: ["アイスをやわらかく整える。", "モナカ皮にはさみ食べやすく提供する。"] },
+      { id: "milk-ice", name: "ミルクアイス", cuisine: "洋食", servingSize: 78, rotationKey: "冷たいデザート", tags: ["冷たいスイーツ"], ingredients: [part("milk", 55)], seasonings: [part("sugar", 5)], instructions: ["なめらかに整える。", "冷やして仕上げる。", "食べやすく提供する。"] },
+      { id: "fruit-sherbet", name: "フルーツシャーベット", cuisine: "洋食", servingSize: 76, rotationKey: "冷たいデザート", tags: ["冷たいスイーツ"], ingredients: [part("mandarin", 24), part("peach", 18)], seasonings: [part("sugar", 5)], instructions: ["果物を整える。", "なめらかなシャーベット状にする。", "冷やして提供する。"] },
+      { id: "pannacotta", name: "パンナコッタ", cuisine: "洋食", servingSize: 84, rotationKey: "プリン・ゼリー", tags: ["プリン・ゼリー"], ingredients: [part("milk", 58)], seasonings: [part("sugar", 5), part("gelatin_powder", 1.5)], instructions: ["材料をよく混ぜる。", "やわらかく固める。", "冷やして提供する。"] },
+      { id: "coffee-jelly", name: "コーヒーゼリー", cuisine: "洋食", servingSize: 80, rotationKey: "プリン・ゼリー", tags: ["プリン・ゼリー"], ingredients: [part("jelly_base", 40, { label: "コーヒーゼリー液" })], seasonings: [part("sugar", 4), part("gelatin_powder", 1.5)], instructions: ["コーヒー液を整える。", "やわらかく固める。", "冷やして提供する。"] },
+      { id: "fruit-jelly", name: "フルーツゼリー", cuisine: "洋食", servingSize: 84, rotationKey: "プリン・ゼリー", tags: ["プリン・ゼリー"], ingredients: [part("mandarin", 18), part("peach", 18), part("jelly_base", 24, { label: "ゼリー液" })], seasonings: [part("sugar", 4), part("gelatin_powder", 1.5)], instructions: ["果物を食べやすく整える。", "ゼリーと合わせて固める。", "冷やして提供する。"] },
+      { id: "milk-kanten", name: "牛乳寒天", cuisine: "和食", servingSize: 84, rotationKey: "プリン・ゼリー", tags: ["プリン・ゼリー", "和風"], ingredients: [part("milk", 56)], seasonings: [part("sugar", 5), part("gelatin_powder", 2)], instructions: ["材料をよく混ぜる。", "やわらかく固める。", "冷やして提供する。"] },
+      { id: "blancmange", name: "ブランマンジェ", cuisine: "洋食", servingSize: 82, rotationKey: "プリン・ゼリー", tags: ["プリン・ゼリー"], ingredients: [part("milk", 56)], seasonings: [part("sugar", 5), part("gelatin_powder", 1.5)], instructions: ["材料をなめらかに混ぜる。", "やわらかく固める。", "冷やして提供する。"] },
+      { id: "mango-pudding", name: "マンゴープリン", cuisine: "中華", servingSize: 84, rotationKey: "プリン・ゼリー", tags: ["プリン・ゼリー", "中華"], ingredients: [part("milk", 42), part("orange", 18, { label: "マンゴー" })], seasonings: [part("sugar", 5), part("gelatin_powder", 1.5)], instructions: ["材料をよく混ぜる。", "やわらかく固める。", "冷やして提供する。"] },
+      { id: "annin-tofu", name: "杏仁豆腐", cuisine: "中華", servingSize: 82, rotationKey: "プリン・ゼリー", tags: ["プリン・ゼリー", "中華"], ingredients: [part("milk", 55), part("jelly_base", 10, { label: "杏仁風ベース" })], seasonings: [part("sugar", 5), part("gelatin_powder", 1.5)], instructions: ["材料をなめらかに混ぜる。", "やわらかく固める。", "冷やして提供する。"] },
+      { id: "fruit-punch", name: "フルーツポンチ", cuisine: "洋食", servingSize: 90, rotationKey: "フルーツデザート", tags: ["フルーツ系"], ingredients: [part("apple", 18), part("banana", 18), part("mandarin", 18), part("jelly_base", 18, { label: "シロップゼリー" })], seasonings: [part("sugar", 4)], instructions: ["果物を食べやすく切る。", "やわらかいシロップと合わせる。", "冷やして提供する。"] },
+      { id: "fruit-assort", name: "フルーツ盛り合わせ", cuisine: "洋食", servingSize: 88, rotationKey: "フルーツデザート", tags: ["フルーツ系"], ingredients: [part("apple", 24), part("banana", 20), part("mandarin", 20)], instructions: ["果物を食べやすく切る。", "彩りよく盛り合わせる。"] },
+      { id: "fruit-sand", name: "フルーツサンド", cuisine: "洋食", servingSize: 84, rotationKey: "フルーツデザート", tags: ["フルーツ系"], ingredients: [part("bread", 26), part("milk", 16, { label: "クリーム" }), part("banana", 16), part("mandarin", 16)], seasonings: [part("sugar", 4)], instructions: ["果物を食べやすく整える。", "やわらかいサンドに仕上げる。", "食べやすく切って提供する。"] },
+      { id: "chocolate-fondue", name: "チョコレートフォンデュ", cuisine: "洋食", servingSize: 82, rotationKey: "洋風デザート", tags: ["チョコ"], ingredients: [part("milk", 24, { label: "チョコレートソース" }), part("banana", 18), part("apple", 18)], seasonings: [part("sugar", 4)], instructions: ["ソースをなめらかに整える。", "果物と合わせて提供する。"] },
+      { id: "brownie", name: "ブラウニー", cuisine: "洋食", servingSize: 72, rotationKey: "焼き菓子", tags: ["チョコ"], ingredients: [part("flour", 18), part("egg", 10), part("milk", 10, { label: "チョコレート" })], seasonings: [part("sugar", 6), part("butter", 3), part("baking_powder", 1)], instructions: ["生地を合わせる。", "しっとり焼き上げる。", "食べやすく提供する。"] },
+      { id: "doughnut", name: "ドーナツ", cuisine: "洋食", servingSize: 74, rotationKey: "軽菓子", tags: ["軽菓子"], ingredients: [part("flour", 20), part("egg", 10), part("milk", 12)], seasonings: [part("sugar", 6), part("butter", 2), part("baking_powder", 1)], instructions: ["生地をまとめる。", "やわらかく仕上げる。", "食べやすく提供する。"] },
+      { id: "cream-puff", name: "シュークリーム", cuisine: "洋食", servingSize: 78, rotationKey: "軽菓子", tags: ["軽菓子"], ingredients: [part("flour", 18), part("egg", 10), part("milk", 18, { label: "クリーム" })], seasonings: [part("sugar", 5), part("butter", 2)], instructions: ["生地をやわらかく整える。", "クリームを詰めて提供する。"] },
+      { id: "eclair", name: "エクレア", cuisine: "洋食", servingSize: 78, rotationKey: "軽菓子", tags: ["軽菓子", "チョコ"], ingredients: [part("flour", 18), part("egg", 10), part("milk", 16, { label: "クリーム" }), part("milk", 8, { label: "チョコレート" })], seasonings: [part("sugar", 5), part("butter", 2)], instructions: ["生地をやわらかく整える。", "クリームとチョコを合わせて仕上げる。", "食べやすく提供する。"] }
+    ].map(dessert);
+  }
   function buildAdditionalSnackRecipes() {
     const fruitFlavors = [
       { key: "apple", name: "りんご", foodId: "apple" },
@@ -1571,10 +1768,12 @@
       ...buildChineseSides(),
       ...buildExtraSides(),
       ...buildAdditionalSideRecipes(),
+      ...buildRequestedSideRecipes(),
       ...buildSingleDishes(),
       ...buildAdditionalSingleDishes(),
       ...buildDesserts(),
       ...buildAdditionalDessertRecipes(),
+      ...buildRequestedLunchDesserts(),
       ...buildAdditionalSoupRecipes(),
       ...buildAdditionalMainRecipes()
     );
@@ -3746,8 +3945,26 @@
     if (otherCuisineRecipes.length) {
       cuisineSections.push({ cuisine: "その他", recipes: otherCuisineRecipes });
     }
+    const sideDishSections = activeFilter === "副菜"
+      ? (() => {
+          const sections = SIDE_DISH_GROUP_ORDER
+            .map((group) => ({
+              group,
+              recipes: filteredRecipes.filter((recipe) => getTagValue(recipe, "副菜区分:") === group)
+            }))
+            .filter((section) => section.recipes.length > 0);
+          const groupedRecipeIds = new Set(sections.flatMap((section) => section.recipes.map((recipe) => recipe.id)));
+          const otherRecipes = filteredRecipes.filter((recipe) => !groupedRecipeIds.has(recipe.id));
+          if (otherRecipes.length) {
+            sections.push({ group: "その他", recipes: otherRecipes });
+          }
+          return sections;
+        })()
+      : [];
     const recipeCards = filteredRecipes.length
-      ? cuisineSections.map((section) => `<section class="recipe-master-cuisine-group"><div class="recipe-master-cuisine-heading">${escapeHtml(section.cuisine)}</div>${section.recipes.map(renderRecipeCard).join("")}</section>`).join("")
+      ? (activeFilter === "副菜"
+          ? sideDishSections.map((section) => `<section class="recipe-master-cuisine-group"><div class="recipe-master-cuisine-heading">${escapeHtml(section.group)}</div>${section.recipes.map(renderRecipeCard).join("")}</section>`).join("")
+          : cuisineSections.map((section) => `<section class="recipe-master-cuisine-group"><div class="recipe-master-cuisine-heading">${escapeHtml(section.cuisine)}</div>${section.recipes.map(renderRecipeCard).join("")}</section>`).join(""))
       : `<article class="card"><div class="empty-state">\u8a72\u5f53\u3059\u308b\u6599\u7406\u304c\u3042\u308a\u307e\u305b\u3093\u3002</div></article>`;
     const recipeDetail = state.recipeMasterMode === "create"
       ? renderRecipeMasterCreatePanel()
