@@ -150,7 +150,8 @@
     .page-nav {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
+      align-items: center;
+      gap: 12px;
       margin-bottom: 18px;
       position: relative;
       z-index: 5;
@@ -159,10 +160,11 @@
     .nav-button,
     .button {
       border: 0;
-      border-radius: 999px;
+      border-radius: 14px;
       padding: 12px 18px;
+      min-height: 46px;
       cursor: pointer;
-      transition: transform 140ms ease, opacity 140ms ease;
+      transition: transform 140ms ease, opacity 140ms ease, background-color 140ms ease, color 140ms ease, border-color 140ms ease;
     }
 
     .nav-button:hover,
@@ -171,16 +173,85 @@
     }
 
     .nav-button {
-      background: rgba(29, 24, 18, 0.08);
+      background: rgba(255, 255, 255, 0.72);
       color: var(--ink);
       font-weight: 700;
       pointer-events: auto;
+      border: 1px solid rgba(135, 112, 91, 0.18);
+      box-shadow: 0 6px 16px rgba(90, 58, 27, 0.08);
     }
 
     .nav-button.is-active,
     .button-primary {
       background: var(--accent);
       color: #fff;
+    }
+
+    .nav-button--resident {
+      background: rgba(201, 100, 41, 0.12);
+      color: var(--accent-deep);
+    }
+
+    .nav-button--resident.is-active {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .nav-button--kitchen {
+      background: var(--success-soft);
+      color: var(--success);
+    }
+
+    .nav-button--kitchen.is-active {
+      background: var(--success);
+      color: #fff;
+    }
+
+    .nav-button--admin {
+      background: rgba(240, 196, 91, 0.24);
+      color: #7a580b;
+    }
+
+    .nav-button--admin.is-active {
+      background: #f0c45b;
+      color: #4f3905;
+    }
+
+    .nav-button--action-resident {
+      background: #ffffff;
+      color: #374151;
+    }
+
+    .nav-button--action-kitchen {
+      background: #ffffff;
+      color: #374151;
+    }
+
+    .nav-button--action-disabled {
+      background: #ffffff;
+      color: #374151;
+      opacity: 1;
+    }
+
+    .nav-group {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 6px;
+      border-radius: 18px;
+      background: rgba(255, 253, 249, 0.72);
+      border: 1px solid rgba(135, 112, 91, 0.12);
+      box-shadow: 0 8px 20px rgba(90, 58, 27, 0.06);
+    }
+
+    .nav-group--admin {
+      margin-left: auto;
+    }
+
+    .nav-divider {
+      width: 1px;
+      height: 30px;
+      background: rgba(135, 112, 91, 0.18);
     }
 
     .button-secondary {
@@ -650,6 +721,19 @@
         align-items: stretch;
       }
 
+      .nav-group {
+        width: 100%;
+        justify-content: stretch;
+      }
+
+      .nav-group--admin {
+        margin-left: 0;
+      }
+
+      .nav-divider {
+        display: none;
+      }
+
       .button,
       .nav-button {
         width: 100%;
@@ -686,6 +770,24 @@
 
       .view.is-print-target {
         display: grid !important;
+      }
+
+      body.printing-resident #resident-view {
+        display: grid !important;
+      }
+
+      body.printing-resident #kitchen-view,
+      body.printing-resident #admin-view {
+        display: none !important;
+      }
+
+      body.printing-kitchen #kitchen-view {
+        display: grid !important;
+      }
+
+      body.printing-kitchen #resident-view,
+      body.printing-kitchen #admin-view {
+        display: none !important;
       }
 
       .panel,
@@ -840,13 +942,19 @@
     </header>
 
     <nav class="page-nav no-print" aria-label="画面の切り替え">
-      <button type="button" class="nav-button is-active" data-view="resident-view">利用者向け献立表</button>
-      <button type="button" class="nav-button" data-view="kitchen-view">調理士向け指示書</button>
-      <button type="button" class="nav-button admin-only" data-view="admin-view">管理画面</button>
-      <button type="button" class="nav-button no-print" id="print-resident-button">利用者向けを印刷</button>
-      <button type="button" class="nav-button no-print" id="print-kitchen-button">調理士向けを印刷</button>
+      <div class="nav-group nav-group--views">
+        <button type="button" class="nav-button nav-button--resident is-active" data-view="resident-view">献立表</button>
+        <button type="button" class="nav-button nav-button--kitchen" data-view="kitchen-view">指示書</button>
+      </div>
+      <div class="nav-divider" aria-hidden="true"></div>
+      <div class="nav-group nav-group--actions">
+        <button type="button" class="nav-button nav-button--action-resident no-print" id="print-current-button">印刷</button>
+      </div>
+      <div class="nav-divider" aria-hidden="true"></div>
+      <div class="nav-group nav-group--admin">
+        <button type="button" class="nav-button nav-button--admin admin-only" data-view="admin-view">管理画面</button>
+      </div>
     </nav>
-
     <section id="resident-view" class="view is-active is-print-target"></section>
     <section id="kitchen-view" class="view"></section>
     <section id="admin-view" class="view admin-only"></section>
@@ -946,6 +1054,7 @@
       goals: { ...DEFAULT_GOALS, ...loadStorage(STORAGE_KEYS.goals, {}) },
       settings: { ...DEFAULT_SETTINGS, ...loadStorage(STORAGE_KEYS.settings, {}) },
       selectedView: "resident-view",
+      currentView: "resident",
       selectedRecipeId: null,
       ingredientDrafts: [],
       printTarget: "resident-view",
@@ -959,8 +1068,7 @@
       kitchenView: document.querySelector("#kitchen-view"),
       adminView: document.querySelector("#admin-view"),
       navButtons: Array.from(document.querySelectorAll(".nav-button[data-view]")),
-      printResidentButton: document.querySelector("#print-resident-button"),
-      printKitchenButton: document.querySelector("#print-kitchen-button"),
+      printCurrentButton: document.querySelector("#print-current-button"),
     };
     globalThis.elements = elements;
 
@@ -1778,6 +1886,83 @@ function formatWeekLabel(weekStart) {
       `;
     }
 
+    function pickShuffledRecipeId(category, currentValue, excludeIds = []) {
+      const recipes = getAllRecipes().filter((recipe) => recipe.category === category);
+      if (!recipes.length) {
+        return currentValue || null;
+      }
+      const freshPool = recipes.filter((recipe) => recipe.id !== currentValue && !excludeIds.includes(recipe.id));
+      if (freshPool.length) {
+        return freshPool[Math.floor(Math.random() * freshPool.length)].id;
+      }
+      const relaxedPool = recipes.filter((recipe) => recipe.id !== currentValue);
+      if (relaxedPool.length) {
+        return relaxedPool[Math.floor(Math.random() * relaxedPool.length)].id;
+      }
+      return recipes[Math.floor(Math.random() * recipes.length)].id;
+    }
+
+    function buildShuffledDayMenu(dayMenu) {
+      const nextDayMenu = {
+        ...dayMenu,
+        basic: { ...dayMenu.basic },
+        exception: { ...dayMenu.exception },
+      };
+
+      if (dayMenu.mode === "exception") {
+        nextDayMenu.exception.singleDish = pickShuffledRecipeId("単品料理", dayMenu.exception.singleDish);
+        nextDayMenu.exception.extraSoup = pickShuffledRecipeId("汁物", dayMenu.exception.extraSoup);
+        nextDayMenu.exception.extraSide = pickShuffledRecipeId("副菜", dayMenu.exception.extraSide);
+        nextDayMenu.exception.extraDessert = pickShuffledRecipeId("デザート", dayMenu.exception.extraDessert);
+        return nextDayMenu;
+      }
+
+      const usedIds = [];
+      nextDayMenu.basic.staple = pickShuffledRecipeId("主食", dayMenu.basic.staple, usedIds);
+      if (nextDayMenu.basic.staple) usedIds.push(nextDayMenu.basic.staple);
+      nextDayMenu.basic.soup = pickShuffledRecipeId("汁物", dayMenu.basic.soup, usedIds);
+      if (nextDayMenu.basic.soup) usedIds.push(nextDayMenu.basic.soup);
+      nextDayMenu.basic.main = pickShuffledRecipeId("主菜", dayMenu.basic.main, usedIds);
+      if (nextDayMenu.basic.main) usedIds.push(nextDayMenu.basic.main);
+      nextDayMenu.basic.side1 = pickShuffledRecipeId("副菜", dayMenu.basic.side1, usedIds);
+      if (nextDayMenu.basic.side1) usedIds.push(nextDayMenu.basic.side1);
+      nextDayMenu.basic.side2 = pickShuffledRecipeId("副菜", dayMenu.basic.side2, usedIds);
+      if (nextDayMenu.basic.side2) usedIds.push(nextDayMenu.basic.side2);
+      nextDayMenu.basic.dessert = pickShuffledRecipeId("デザート", dayMenu.basic.dessert, usedIds);
+      return nextDayMenu;
+    }
+
+    function applyDayMenuToDom(dayKey, dayMenu, triggerButton = null) {
+      const setInputValue = (selector, value) => {
+        const input = document.querySelector(selector);
+        if (input) {
+          input.value = value || "";
+        }
+      };
+
+      setInputValue(`[data-menu-day="${dayKey}"][data-menu-field="mode"]`, dayMenu.mode);
+      setInputValue(`[data-menu-day="${dayKey}"][data-menu-mode="basic"][data-menu-field="staple"]`, dayMenu.basic.staple);
+      setInputValue(`[data-menu-day="${dayKey}"][data-menu-mode="basic"][data-menu-field="soup"]`, dayMenu.basic.soup);
+      setInputValue(`[data-menu-day="${dayKey}"][data-menu-mode="basic"][data-menu-field="main"]`, dayMenu.basic.main);
+      setInputValue(`[data-menu-day="${dayKey}"][data-menu-mode="basic"][data-menu-field="side1"]`, dayMenu.basic.side1);
+      setInputValue(`[data-menu-day="${dayKey}"][data-menu-mode="basic"][data-menu-field="side2"]`, dayMenu.basic.side2);
+      setInputValue(`[data-menu-day="${dayKey}"][data-menu-mode="basic"][data-menu-field="dessert"]`, dayMenu.basic.dessert);
+      setInputValue(`[data-menu-day="${dayKey}"][data-menu-mode="exception"][data-menu-field="singleDish"]`, dayMenu.exception.singleDish);
+      setInputValue(`[data-menu-day="${dayKey}"][data-menu-mode="exception"][data-menu-field="extraSoup"]`, dayMenu.exception.extraSoup);
+      setInputValue(`[data-menu-day="${dayKey}"][data-menu-mode="exception"][data-menu-field="extraSide"]`, dayMenu.exception.extraSide);
+      setInputValue(`[data-menu-day="${dayKey}"][data-menu-mode="exception"][data-menu-field="extraDessert"]`, dayMenu.exception.extraDessert);
+      setInputValue(`[data-menu-day="${dayKey}"][data-menu-field="memo"]`, dayMenu.memo);
+
+      const card = triggerButton?.closest(".menu-card");
+      const checkGrid = card?.querySelector(".check-grid");
+      if (checkGrid) {
+        checkGrid.innerHTML = renderConditionCards(evaluateDayMenu(dayMenu));
+      }
+      if (elements.heroEnergy) {
+        elements.heroEnergy.textContent = `${formatNumber(evaluateDayMenu(dayMenu).totals.energy, 0)} kcal`;
+      }
+    }
+
     function bindAdminViewEvents() {
       const weekStartInput = document.querySelector("#admin-week-start");
       const kitchenServingsInput = document.querySelector("#admin-kitchen-servings");
@@ -1815,14 +2000,24 @@ function formatWeekLabel(weekStart) {
           }
         });
       });
-const shuffleButtons = Array.from(document.querySelectorAll("[data-shuffle-day]"));
+      const shuffleButtons = Array.from(document.querySelectorAll("[data-shuffle-day]"));
 
-shuffleButtons.forEach((button) => {
-  button.addEventListener("click", () => {
-    const dayKey = button.dataset.shuffleDay;
-    console.log("shuffle day:", dayKey);
-  });
-});
+      shuffleButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          const dayKey = button.dataset.shuffleDay;
+          if (!dayKey) {
+            return;
+          }
+          const draftWeek = collectWeekDraftFromDom();
+          const currentDayMenu = draftWeek[dayKey];
+          if (!currentDayMenu) {
+            return;
+          }
+          const nextDayMenu = buildShuffledDayMenu(currentDayMenu);
+          applyDayMenuToDom(dayKey, nextDayMenu, button);
+        });
+      });
+
       saveWeekButton?.addEventListener("click", () => {
         const nextWeek = collectWeekDraftFromDom();
         state.weeklyMenus[state.settings.weekStart] = nextWeek;
@@ -1860,12 +2055,17 @@ shuffleButtons.forEach((button) => {
 
       return draft;
     }
-  </script><script src="./enhancements.js?v=20260413-openai3"></script>
+  </script><script src="./enhancements.js?v=20260429-restore-print1"></script>
   <script>
     (function () {
       const viewIds = ["resident-view", "kitchen-view", "admin-view"];
 
       function setActiveView(viewId, logLabel) {
+        const currentView = viewId === "resident-view" ? "resident" : (viewId === "kitchen-view" ? "kitchen" : "admin");
+        if (window.state) {
+          window.state.selectedView = viewId;
+          window.state.currentView = currentView;
+        }
         viewIds.forEach((id) => {
           const section = document.getElementById(id);
           if (!section) {
@@ -1884,27 +2084,161 @@ shuffleButtons.forEach((button) => {
       }
 
       function bindTopButtons() {
+        const syncViewState = function (viewId) {
+          const currentView = viewId === "resident-view" ? "resident" : (viewId === "kitchen-view" ? "kitchen" : "admin");
+          if (window.state) {
+            window.state.selectedView = viewId;
+            window.state.currentView = currentView;
+            window.state.printTarget = viewId === "admin-view" ? "" : viewId;
+          }
+          document.body.classList.remove("printing-resident", "printing-kitchen");
+        };
         const residentButton = document.querySelector('.nav-button[data-view="resident-view"]');
         const kitchenButton = document.querySelector('.nav-button[data-view="kitchen-view"]');
         const adminButton = document.querySelector('.nav-button[data-view="admin-view"]');
-        const residentPrintButton = document.getElementById("print-resident-button");
-        const kitchenPrintButton = document.getElementById("print-kitchen-button");
+        const printButton = document.getElementById("print-current-button");
+        const getActiveViewForPrint = function () {
+          const resident = document.getElementById("resident-view");
+          const kitchen = document.getElementById("kitchen-view");
+          const admin = document.getElementById("admin-view");
+          const isVisible = function (element) {
+            if (!element) {
+              return false;
+            }
+            const style = window.getComputedStyle(element);
+            return !element.hidden
+              && style.display !== "none"
+              && style.visibility !== "hidden"
+              && (element.classList.contains("is-active") || element.offsetParent !== null);
+          };
+          if (isVisible(kitchen)) return "kitchen";
+          if (isVisible(resident)) return "resident";
+          if (isVisible(admin)) return "admin";
+          return window.state?.currentView || "resident";
+        };
+        const updatePrintBodyClass = function (currentView) {
+          document.body.classList.remove("printing-resident", "printing-kitchen");
+          if (currentView === "resident") {
+            document.body.classList.add("printing-resident");
+          }
+          if (currentView === "kitchen") {
+            document.body.classList.add("printing-kitchen");
+          }
+        };
+        const updateActionButtons = function () {
+          const currentView = getActiveViewForPrint();
+          [printButton].forEach((button) => {
+            if (!button) {
+              return;
+            }
+            button.classList.remove("nav-button--action-resident", "nav-button--action-kitchen", "nav-button--action-disabled");
+            if (currentView === "resident") {
+              button.classList.add("nav-button--action-resident");
+            } else if (currentView === "kitchen") {
+              button.classList.add("nav-button--action-kitchen");
+            } else {
+              button.classList.add("nav-button--action-disabled");
+            }
+          });
+        };
+        const showUnavailableMessage = function () {
+          window.alert("献立表または指示書を選択してください");
+        };
+        const printIsolatedView = function (view) {
+          const sourceId = view === "resident" ? "resident-view" : "kitchen-view";
+          const source = document.getElementById(sourceId);
+          if (!source) {
+            return;
+          }
+          const iframe = document.createElement("iframe");
+          iframe.setAttribute("aria-hidden", "true");
+          iframe.style.position = "fixed";
+          iframe.style.right = "0";
+          iframe.style.bottom = "0";
+          iframe.style.width = "0";
+          iframe.style.height = "0";
+          iframe.style.border = "0";
+          document.body.appendChild(iframe);
+          const printWindow = iframe.contentWindow;
+          const printDocument = printWindow.document;
+          const copiedStyles = Array.from(document.querySelectorAll('style, link[rel="stylesheet"]'))
+            .map((node) => node.outerHTML)
+            .join("\n");
+          const pageCss = view === "resident"
+            ? "@page { size: A4 landscape; margin: 6mm; }"
+            : "@page { size: A4 portrait; margin: 7mm; }";
+          printDocument.open();
+          printDocument.write(`<!doctype html><html><head><meta charset="utf-8"><title>print</title>${copiedStyles}<style>${pageCss}@media print { html, body { margin:0; padding:0; background:#fff; -webkit-print-color-adjust:exact; print-color-adjust:exact; } }</style></head><body class="${view === "resident" ? "printing-resident" : "printing-kitchen"}"></body></html>`);
+          printDocument.close();
+          const shell = printDocument.createElement("div");
+          shell.className = "app-shell";
+          const clone = source.cloneNode(true);
+          clone.classList.add("is-active", "is-print-target");
+          clone.style.display = "grid";
+          shell.appendChild(clone);
+          printDocument.body.appendChild(shell);
+          const cleanup = function () {
+            try {
+              printWindow.removeEventListener("afterprint", cleanup);
+            } catch (error) {}
+            window.setTimeout(function () {
+              if (iframe.parentNode) {
+                iframe.parentNode.removeChild(iframe);
+              }
+            }, 150);
+          };
+          try {
+            printWindow.addEventListener("afterprint", cleanup, { once: true });
+          } catch (error) {}
+          window.setTimeout(function () {
+            printWindow.focus();
+            printWindow.print();
+            window.setTimeout(cleanup, 1000);
+          }, 80);
+        };
+        const openPrintDialogForCurrentView = function () {
+          const currentView = getActiveViewForPrint();
+          if (currentView === "admin") {
+            showUnavailableMessage();
+            return;
+          }
+          if (window.state) {
+            window.state.currentView = currentView;
+            window.state.printTarget = currentView === "resident" ? "resident-view" : "kitchen-view";
+          }
+          printIsolatedView(currentView);
+        };
+        window.addEventListener("afterprint", function () {
+          updatePrintBodyClass("");
+          syncViewState(window.state?.selectedView || "resident-view");
+          setActiveView(window.state?.selectedView || "resident-view", "afterprint restore");
+        });
 
         if (residentButton) {
           residentButton.onclick = function () {
+            syncViewState("resident-view");
             setActiveView("resident-view", "利用者向け献立表 clicked");
+            updateActionButtons();
           };
         }
         if (kitchenButton) {
           kitchenButton.onclick = function () {
+            syncViewState("kitchen-view");
             setActiveView("kitchen-view", "調理室向け指示書 clicked");
+            updateActionButtons();
           };
         }
         if (adminButton) {
           adminButton.onclick = function () {
+            syncViewState("admin-view");
             setActiveView("admin-view", "管理画面 clicked");
+            updateActionButtons();
           };
         }
+        if (printButton) {
+          printButton.onclick = openPrintDialogForCurrentView;
+        }
+        updateActionButtons();
       }
 
       if (document.readyState === "loading") {
