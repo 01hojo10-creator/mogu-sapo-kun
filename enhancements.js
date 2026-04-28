@@ -4533,17 +4533,21 @@
       .resident-footer-app { text-align:left; }
     }
     @media print {
+      html:has(body.printing-resident),
+      body.printing-resident,
       html:has(#resident-view.is-print-target),
       body:has(#resident-view.is-print-target) {
         width:auto !important;
       }
 
+      body.printing-resident .app-shell,
       body:has(#resident-view.is-print-target) .app-shell {
         width:100% !important;
       }
 
       @page resident-landscape { size:A4 landscape; margin:6mm; }
 
+      body.printing-resident #resident-view .resident-friendly-panel,
       #resident-view.is-print-target .resident-friendly-panel {
         page:resident-landscape;
         padding:0 !important;
@@ -4901,31 +4905,142 @@
     Array.from(document.querySelectorAll('.nav-button[data-view]')).forEach((button) => {
       button.classList.toggle('is-active', button.dataset.view === state.selectedView);
     });
+    updateTopNavigationActionButtons();
     console.log('[nav] renderViews', { selectedView: state.selectedView, printTarget: state.printTarget });
   };
-  function bindTopNavigationButtons() {
-    const activateView = (viewId, buttonName) => {
-      state.selectedView = viewId;
-      renderViews();
-      console.log(`[nav] ${buttonName} clicked`, { selectedView: state.selectedView });
+  function getCurrentTopView() {
+    if (state.selectedView === 'resident-view') return 'resident';
+    if (state.selectedView === 'kitchen-view') return 'kitchen';
+    return 'admin';
+  }
+  function getActiveViewForPrint() {
+    const resident = document.getElementById('resident-view');
+    const kitchen = document.getElementById('kitchen-view');
+    const admin = document.getElementById('admin-view');
+    const isVisible = (element) => {
+      if (!element) return false;
+      const style = window.getComputedStyle(element);
+      return !element.hidden
+        && style.display !== 'none'
+        && style.visibility !== 'hidden'
+        && (element.classList.contains('is-active') || element.offsetParent !== null);
     };
-    const printView = (viewId, buttonName) => {
+    if (isVisible(kitchen)) return 'kitchen';
+    if (isVisible(resident)) return 'resident';
+    if (isVisible(admin)) return 'admin';
+    return state.currentView || getCurrentTopView();
+  }
+  function updatePrintBodyClass(currentView) {
+    document.body.classList.remove('printing-resident', 'printing-kitchen');
+    if (currentView === 'resident') document.body.classList.add('printing-resident');
+    if (currentView === 'kitchen') document.body.classList.add('printing-kitchen');
+  }
+  function updateTopNavigationActionButtons() {
+    const printButton = document.querySelector('#print-current-button');
+    const currentView = getActiveViewForPrint();
+    [printButton].forEach((button) => {
+      if (!button) return;
+      button.classList.remove('nav-button--action-resident', 'nav-button--action-kitchen', 'nav-button--action-disabled');
+      if (currentView === 'resident') {
+        button.classList.add('nav-button--action-resident');
+      } else if (currentView === 'kitchen') {
+        button.classList.add('nav-button--action-kitchen');
+      } else {
+        button.classList.add('nav-button--action-disabled');
+      }
+    });
+  }
+  function printIsolatedView(view) {
+    const sourceId = view === 'resident' ? 'resident-view' : 'kitchen-view';
+    const source = document.getElementById(sourceId);
+    if (!source) return;
+    const iframe = document.createElement('iframe');
+    iframe.setAttribute('aria-hidden', 'true');
+    iframe.style.position = 'fixed';
+    iframe.style.right = '0';
+    iframe.style.bottom = '0';
+    iframe.style.width = '0';
+    iframe.style.height = '0';
+    iframe.style.border = '0';
+    document.body.appendChild(iframe);
+    const printWindow = iframe.contentWindow;
+    const printDocument = printWindow.document;
+    const copiedStyles = Array.from(document.querySelectorAll('style, link[rel="stylesheet"]'))
+      .map((node) => node.outerHTML)
+      .join('\n');
+    const pageCss = view === 'resident'
+      ? '@page { size: A4 landscape; margin: 6mm; }'
+      : '@page { size: A4 portrait; margin: 7mm; }';
+    printDocument.open();
+    printDocument.write(`<!doctype html><html><head><meta charset="utf-8"><title>print</title>${copiedStyles}<style>${pageCss}@media print { html, body { margin:0; padding:0; background:#fff; -webkit-print-color-adjust:exact; print-color-adjust:exact; } }</style></head><body class="${view === 'resident' ? 'printing-resident' : 'printing-kitchen'}"></body></html>`);
+    printDocument.close();
+    const shell = printDocument.createElement('div');
+    shell.className = 'app-shell';
+    const clone = source.cloneNode(true);
+    clone.classList.add('is-active', 'is-print-target');
+    clone.style.display = 'grid';
+    shell.appendChild(clone);
+    printDocument.body.appendChild(shell);
+    const cleanup = () => {
+      try {
+        printWindow.removeEventListener('afterprint', cleanup);
+      } catch (error) {}
+      window.setTimeout(() => {
+        if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
+      }, 150);
+    };
+    try {
+      printWindow.addEventListener('afterprint', cleanup, { once: true });
+    } catch (error) {}
+    window.setTimeout(() => {
+      printWindow.focus();
+      printWindow.print();
+      window.setTimeout(cleanup, 1000);
+    }, 80);
+  }
+  function bindTopNavigationButtons() {
+    const syncViewState = (viewId) => {
       state.selectedView = viewId;
-      state.printTarget = viewId;
+      state.currentView = viewId === 'resident-view' ? 'resident' : (viewId === 'kitchen-view' ? 'kitchen' : 'admin');
+      state.printTarget = viewId === 'admin-view' ? '' : viewId;
+      updatePrintBodyClass('');
+    };
+    const activateView = (viewId, buttonName) => {
+      syncViewState(viewId);
       renderViews();
-      console.log(`[nav] ${buttonName} clicked`, { selectedView: state.selectedView, printTarget: state.printTarget });
-      window.setTimeout(() => window.print(), 0);
+      console.log(`[nav] ${buttonName} clicked`, { selectedView: state.selectedView, currentView: state.currentView, printTarget: state.printTarget });
+    };
+    const showUnavailableMessage = () => {
+      window.alert('献立表または指示書を選択してください');
+    };
+    const openPrintDialogForCurrentView = () => {
+      const currentView = getActiveViewForPrint();
+      state.currentView = currentView;
+      if (currentView === 'admin') {
+        showUnavailableMessage();
+        return;
+      }
+      state.printTarget = currentView === 'resident' ? 'resident-view' : 'kitchen-view';
+      renderViews();
+      console.log('[nav] 印刷 clicked', { currentView: state.currentView, selectedView: state.selectedView, printTarget: state.printTarget });
+      printIsolatedView(currentView);
     };
     const residentButton = document.querySelector('.nav-button[data-view="resident-view"]');
     const kitchenButton = document.querySelector('.nav-button[data-view="kitchen-view"]');
     const adminButton = document.querySelector('.nav-button[data-view="admin-view"]');
-    const residentPrintButton = document.querySelector('#print-resident-button');
-    const kitchenPrintButton = document.querySelector('#print-kitchen-button');
-    if (residentButton) residentButton.onclick = () => activateView('resident-view', '利用者向け献立表');
-    if (kitchenButton) kitchenButton.onclick = () => activateView('kitchen-view', '調理室向け指示書');
+    const printButton = document.querySelector('#print-current-button');
+    if (residentButton) residentButton.onclick = () => activateView('resident-view', '献立表');
+    if (kitchenButton) kitchenButton.onclick = () => activateView('kitchen-view', '指示書');
     if (adminButton) adminButton.onclick = () => activateView('admin-view', '管理画面');
-    if (residentPrintButton) residentPrintButton.onclick = () => printView('resident-view', '利用者向けを印刷');
-    if (kitchenPrintButton) kitchenPrintButton.onclick = () => printView('kitchen-view', '調理室向けを印刷');
+    if (printButton) printButton.onclick = openPrintDialogForCurrentView;
+    if (!window.__moguTopNavAfterPrintBound) {
+      window.addEventListener('afterprint', () => {
+        updatePrintBodyClass('');
+        syncViewState(state.selectedView || 'resident-view');
+        renderViews();
+      });
+      window.__moguTopNavAfterPrintBound = true;
+    }
     activateView(state.selectedView || 'resident-view', '初期表示');
   }
   renderAll = function () {
