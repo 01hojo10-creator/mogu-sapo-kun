@@ -1095,6 +1095,21 @@
     let viewRenderCycle = 0;
     let deferredViewRenderCycle = 0;
     const renderedViewCycle = { resident: 0, kitchen: 0, admin: 0 };
+    function invalidateMenuDisplayViews() {
+      renderedViewCycle.resident = -1;
+      renderedViewCycle.kitchen = -1;
+    }
+    function syncMenuDisplayViewsAfterWeekSave() {
+      invalidateMenuDisplayViews();
+      updateHeroSummary();
+      if (state.selectedView === "resident-view") {
+        renderNamedView("resident-view");
+        return;
+      }
+      if (state.selectedView === "kitchen-view") {
+        renderNamedView("kitchen-view");
+      }
+    }
 
     function scheduleDeferredRender(task) {
       if (typeof window.requestIdleCallback === "function") {
@@ -2085,7 +2100,7 @@ function formatWeekLabel(weekStart) {
         state.weeklyMenus[state.settings.weekStart] = generatedWeek;
         saveStorage(STORAGE_KEYS.weeklyMenus, state.weeklyMenus);
         saveStorage(STORAGE_KEYS.settings, state.settings);
-        updateHeroSummary();
+        syncMenuDisplayViewsAfterWeekSave();
         renderAdminView();
       }).catch((error) => {
         console.error(error);
@@ -2282,7 +2297,8 @@ function formatWeekLabel(weekStart) {
         const nextWeek = collectWeekDraftFromDom();
         state.weeklyMenus[state.settings.weekStart] = nextWeek;
         saveStorage(STORAGE_KEYS.weeklyMenus, state.weeklyMenus);
-        renderAll();
+        syncMenuDisplayViewsAfterWeekSave();
+        renderAdminView();
       });
 
       document.querySelector("#admin-create-week-button")?.addEventListener("click", () => {
@@ -2319,7 +2335,7 @@ function formatWeekLabel(weekStart) {
 
       return draft;
     }
-  </script><script src="./enhancements.js?v=20260429-adminweek1"></script>
+  </script><script src="./enhancements.js?v=20260429-syncviews1"></script>
   <script>
     (function () {
       const viewIds = ["resident-view", "kitchen-view", "admin-view"];
@@ -2330,7 +2346,11 @@ function formatWeekLabel(weekStart) {
           window.state.selectedView = viewId;
           window.state.currentView = currentView;
         }
-        ensureViewRendered(viewId);
+        if (viewId === "resident-view" || viewId === "kitchen-view") {
+          renderNamedView(viewId);
+        } else {
+          ensureViewRendered(viewId);
+        }
         viewIds.forEach((id) => {
           const section = document.getElementById(id);
           if (!section) {
