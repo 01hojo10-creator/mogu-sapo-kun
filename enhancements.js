@@ -2445,7 +2445,7 @@
     document.querySelector('#admin-kitchen-servings')?.addEventListener('change', (event) => { state.settings.kitchenServings = Math.max(1, Number(event.target.value || 1)); saveStorage(STORAGE_KEYS.settings, state.settings); renderAll(); });
     document.querySelector('#auto-generate-button')?.addEventListener('click', () => { state.weeklyMenus[state.settings.weekStart] = generateAutoWeek(state.settings.weekStart); saveStorage(STORAGE_KEYS.weeklyMenus, state.weeklyMenus); renderAll(); });
     document.querySelector('#regenerate-week-button')?.addEventListener('click', () => { state.weeklyMenus[state.settings.weekStart] = generateAutoWeek(state.settings.weekStart); saveStorage(STORAGE_KEYS.weeklyMenus, state.weeklyMenus); renderAll(); });
-    document.querySelector('#save-week-button')?.addEventListener('click', () => { state.weeklyMenus[state.settings.weekStart] = collectWeekDraftFromDom(); saveStorage(STORAGE_KEYS.weeklyMenus, state.weeklyMenus); renderAll(); });
+    document.querySelector('#save-week-button')?.addEventListener('click', () => { state.weeklyMenus[state.settings.weekStart] = collectWeekDraftFromDom(); saveStorage(STORAGE_KEYS.weeklyMenus, state.weeklyMenus); syncMenuDisplayViewsAfterWeekSave(); renderAdminView(); });
     Array.from(document.querySelectorAll('[data-recipe-card]')).forEach((card) => { card.addEventListener('click', () => { state.selectedRecipeId = card.dataset.recipeCard; state.recipeMasterMode = "view"; state.recipeMasterDraft = null; state.recipeMasterDraftError = ""; renderAdminView(); }); });
   };
   STORAGE_KEYS.menuHistory = STORAGE_KEYS.menuHistory || "nutrition-kun::menu-history";
@@ -3491,14 +3491,15 @@
     document.querySelector('#save-week-button')?.addEventListener('click', () => {
       const validatedWeek = finalizeWeekForSave(state.settings.weekStart, collectWeekDraftFromDom(), false);
       if (!validatedWeek) {
-        renderAll();
+        renderAdminView();
         return;
       }
       state.weeklyMenus[state.settings.weekStart] = validatedWeek;
       syncMenuHistoryStorage();
       saveStorage(STORAGE_KEYS.weeklyMenus, state.weeklyMenus);
       saveStorage(STORAGE_KEYS.settings, state.settings);
-      renderAll();
+      syncMenuDisplayViewsAfterWeekSave();
+      renderAdminView();
     });
     Array.from(document.querySelectorAll('[data-recipe-card]')).forEach((card) => { card.addEventListener('click', () => { state.selectedRecipeId = card.dataset.recipeCard; state.recipeMasterMode = "view"; state.recipeMasterDraft = null; state.recipeMasterDraftError = ""; renderAdminView(); }); });
     Array.from(document.querySelectorAll('[data-recipe-filter]')).forEach((button) => {
@@ -4372,7 +4373,7 @@
       syncMenuHistoryStorage();
       saveStorage(STORAGE_KEYS.weeklyMenus, state.weeklyMenus);
       saveStorage(STORAGE_KEYS.settings, state.settings);
-      if (typeof updateHeroSummary === "function") updateHeroSummary();
+      syncMenuDisplayViewsAfterWeekSave();
       const generationMeta = generateAutoWeekNonBlocking.lastRunMeta || {};
       state.adminWeekGenerationNotice = generationMeta.usedFallback || generationMeta.timedOutDays
         ? "献立作成に時間がかかったため、条件を緩めて作成しました。"
@@ -4459,7 +4460,7 @@
         currentWeek[dayKey] = draftWeek[dayKey];
         const validatedWeek = finalizeWeekForSave(state.settings.weekStart, currentWeek, false);
         if (!validatedWeek) {
-          renderAll();
+          renderAdminWeekPanelOnly();
           scheduleDaySaveFlashClear();
           return;
         }
@@ -4467,7 +4468,8 @@
         syncMenuHistoryStorage();
         saveStorage(STORAGE_KEYS.weeklyMenus, state.weeklyMenus);
         saveStorage(STORAGE_KEYS.settings, state.settings);
-        renderAll();
+        syncMenuDisplayViewsAfterWeekSave();
+        renderAdminWeekPanelOnly();
         scheduleDaySaveFlashClear();
       });
     });
@@ -5287,6 +5289,25 @@
   let viewRenderCycle = 0;
   let deferredViewRenderCycle = 0;
   const renderedViewCycle = { resident: 0, kitchen: 0, admin: 0 };
+  function invalidateMenuDisplayViews() {
+    renderedViewCycle.resident = -1;
+    renderedViewCycle.kitchen = -1;
+  }
+  function syncMenuDisplayViewsAfterWeekSave() {
+    invalidateMenuDisplayViews();
+    if (typeof updateHeroSummary === 'function') {
+      updateHeroSummary();
+    }
+    if (state.selectedView === 'resident-view') {
+      renderNamedView('resident-view');
+      renderViews();
+      return;
+    }
+    if (state.selectedView === 'kitchen-view') {
+      renderNamedView('kitchen-view');
+      renderViews();
+    }
+  }
   function scheduleDeferredRender(task) {
     if (typeof window.requestIdleCallback === 'function') {
       window.requestIdleCallback(task, { timeout: 300 });
@@ -5396,7 +5417,11 @@
     };
     const activateView = (viewId, buttonName) => {
       syncViewState(viewId);
-      ensureViewRendered(viewId);
+      if (viewId === 'resident-view' || viewId === 'kitchen-view') {
+        renderNamedView(viewId);
+      } else {
+        ensureViewRendered(viewId);
+      }
       renderViews();
       console.log(`[nav] ${buttonName} clicked`, { selectedView: state.selectedView, currentView: state.currentView, printTarget: state.printTarget });
     };
