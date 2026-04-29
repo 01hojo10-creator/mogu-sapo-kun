@@ -1827,6 +1827,15 @@
       saveStorage(STORAGE_KEYS.weeklyMenus, state.weeklyMenus);
     }
   }
+  function syncCurrentWeekMenuOnStartup() {
+    const currentWeekStart = mondayString(new Date());
+    const previousWeekStart = state.settings.weekStart;
+    state.settings.weekStart = currentWeekStart;
+    ensureWeekExists(currentWeekStart);
+    if (previousWeekStart !== currentWeekStart) {
+      saveStorage(STORAGE_KEYS.settings, state.settings);
+    }
+  }
   evaluateDayMenu = function (dayMenu) {
     const map = getRecipeMap();
     const recipes = getMenuRecipeIds(dayMenu).map((id) => map.get(id)).filter(Boolean);
@@ -2432,7 +2441,7 @@
     return week;
   };
   bindAdminViewEvents = function () {
-    document.querySelector('#admin-week-start')?.addEventListener('change', (event) => { state.settings.weekStart = event.target.value || mondayString(new Date()); ensureWeekExists(state.settings.weekStart); saveStorage(STORAGE_KEYS.settings, state.settings); renderAll(); });
+    document.querySelector('#admin-week-start')?.addEventListener('change', (event) => { switchAdminWeek(event.target.value || mondayString(new Date())); });
     document.querySelector('#admin-kitchen-servings')?.addEventListener('change', (event) => { state.settings.kitchenServings = Math.max(1, Number(event.target.value || 1)); saveStorage(STORAGE_KEYS.settings, state.settings); renderAll(); });
     document.querySelector('#auto-generate-button')?.addEventListener('click', () => { state.weeklyMenus[state.settings.weekStart] = generateAutoWeek(state.settings.weekStart); saveStorage(STORAGE_KEYS.weeklyMenus, state.weeklyMenus); renderAll(); });
     document.querySelector('#regenerate-week-button')?.addEventListener('click', () => { state.weeklyMenus[state.settings.weekStart] = generateAutoWeek(state.settings.weekStart); saveStorage(STORAGE_KEYS.weeklyMenus, state.weeklyMenus); renderAll(); });
@@ -3475,7 +3484,7 @@
     renderAll();
   }
   bindAdminViewEvents = function () {
-    document.querySelector('#admin-week-start')?.addEventListener('change', (event) => { state.settings.weekStart = event.target.value || mondayString(new Date()); ensureWeekExists(state.settings.weekStart); saveStorage(STORAGE_KEYS.settings, state.settings); renderAll(); });
+    document.querySelector('#admin-week-start')?.addEventListener('change', (event) => { switchAdminWeek(event.target.value || mondayString(new Date())); });
     document.querySelector('#admin-kitchen-servings')?.addEventListener('change', (event) => { state.settings.kitchenServings = Math.max(1, Number(event.target.value || 1)); saveStorage(STORAGE_KEYS.settings, state.settings); renderAll(); });
     document.querySelector('#admin-birthday-week')?.addEventListener('change', (event) => { setBirthdayWeekRuleEnabled(event.target.checked); saveStorage(STORAGE_KEYS.settings, state.settings); renderAll(); });
     document.querySelector('#regenerate-week-button')?.addEventListener('click', () => { regenerateWeekFromScratch(state.settings.weekStart); });
@@ -4106,9 +4115,330 @@
     }).join("");
     return `<div class="section-head weekly-editor-head"><div><p class="section-kicker">Weekly Editor</p><h2>5日分献立編集</h2></div>${settingsMarkup}</div><div class="weekly-editor-scroll"><div class="weekly-editor-card-grid">${cards}</div></div>`;
   }
+  let adminWeekSwitchToken = 0;
+  function hasSavedAdminWeek(weekStart) {
+    const storedWeek = state.weeklyMenus?.[weekStart];
+    return Boolean(storedWeek && hasRenderableWeekData(storedWeek));
+  }
+  function renderAdminEmptyWeekPanel() {
+    return `<div class="section-head"><div><p class="section-kicker">Weekly Editor</p><h2>5日分献立編集</h2></div></div><div class="empty-state"><p>この週の献立はまだ作成されていません</p><button type="button" class="button button-primary" id="admin-create-week-button">この週の献立を作成</button></div>`;
+  }
+  function renderAdminRecipeMasterSection() {
+    return renderRecipeMasterPanel(getAllRecipes());
+  }
+  function renderAdminCreateWeekProgressPanel(message, disabled = true) {
+    return `<div class="section-head"><div><p class="section-kicker">Weekly Editor</p><h2>5日分献立編集</h2></div></div><div class="empty-state"><p class="muted" id="admin-create-week-status">${escapeHtml(message)}</p><button type="button" class="button button-primary" id="admin-create-week-button" ${disabled ? "disabled" : ""}>この週の献立を作成</button></div>`;
+  }
+  function renderAdminEmptyWeekView() {
+    const birthdayChecked = isBirthdayRuleEnabled() ? "checked" : "";
+    elements.adminView.innerHTML = `<article class="panel"><div class="section-head"><div><p class="section-kicker">Admin</p><h2>管理画面</h2></div></div><div class="toolbar"><label class="field"><span>週の開始日</span><input id="admin-week-start" type="date" value="${escapeHtml(state.settings.weekStart)}"></label><label class="field"><span>調理人数</span><input id="admin-kitchen-servings" type="number" min="1" step="1" value="${escapeHtml(state.settings.kitchenServings)}"></label><label class="field"><span>誕生日週ルールを第3週に適用</span><input id="admin-birthday-week" type="checkbox" ${birthdayChecked}></label></div><p class="print-note">この週の献立はまだ作成されていません。</p></article><article class="panel weekly-editor-panel">${renderAdminEmptyWeekPanel()}</article>${renderAdminRecipeMasterSection()}`;
+    bindAdminViewEvents();
+    bindWeeklyEditorPanelEvents();
+  }
+  function waitForAdminGenerationYield() {
+    return new Promise((resolve) => window.setTimeout(resolve, 0));
+  }
+  async function generateAutoWeekNonBlocking(weekStart, onProgress) {
+    const MAX_DAY_MS = 800;
+    const MAX_BASIC_ATTEMPTS = 8;
+    const MAX_EXCEPTION_ATTEMPTS = 3;
+    const week = createEmptyWeekMenu(weekStart);
+    const allRecipes = getAllRecipes();
+    const cachedPoolCategories = ["主食", "汁物", "主菜", "副菜", "デザート", "単品料理", "おやつ"];
+    const cachedPoolCuisines = ["all", ...CUISINES];
+    const recipePools = Object.fromEntries(
+      cachedPoolCategories.map((category) => [
+        category,
+        Object.fromEntries(
+          cachedPoolCuisines.map((cuisine) => [
+            cuisine,
+            allRecipes.filter((recipe) => recipe.category === category && (cuisine === "all" || recipe.cuisine === cuisine))
+          ])
+        )
+      ])
+    );
+    const getCachedRecipePool = (opts) => {
+      const excludes = new Set((opts.excludeIds || []).filter(Boolean));
+      const cuisineKey = opts.cuisine || "all";
+      const basePool = recipePools[opts.category]?.[cuisineKey] || [];
+      return basePool.filter((recipe) => !excludes.has(recipe.id) && recipe.nutrition.energy >= (opts.minEnergy || 0) && recipe.nutrition.energy <= (opts.maxEnergy || 9999));
+    };
+    const context = { cuisineCounts: { 和食: 0, 洋食: 0, 中華: 0 }, recipeUseCount: new Map(), mainRotationCount: new Map(), sideRotationCount: new Map(), dessertRotationCount: new Map(), dessertFruitCount: new Map(), dessertBaseCount: new Map(), lastMainId: null, lastMainRotationKey: null, lastDessertRotationKey: null, lastDessertFruitTag: null, lastDessertBaseTag: null, lastSideRotationKeys: new Set(), freshFruitDessertCount: 0, usedSideIds: new Set(), usedSideNames: new Set(), usedSnackIds: new Set() };
+    const usedSoupIds = new Set();
+    const usedMainIds = new Set();
+    const exceptionDays = [...WEEKDAY_KEYS].sort(() => Math.random() - 0.5).slice(0, 1);
+    const buildWeeklyVariedPool = (primaryPool, fallbackPool, usedIds, previousId) => {
+      const backupPool = fallbackPool || primaryPool;
+      const pools = [
+        primaryPool.filter((recipe) => !usedIds.has(recipe.id) && recipe.id !== previousId),
+        primaryPool.filter((recipe) => recipe.id !== previousId),
+        backupPool.filter((recipe) => !usedIds.has(recipe.id) && recipe.id !== previousId),
+        backupPool.filter((recipe) => recipe.id !== previousId),
+        primaryPool.filter((recipe) => !usedIds.has(recipe.id)),
+        backupPool.filter((recipe) => !usedIds.has(recipe.id)),
+        primaryPool,
+        backupPool
+      ];
+      return pools.find((pool) => pool.length) || [];
+    };
+    const pickFirstRecipe = (...pools) => {
+      for (const pool of pools) {
+        if (pool?.length) return pool[0];
+      }
+      return null;
+    };
+    const buildFallbackMenuForDay = (date, targetCuisine, previousSoupId, previousMainId, dayKey) => {
+      const staple = pickFirstRecipe(
+        getCachedRecipePool({ category: "主食", cuisine: targetCuisine, minEnergy: 100, maxEnergy: 230 }),
+        getCachedRecipePool({ category: "主食", minEnergy: 100, maxEnergy: 230 })
+      );
+      const soupBasePool = getCachedRecipePool({ category: "汁物", cuisine: targetCuisine, minEnergy: 15, maxEnergy: 90 });
+      const soup = pickFirstRecipe(
+        buildWeeklyVariedPool(soupBasePool, soupBasePool, usedSoupIds, previousSoupId),
+        getCachedRecipePool({ category: "汁物", minEnergy: 15, maxEnergy: 90 })
+      );
+      const mainBasePool = getCachedRecipePool({ category: "主菜", cuisine: targetCuisine, minEnergy: 140, maxEnergy: 280 });
+      const main = pickFirstRecipe(
+        buildWeeklyVariedPool(mainBasePool, mainBasePool, usedMainIds, previousMainId),
+        getCachedRecipePool({ category: "主菜", minEnergy: 140, maxEnergy: 280 })
+      );
+      const side1 = pickFirstRecipe(
+        filterPoolByUsedSideNames(getCachedRecipePool({ category: "副菜", cuisine: targetCuisine, minEnergy: 20, maxEnergy: 110, excludeIds: [...context.usedSideIds] }), context),
+        filterPoolByUsedSideNames(getCachedRecipePool({ category: "副菜", minEnergy: 20, maxEnergy: 110, excludeIds: [...context.usedSideIds] }), context),
+        getCachedRecipePool({ category: "副菜", minEnergy: 20, maxEnergy: 110 })
+      );
+      const side2 = side1
+        ? (pickSecondSideRecipe(targetCuisine, context, side1, (pool) => pool[0] || null, { excludeIds: [...context.usedSideIds], date })
+          || getCachedRecipePool({ category: "副菜", minEnergy: 20, maxEnergy: 110, excludeIds: [side1.id] }).find((recipe) => recipe.name !== side1.name)
+          || null)
+        : null;
+      const dessert = pickFirstRecipe(
+        getCachedRecipePool({ category: "デザート", minEnergy: 35, maxEnergy: 120 }),
+        getCachedRecipePool({ category: "デザート" })
+      );
+      const snack = pickFirstRecipe(
+        filterPreferredSnackRecipes(getCachedRecipePool({ category: "おやつ", minEnergy: 40, maxEnergy: 160, excludeIds: [...context.usedSnackIds] })),
+        filterPreferredSnackRecipes(getCachedRecipePool({ category: "おやつ", minEnergy: 40, maxEnergy: 160 })),
+        getCachedRecipePool({ category: "おやつ" })
+      );
+      if (staple && soup && main && side1 && side2 && dessert && snack) {
+        return { date, mode: "basic", basic: { staple: staple.id, soup: soup.id, main: main.id, side1: side1.id, side2: side2.id, dessert: dessert.id }, exception: { singleDish: null, extraSoup: null, extraSide: null, extraDessert: null }, snack: snack.id, memo: `${targetCuisine}中心の自動献立`, generatedByAuto: true };
+      }
+      const singleDish = pickFirstRecipe(
+        getCachedRecipePool({ category: "単品料理", cuisine: targetCuisine, minEnergy: 320, maxEnergy: 520 }),
+        getCachedRecipePool({ category: "単品料理", minEnergy: 320, maxEnergy: 520 })
+      );
+      if (singleDish && snack) {
+        const extraSoup = pickFirstRecipe(
+          getCachedRecipePool({ category: "汁物", cuisine: singleDish.cuisine, minEnergy: 15, maxEnergy: 70 }),
+          getCachedRecipePool({ category: "汁物", minEnergy: 15, maxEnergy: 70 })
+        );
+        const extraSide = pickFirstRecipe(
+          getCachedRecipePool({ category: "副菜", cuisine: singleDish.cuisine, minEnergy: 25, maxEnergy: 90, excludeIds: [...context.usedSideIds] }),
+          getCachedRecipePool({ category: "副菜", minEnergy: 25, maxEnergy: 90, excludeIds: [...context.usedSideIds] })
+        );
+        const extraDessert = pickFirstRecipe(
+          getCachedRecipePool({ category: "デザート", minEnergy: 35, maxEnergy: 110 }),
+          getCachedRecipePool({ category: "デザート" })
+        );
+        return { date, mode: "exception", basic: { staple: null, soup: null, main: null, side1: null, side2: null, dessert: null }, exception: { singleDish: singleDish.id, extraSoup: extraSoup?.id || null, extraSide: extraSide?.id || null, extraDessert: extraDessert?.id || null }, snack: snack.id, memo: `${targetCuisine}中心の例外献立`, generatedByAuto: true };
+      }
+      console.warn(`[ADMIN_WEEK_GEN] ${WEEKDAY_LABELS[dayKey]} fallback failed, empty menu used`);
+      return createEmptyWeekMenu(weekStart)[dayKey];
+    };
+    let usedFallback = false;
+    let timedOutDays = 0;
+    for (let index = 0; index < WEEKDAY_KEYS.length; index += 1) {
+      const dayKey = WEEKDAY_KEYS[index];
+      if (typeof onProgress === "function") {
+        onProgress(index + 1, WEEKDAY_KEYS.length, dayKey);
+      }
+      console.log(`[ADMIN_WEEK_GEN] start ${WEEKDAY_LABELS[dayKey]} ${index + 1}/${WEEKDAY_KEYS.length}`);
+      await waitForAdminGenerationYield();
+      const date = addDays(weekStart, index);
+      const startedAt = performance.now();
+      const targetCuisine = chooseTargetCuisine(context.cuisineCounts, index);
+      const previousDayMenu = index > 0 ? week[WEEKDAY_KEYS[index - 1]] : null;
+      const previousSoupId = previousDayMenu?.basic?.soup || null;
+      const previousMainId = previousDayMenu?.basic?.main || null;
+      const candidates = [];
+      let basicAttempts = 0;
+      let exceptionAttempts = 0;
+      let timedOut = false;
+      for (let i = 0; i < MAX_BASIC_ATTEMPTS; i += 1) {
+        basicAttempts += 1;
+        if (performance.now() - startedAt > MAX_DAY_MS) {
+          timedOut = true;
+          timedOutDays += 1;
+          console.warn(`[ADMIN_WEEK_GEN] timeout ${WEEKDAY_LABELS[dayKey]} basic attempts=${basicAttempts}`);
+          break;
+        }
+        const staple = pickRecipeWithHistory(getCachedRecipePool({ category: "主食", cuisine: targetCuisine, minEnergy: 100, maxEnergy: 230 }), context, "staple", date);
+        const soupPool = getCachedRecipePool({ category: "汁物", cuisine: targetCuisine, minEnergy: 15, maxEnergy: 90 });
+        const soup = pickRecipeWithHistory(buildWeeklyVariedPool(soupPool, soupPool, usedSoupIds, previousSoupId), context, "soup", date);
+        const standardMainPool = getCachedRecipePool({ category: "主菜", cuisine: targetCuisine, minEnergy: 140, maxEnergy: 280 });
+        const mainPool = buildWeeklyVariedPool(standardMainPool, standardMainPool, usedMainIds, previousMainId);
+        const main = pickRecipeWithHistory(mainPool, context, "main", date, { excludeMainRotation: context.lastMainRotationKey });
+        const side1 = pickRecipeWithHistory(filterPoolByUsedSideNames(getCachedRecipePool({ category: "副菜", cuisine: targetCuisine, minEnergy: 20, maxEnergy: 110, excludeIds: [...context.usedSideIds] }), context), context, "side1", date);
+        const side2 = pickSecondSideRecipe(targetCuisine, context, side1, (pool, pickOptions) => pickRecipeWithHistory(pool, context, "side2", date, pickOptions), { excludeIds: [...context.usedSideIds], date });
+        const dessert = pickRecipeWithHistory(getCachedRecipePool({ category: "デザート", minEnergy: 35, maxEnergy: 120 }), context, "dessert", date, { excludeRotationKeys: new Set([context.lastDessertRotationKey].filter(Boolean)) });
+        const snack = pickRecipeWithHistory(filterPreferredSnackRecipes(getCachedRecipePool({ category: "おやつ", minEnergy: 40, maxEnergy: 160, excludeIds: [...context.usedSnackIds] })), context, "snack", date);
+        if (!(staple && soup && main && side1 && side2 && dessert && snack)) continue;
+        if (side1.id === side2.id || side1.name === side2.name) continue;
+        const menu = { date, mode: "basic", basic: { staple: staple.id, soup: soup.id, main: main.id, side1: side1.id, side2: side2.id, dessert: dessert.id }, exception: { singleDish: null, extraSoup: null, extraSide: null, extraDessert: null }, snack: snack.id, memo: `${targetCuisine}中心の自動献立`, generatedByAuto: true };
+        candidates.push({ menu, score: scoreMenu(menu, context, targetCuisine) });
+      }
+      for (let i = 0; i < MAX_EXCEPTION_ATTEMPTS; i += 1) {
+        exceptionAttempts += 1;
+        if (performance.now() - startedAt > MAX_DAY_MS) {
+          timedOut = true;
+          timedOutDays += 1;
+          console.warn(`[ADMIN_WEEK_GEN] timeout ${WEEKDAY_LABELS[dayKey]} exception attempts=${exceptionAttempts}`);
+          break;
+        }
+        const singleDish = pickRecipeWithHistory(getCachedRecipePool({ category: "単品料理", cuisine: targetCuisine, minEnergy: 320, maxEnergy: 520 }), context, "main", date, { excludeMainRotation: context.lastMainRotationKey });
+        const snack = pickRecipeWithHistory(filterPreferredSnackRecipes(getCachedRecipePool({ category: "おやつ", minEnergy: 40, maxEnergy: 160, excludeIds: [...context.usedSnackIds] })), context, "snack", date);
+        if (!(singleDish && snack)) continue;
+        const exceptionCuisine = singleDish.cuisine;
+        let extraSoup = null;
+        let extraSide = null;
+        let extraDessert = null;
+        if (singleDish.nutrition.energy < 470) {
+          extraSide = pickRecipeWithHistory(getCachedRecipePool({ category: "副菜", cuisine: exceptionCuisine, minEnergy: 25, maxEnergy: 90, excludeIds: [...context.usedSideIds] }), context, "side1", date);
+          extraDessert = pickRecipeWithHistory(getCachedRecipePool({ category: "デザート", minEnergy: 40, maxEnergy: 110 }), context, "dessert", date);
+        } else if (singleDish.nutrition.energy < 520) {
+          extraDessert = pickRecipeWithHistory(getCachedRecipePool({ category: "デザート", minEnergy: 35, maxEnergy: 90 }), context, "dessert", date);
+        }
+        if (singleDish.nutrition.salt < 2.2) extraSoup = pickRecipeWithHistory(getCachedRecipePool({ category: "汁物", cuisine: exceptionCuisine, minEnergy: 15, maxEnergy: 70 }), context, "soup", date);
+        const menu = { date, mode: "exception", basic: { staple: null, soup: null, main: null, side1: null, side2: null, dessert: null }, exception: { singleDish: singleDish.id, extraSoup: extraSoup?.id || null, extraSide: extraSide?.id || null, extraDessert: extraDessert?.id || null }, snack: snack.id, memo: `${targetCuisine}中心の例外献立`, generatedByAuto: true };
+        if (exceptionDays.includes(dayKey)) candidates.push({ menu, score: scoreMenu(menu, context, targetCuisine) - 8 });
+      }
+      const best = candidates.filter(Boolean).sort((a, b) => b.score - a.score)[0];
+      const dayUsedFallback = !best;
+      if (dayUsedFallback) {
+        usedFallback = true;
+        console.warn(`[ADMIN_WEEK_GEN] fallback used ${WEEKDAY_LABELS[dayKey]} attempts=${basicAttempts + exceptionAttempts} timeout=${timedOut}`);
+      } else {
+        console.log(`[ADMIN_WEEK_GEN] complete ${WEEKDAY_LABELS[dayKey]} attempts=${basicAttempts + exceptionAttempts} fallback=false timeout=${timedOut}`);
+      }
+      week[dayKey] = best ? best.menu : buildFallbackMenuForDay(date, targetCuisine, previousSoupId, previousMainId, dayKey);
+      if (week[dayKey]?.mode === "basic") {
+        if (week[dayKey].basic?.soup) usedSoupIds.add(week[dayKey].basic.soup);
+        if (week[dayKey].basic?.main) usedMainIds.add(week[dayKey].basic.main);
+      }
+      updateGenerationContext(week[dayKey], context);
+    }
+    generateAutoWeekNonBlocking.lastRunMeta = { usedFallback, timedOutDays };
+    return finalizeWeekForSave(weekStart, week, false) || createEmptyWeekMenu(weekStart);
+  }
+  async function renderAdminGeneratedWeekPanelOnly(generatedWeek) {
+    const weeklyEditorPanel = elements.adminView?.querySelector(".weekly-editor-panel");
+    if (!weeklyEditorPanel) {
+      renderAdminView();
+      return;
+    }
+    const temp = document.createElement("div");
+    temp.innerHTML = renderWeeklyEditorPanel(generatedWeek, getAllRecipes());
+    temp.querySelector(".weekly-editor-settings")?.remove();
+    const headMarkup = temp.querySelector(".weekly-editor-head")?.outerHTML || `<div class="section-head weekly-editor-head"><div><p class="section-kicker">Weekly Editor</p><h2>5日分献立編集</h2></div></div>`;
+    const cardMarkups = Array.from(temp.querySelectorAll(".weekly-editor-day-card")).map((card) => card.outerHTML);
+    weeklyEditorPanel.innerHTML = `${headMarkup}<div class="weekly-editor-scroll"><div class="weekly-editor-card-grid"></div></div>`;
+    if (state.adminWeekGenerationNotice) {
+      weeklyEditorPanel.insertAdjacentHTML("beforeend", `<p class="muted">${escapeHtml(state.adminWeekGenerationNotice)}</p>`);
+      state.adminWeekGenerationNotice = "";
+    }
+    const cardGrid = weeklyEditorPanel.querySelector(".weekly-editor-card-grid");
+    for (let index = 0; index < cardMarkups.length; index += 1) {
+      await waitForAdminGenerationYield();
+      cardGrid?.insertAdjacentHTML("beforeend", cardMarkups[index]);
+    }
+    bindWeeklyEditorPanelEvents();
+    syncWeeklyEditorModeCards();
+  }
+  async function createAdminWeekOnDemand() {
+    const weeklyEditorPanel = elements.adminView?.querySelector(".weekly-editor-panel");
+    if (weeklyEditorPanel) {
+      weeklyEditorPanel.innerHTML = renderAdminCreateWeekProgressPanel("献立を作成中です… 1/5", true);
+    }
+    try {
+      const generatedWeek = await generateAutoWeekNonBlocking(state.settings.weekStart, (step, total) => {
+        const status = elements.adminView?.querySelector("#admin-create-week-status");
+        if (status) {
+          const dayLabel = WEEKDAY_LABELS[WEEKDAY_KEYS[step - 1]] || "";
+          status.textContent = `献立を作成中です… ${dayLabel} ${step}/${total}`;
+        }
+      });
+      state.weeklyMenus[state.settings.weekStart] = generatedWeek;
+      syncMenuHistoryStorage();
+      saveStorage(STORAGE_KEYS.weeklyMenus, state.weeklyMenus);
+      saveStorage(STORAGE_KEYS.settings, state.settings);
+      if (typeof updateHeroSummary === "function") updateHeroSummary();
+      const generationMeta = generateAutoWeekNonBlocking.lastRunMeta || {};
+      state.adminWeekGenerationNotice = generationMeta.usedFallback || generationMeta.timedOutDays
+        ? "献立作成に時間がかかったため、条件を緩めて作成しました。"
+        : "";
+      await renderAdminGeneratedWeekPanelOnly(generatedWeek);
+    } catch (error) {
+      console.error(error);
+      if (weeklyEditorPanel) {
+        weeklyEditorPanel.innerHTML = renderAdminCreateWeekProgressPanel("献立作成に失敗しました。もう一度お試しください。", false);
+      }
+      bindWeeklyEditorPanelEvents();
+    }
+  }
+  function renderAdminWeekPanelOnly() {
+    const weeklyEditorPanel = elements.adminView?.querySelector(".weekly-editor-panel");
+    if (!weeklyEditorPanel) {
+      renderAdminView();
+      return;
+    }
+    if (!hasSavedAdminWeek(state.settings.weekStart)) {
+      weeklyEditorPanel.innerHTML = renderAdminEmptyWeekPanel();
+      bindWeeklyEditorPanelEvents();
+      return;
+    }
+    weeklyEditorPanel.innerHTML = renderWeeklyEditorPanel(getWeekMenus(state.settings.weekStart), getAllRecipes());
+    bindWeeklyEditorPanelEvents();
+    syncWeeklyEditorModeCards();
+  }
+  function switchAdminWeek(targetWeekStart) {
+    state.settings.weekStart = targetWeekStart || mondayString(new Date());
+    saveStorage(STORAGE_KEYS.settings, state.settings);
+    if (elements.heroWeekLabel) {
+      elements.heroWeekLabel.textContent = `対象週 ${formatWeekLabel(state.settings.weekStart)}`;
+    }
+    if (typeof updateHeroSummary === "function" && hasSavedAdminWeek(state.settings.weekStart)) {
+      updateHeroSummary();
+    } else if (elements.heroEnergy) {
+      elements.heroEnergy.textContent = `-- kcal`;
+    }
+    if (state.selectedView !== "admin-view") {
+      renderAll();
+      return;
+    }
+    if (!hasSavedAdminWeek(state.settings.weekStart)) {
+      renderAdminEmptyWeekView();
+      return;
+    }
+    const weeklyEditorPanel = elements.adminView?.querySelector(".weekly-editor-panel");
+    if (!weeklyEditorPanel) {
+      renderAdminView();
+      return;
+    }
+    weeklyEditorPanel.innerHTML = `<div class="muted">週の献立を読み込み中です…</div>`;
+    const token = ++adminWeekSwitchToken;
+    const schedule = typeof window.requestIdleCallback === "function"
+      ? (callback) => window.requestIdleCallback(callback, { timeout: 250 })
+      : (callback) => window.setTimeout(callback, 0);
+    schedule(() => {
+      if (token !== adminWeekSwitchToken) return;
+      renderAdminWeekPanelOnly();
+    });
+  }
   function bindWeeklyEditorPanelEvents() {
-    document.querySelector('#admin-week-start')?.addEventListener('change', (event) => { state.settings.weekStart = event.target.value || mondayString(new Date()); ensureWeekExists(state.settings.weekStart); saveStorage(STORAGE_KEYS.settings, state.settings); renderAll(); });
+    document.querySelector('#admin-week-start')?.addEventListener('change', (event) => { switchAdminWeek(event.target.value || mondayString(new Date())); });
     document.querySelector('#admin-birthday-week')?.addEventListener('change', (event) => { setBirthdayWeekRuleEnabled(event.target.checked); saveStorage(STORAGE_KEYS.settings, state.settings); renderAll(); });
+    document.querySelector('#admin-create-week-button')?.addEventListener('click', () => { createAdminWeekOnDemand(); });
     Array.from(document.querySelectorAll('[data-save-day]')).forEach((button) => {
       button.addEventListener('click', () => {
         const dayKey = button.dataset.saveDay;
@@ -4193,6 +4523,10 @@
   };
   const previousRenderAdminViewForWeeklyEditor = renderAdminView;
   renderAdminView = function () {
+    if (!hasSavedAdminWeek(state.settings.weekStart)) {
+      renderAdminEmptyWeekView();
+      return;
+    }
     previousRenderAdminViewForWeeklyEditor();
     const weeklyEditorPanel = Array.from(elements.adminView.querySelectorAll(".panel")).find((panel) => panel.querySelector(".section-kicker")?.textContent?.trim() === "Weekly Editor");
     if (weeklyEditorPanel) {
@@ -4950,6 +5284,61 @@
       }
     });
   }
+  let viewRenderCycle = 0;
+  let deferredViewRenderCycle = 0;
+  const renderedViewCycle = { resident: 0, kitchen: 0, admin: 0 };
+  function scheduleDeferredRender(task) {
+    if (typeof window.requestIdleCallback === 'function') {
+      window.requestIdleCallback(task, { timeout: 300 });
+      return;
+    }
+    window.setTimeout(task, 100);
+  }
+  function renderNamedView(viewId) {
+    if (viewId === 'resident-view') {
+      renderResidentView();
+      renderedViewCycle.resident = viewRenderCycle;
+      return;
+    }
+    if (viewId === 'kitchen-view') {
+      renderKitchenView();
+      renderedViewCycle.kitchen = viewRenderCycle;
+      return;
+    }
+    if (viewId === 'admin-view') {
+      renderAdminView();
+      renderedViewCycle.admin = viewRenderCycle;
+    }
+  }
+  function ensureViewRendered(viewId) {
+    if (viewId === 'resident-view' && renderedViewCycle.resident !== viewRenderCycle) {
+      renderNamedView(viewId);
+      return;
+    }
+    if (viewId === 'kitchen-view' && renderedViewCycle.kitchen !== viewRenderCycle) {
+      renderNamedView(viewId);
+      return;
+    }
+    if (viewId === 'admin-view' && renderedViewCycle.admin !== viewRenderCycle) {
+      renderNamedView(viewId);
+    }
+  }
+  function scheduleDeferredViews() {
+    const scheduledCycle = viewRenderCycle;
+    if (deferredViewRenderCycle === scheduledCycle) return;
+    deferredViewRenderCycle = scheduledCycle;
+    scheduleDeferredRender(() => {
+      if (scheduledCycle !== viewRenderCycle) return;
+      if (state.selectedView === 'resident-view') {
+        ensureViewRendered('kitchen-view');
+        ensureViewRendered('admin-view');
+        return;
+      }
+      if (state.selectedView === 'kitchen-view') {
+        ensureViewRendered('admin-view');
+      }
+    });
+  }
   function printIsolatedView(view) {
     const sourceId = view === 'resident' ? 'resident-view' : 'kitchen-view';
     const source = document.getElementById(sourceId);
@@ -5007,6 +5396,7 @@
     };
     const activateView = (viewId, buttonName) => {
       syncViewState(viewId);
+      ensureViewRendered(viewId);
       renderViews();
       console.log(`[nav] ${buttonName} clicked`, { selectedView: state.selectedView, currentView: state.currentView, printTarget: state.printTarget });
     };
@@ -5044,6 +5434,7 @@
     activateView(state.selectedView || 'resident-view', '初期表示');
   }
   renderAll = function () {
+    viewRenderCycle += 1;
     ensureWeekExists(state.settings.weekStart);
     syncMenuHistoryStorage();
     if (elements.heroWeekLabel) {
@@ -5051,12 +5442,13 @@
     }
     if (typeof updateHeroSummary === 'function') updateHeroSummary();
     if (typeof renderViews === 'function') renderViews();
-    renderResidentView();
-    renderKitchenView();
-    renderAdminView();
+    ensureViewRendered('resident-view');
+    if (state.selectedView === 'kitchen-view') ensureViewRendered('kitchen-view');
+    if (state.selectedView === 'admin-view') ensureViewRendered('admin-view');
     bindTopNavigationButtons();
+    scheduleDeferredViews();
   };
-  ensureWeekExists(state.settings.weekStart);
+  syncCurrentWeekMenuOnStartup();
   syncSelectedRecipe();
   renderAll();
 })();
