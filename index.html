@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>もぐサポ君</title>
+  <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="78" font-size="78">🍱</text></svg>'>
   <style>
     :root {
       color-scheme: light;
@@ -1075,6 +1076,7 @@
     init();
 
     function init() {
+      syncCurrentWeekMenuOnStartup();
       syncSelectedRecipe();
       bindEvents();
       renderAll();
@@ -1090,15 +1092,85 @@
 
     }
 
+    let viewRenderCycle = 0;
+    let deferredViewRenderCycle = 0;
+    const renderedViewCycle = { resident: 0, kitchen: 0, admin: 0 };
+
+    function scheduleDeferredRender(task) {
+      if (typeof window.requestIdleCallback === "function") {
+        window.requestIdleCallback(task, { timeout: 300 });
+        return;
+      }
+      window.setTimeout(task, 100);
+    }
+
+    function renderNamedView(viewId) {
+      if (viewId === "resident-view") {
+        renderResidentView();
+        renderedViewCycle.resident = viewRenderCycle;
+        return;
+      }
+      if (viewId === "kitchen-view") {
+        renderKitchenView();
+        renderedViewCycle.kitchen = viewRenderCycle;
+        return;
+      }
+      if (viewId === "admin-view") {
+        renderAdminView();
+        renderedViewCycle.admin = viewRenderCycle;
+      }
+    }
+
+    function ensureViewRendered(viewId) {
+      if (viewId === "resident-view" && renderedViewCycle.resident !== viewRenderCycle) {
+        renderNamedView(viewId);
+        return;
+      }
+      if (viewId === "kitchen-view" && renderedViewCycle.kitchen !== viewRenderCycle) {
+        renderNamedView(viewId);
+        return;
+      }
+      if (viewId === "admin-view" && renderedViewCycle.admin !== viewRenderCycle) {
+        renderNamedView(viewId);
+      }
+    }
+
+    function scheduleDeferredViews() {
+      const scheduledCycle = viewRenderCycle;
+      if (deferredViewRenderCycle === scheduledCycle) {
+        return;
+      }
+      deferredViewRenderCycle = scheduledCycle;
+      scheduleDeferredRender(function () {
+        if (scheduledCycle !== viewRenderCycle) {
+          return;
+        }
+        if (state.selectedView === "resident-view") {
+          ensureViewRendered("kitchen-view");
+          ensureViewRendered("admin-view");
+          return;
+        }
+        if (state.selectedView === "kitchen-view") {
+          ensureViewRendered("admin-view");
+        }
+      });
+    }
+
     function renderAll() {
+      viewRenderCycle += 1;
       if (elements.heroWeekLabel) {
         elements.heroWeekLabel.textContent = `蟇ｾ雎｡騾ｱ ${formatWeekLabel(state.settings.weekStart)}`;
       }
       updateHeroSummary();
       renderViews();
-      renderResidentView();
-      renderKitchenView();
-      renderAdminView();
+      ensureViewRendered("resident-view");
+      if (state.selectedView === "kitchen-view") {
+        ensureViewRendered("kitchen-view");
+      }
+      if (state.selectedView === "admin-view") {
+        ensureViewRendered("admin-view");
+      }
+      scheduleDeferredViews();
     }
 
     function renderViews() {
@@ -1187,6 +1259,27 @@
 
     function getWeekMenus(weekStart) {
       return state.weeklyMenus[weekStart] ?? createEmptyWeekMenu(weekStart);
+    }
+
+    function ensureWeekExists(weekStart) {
+      if (!state.weeklyMenus[weekStart]) {
+        if (typeof generateAutoWeek === "function") {
+          state.weeklyMenus[weekStart] = generateAutoWeek(weekStart);
+        } else {
+          state.weeklyMenus[weekStart] = createEmptyWeekMenu(weekStart);
+        }
+        saveStorage(STORAGE_KEYS.weeklyMenus, state.weeklyMenus);
+      }
+    }
+
+    function syncCurrentWeekMenuOnStartup() {
+      const currentWeekStart = mondayString(new Date());
+      const previousWeekStart = state.settings.weekStart;
+      state.settings.weekStart = currentWeekStart;
+      ensureWeekExists(currentWeekStart);
+      if (previousWeekStart !== currentWeekStart) {
+        saveStorage(STORAGE_KEYS.settings, state.settings);
+      }
     }
 
     function createEmptyWeekMenu(weekStart) {
@@ -1729,6 +1822,10 @@ function formatWeekLabel(weekStart) {
     }
 
     function renderAdminView() {
+      if (!hasSavedAdminWeek(state.settings.weekStart)) {
+        renderAdminEmptyWeekView();
+        return;
+      }
       const weekMenus = getWeekMenus(state.settings.weekStart);
       const recipes = getAllRecipes();
       const foods = getAllFoods();
@@ -1874,6 +1971,171 @@ function formatWeekLabel(weekStart) {
       bindAdminViewEvents();
     }
 
+    let adminWeekSwitchToken = 0;
+
+    function hasSavedAdminWeek(weekStart) {
+      const storedWeek = state.weeklyMenus?.[weekStart];
+      return Boolean(storedWeek && WEEKDAY_KEYS.some((dayKey) => {
+        const day = storedWeek[dayKey];
+        return Boolean(
+          day?.basic?.staple
+          || day?.basic?.soup
+          || day?.basic?.main
+          || day?.basic?.side1
+          || day?.basic?.side2
+          || day?.basic?.dessert
+          || day?.exception?.singleDish
+          || day?.exception?.extraSoup
+          || day?.exception?.extraSide
+          || day?.exception?.extraDessert
+        );
+      }));
+    }
+
+    function renderAdminEmptyWeekView() {
+      const recipes = getAllRecipes();
+      const selectedRecipe = recipes.find((recipe) => recipe.id === state.selectedRecipeId) ?? null;
+      elements.adminView.innerHTML = `
+        <article class="panel">
+          <div class="section-head">
+            <div>
+              <p class="section-kicker">Admin</p>
+              <h2>管理画面</h2>
+            </div>
+            <p class="section-note">5日分の献立を確認し、必要な週だけ作成できます。</p>
+          </div>
+          <div class="toolbar">
+            <label class="field">
+              <span>週の開始日</span>
+              <input id="admin-week-start" type="date" value="${escapeHtml(state.settings.weekStart)}">
+            </label>
+            <label class="field">
+              <span>調理人数</span>
+              <input id="admin-kitchen-servings" type="number" min="1" step="1" value="${escapeHtml(state.settings.kitchenServings)}">
+            </label>
+          </div>
+        </article>
+        <article class="panel">
+          <div class="section-head">
+            <div>
+              <p class="section-kicker">Weekly Editor</p>
+              <h2>5日分献立編集</h2>
+            </div>
+          </div>
+          <div class="empty-state">
+            <p>この週の献立はまだ作成されていません</p>
+            <button type="button" class="button button-primary" id="admin-create-week-button">この週の献立を作成</button>
+          </div>
+        </article>
+        <article class="panel">
+          <div class="section-head">
+            <div>
+              <p class="section-kicker">Recipe Master</p>
+              <h2>メニュー一覧</h2>
+            </div>
+            <p class="section-note">メニューを選ぶと、メニュー編集を確認できます。</p>
+          </div>
+          <div class="detail-grid">
+            <div class="recipe-list">
+              ${recipes.map((recipe) => {
+                const nutrition = computeRecipeNutrition(recipe);
+                return `
+                  <article class="recipe-card ${recipe.id === state.selectedRecipeId ? "is-active" : ""}" data-recipe-card="${recipe.id}">
+                    <div class="sub-head">
+                      <div>
+                        <h3>${escapeHtml(recipe.name)}</h3>
+                        <span class="tag">${escapeHtml(recipe.category)}</span>
+                      </div>
+                      <span class="pill">${formatNumber(nutrition.perServing.energy, 0)} kcal</span>
+                    </div>
+                    <p class="muted">${escapeHtml(recipe.description)}</p>
+                  </article>
+                `;
+              }).join("")}
+            </div>
+            ${renderRecipeDetailPanel(selectedRecipe)}
+          </div>
+        </article>
+      `;
+      bindAdminViewEvents();
+    }
+
+    function createAdminWeekOnDemand() {
+      const emptyState = elements.adminView?.querySelector(".empty-state");
+      if (emptyState) {
+        emptyState.innerHTML = `<p class="muted" id="admin-create-week-status">献立を作成中です… 1/5</p><button type="button" class="button button-primary" id="admin-create-week-button" disabled>この週の献立を作成</button>`;
+      }
+      const generator = typeof window.generateAutoWeekNonBlocking === "function"
+        ? window.generateAutoWeekNonBlocking
+        : async (weekStart, onProgress) => {
+            if (typeof onProgress === "function") {
+              onProgress(1, 1);
+            }
+            await new Promise((resolve) => window.setTimeout(resolve, 0));
+            return generateAutoWeek(weekStart);
+          };
+
+      generator(state.settings.weekStart, (step, total, dayKey) => {
+        const status = document.querySelector("#admin-create-week-status");
+        if (status) {
+          const dayLabel = WEEKDAY_LABELS[dayKey] || WEEKDAY_LABELS[WEEKDAY_KEYS[step - 1]] || "";
+          status.textContent = `献立を作成中です… ${dayLabel} ${step}/${total}`;
+        }
+      }).then((generatedWeek) => {
+        state.weeklyMenus[state.settings.weekStart] = generatedWeek;
+        saveStorage(STORAGE_KEYS.weeklyMenus, state.weeklyMenus);
+        saveStorage(STORAGE_KEYS.settings, state.settings);
+        updateHeroSummary();
+        renderAdminView();
+      }).catch((error) => {
+        console.error(error);
+        if (emptyState) {
+          emptyState.innerHTML = `<p class="muted">献立作成に失敗しました。もう一度お試しください。</p><button type="button" class="button button-primary" id="admin-create-week-button">この週の献立を作成</button>`;
+        }
+        bindAdminViewEvents();
+      });
+    }
+
+    function switchAdminWeek(targetWeekStart) {
+      state.settings.weekStart = targetWeekStart || mondayString(new Date());
+      saveStorage(STORAGE_KEYS.settings, state.settings);
+
+      if (elements.heroWeekLabel) {
+        elements.heroWeekLabel.textContent = `週の対象期間 ${formatWeekLabel(state.settings.weekStart)}`;
+      }
+      if (hasSavedAdminWeek(state.settings.weekStart)) {
+        updateHeroSummary();
+      } else if (elements.heroEnergy) {
+        elements.heroEnergy.textContent = `-- kcal`;
+      }
+
+      if (state.selectedView !== "admin-view") {
+        renderAll();
+        return;
+      }
+
+      if (!hasSavedAdminWeek(state.settings.weekStart)) {
+        renderAdminEmptyWeekView();
+        return;
+      }
+
+      const token = ++adminWeekSwitchToken;
+      if (elements.adminView) {
+        elements.adminView.innerHTML = `<article class="panel"><p class="muted">週の献立を読み込み中です…</p></article>`;
+      }
+
+      const schedule = window.requestIdleCallback
+        ? (callback) => window.requestIdleCallback(callback, { timeout: 250 })
+        : (callback) => window.setTimeout(callback, 0);
+
+      schedule(() => {
+        if (token !== adminWeekSwitchToken) {
+          return;
+        }
+        renderAdminView();
+      });
+    }
+
     function renderSlotSelect(dayKey, mode, field, label, currentValue, recipes, optional = false) {
       return `
         <label class="field">
@@ -1971,9 +2233,7 @@ function formatWeekLabel(weekStart) {
       const recipeCards = Array.from(document.querySelectorAll("[data-recipe-card]"));
 
       weekStartInput?.addEventListener("change", () => {
-        state.settings.weekStart = weekStartInput.value || mondayString(new Date());
-        saveStorage(STORAGE_KEYS.settings, state.settings);
-        renderAll();
+        switchAdminWeek(weekStartInput.value || mondayString(new Date()));
       });
 
       kitchenServingsInput?.addEventListener("change", () => {
@@ -2024,6 +2284,10 @@ function formatWeekLabel(weekStart) {
         saveStorage(STORAGE_KEYS.weeklyMenus, state.weeklyMenus);
         renderAll();
       });
+
+      document.querySelector("#admin-create-week-button")?.addEventListener("click", () => {
+        createAdminWeekOnDemand();
+      });
     }
 
     function collectWeekDraftFromDom() {
@@ -2055,7 +2319,7 @@ function formatWeekLabel(weekStart) {
 
       return draft;
     }
-  </script><script src="./enhancements.js?v=20260429-restore-print1"></script>
+  </script><script src="./enhancements.js?v=20260429-adminweek1"></script>
   <script>
     (function () {
       const viewIds = ["resident-view", "kitchen-view", "admin-view"];
@@ -2066,6 +2330,7 @@ function formatWeekLabel(weekStart) {
           window.state.selectedView = viewId;
           window.state.currentView = currentView;
         }
+        ensureViewRendered(viewId);
         viewIds.forEach((id) => {
           const section = document.getElementById(id);
           if (!section) {
