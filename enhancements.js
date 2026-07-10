@@ -798,12 +798,88 @@
       };
     }, emptyNutrition()));
   }
+  const CUT_HINTS = {
+    carrot: "2〜3mm厚のいちょう切り", onion: "繊維を断つ薄切り", cabbage: "2cm角のざく切り", chinese_cabbage: "2cm幅のそぎ切り",
+    daikon: "5mm厚のいちょう切り", potato: "一口大(2cm)に切り面取り", sweet_potato: "1cm厚の輪切りにし水にさらす", pumpkin: "一口大(2cm)に切り面取り",
+    spinach: "下ゆで後2〜3cm長さに切る", komatsuna: "下ゆで後2〜3cm長さに切る", broccoli: "小房に分け茎は薄切り",
+    cucumber: "薄い小口切りにし塩もみ", tomato: "湯むきして1cm角", mushrooms: "石づきを除き薄切り", bean_sprouts: "ひげ根を除き短く折る",
+    bell_pepper: "細切りにし下ゆで", burdock: "ささがきにし水にさらす", lotus_root: "薄いいちょう切りにし酢水にさらす",
+    chicken_thigh: "皮と余分な脂を除き一口大のそぎ切り", chicken_breast: "一口大のそぎ切りにし酒少々をふる", pork_lean: "一口大のそぎ切りにし筋を切る",
+    white_fish: "骨の残りがないか確認する", salmon: "骨の残りがないか確認する", mackerel: "骨の残りがないか確認する",
+    shrimp: "背わたを除き小さめに切る", tofu: "2cm角に切り水切り", egg: "溶きほぐす",
+    udon: "5cm程度の食べやすい長さに切る", chinese_noodles: "5cm程度の食べやすい長さに切る", pasta: "5cm程度の食べやすい長さに切る", soba_boiled: "5cm程度の食べやすい長さに切る",
+    apple: "皮をむき薄いいちょう切り", peach: "皮を除き一口大", banana: "1cm厚の輪切り", mandarin: "薄皮を除く", orange: "薄皮を除き一口大", grape: "皮と種を除き半分に切る",
+    naganegi: "小口切りにしやわらかく煮る", green_onion: "小口切り", wakame: "細かく刻む", green_peas: "やわらかくゆで薄皮に注意"
+  };
+  const ANIMAL_FOOD_IDS = new Set(["white_fish", "salmon", "mackerel", "chicken_thigh", "chicken_breast", "pork_lean", "beef_mince", "pork_mince", "egg", "shrimp"]);
+  const BREAD_FOOD_IDS = new Set(["bread", "roll_bread", "milk_bread"]);
+  const COLD_SIDE_TYPES = ["和え物", "酢の物", "サラダ・漬物"];
+  const SIDE_TYPE_CORE_STEPS = {
+    "和え物": ["材料を歯ぐきでつぶせる硬さまでゆで、水気をよく絞る。", "提供前に調味料で和え、味をなじませる。"],
+    "煮物": ["だしと調味料を煮立て、材料を入れて弱火で10〜15分やわらかく煮含める。", "火を止めて5分おき、味を含ませる。"],
+    "炒め物": ["材料をやわらかく下ゆでする。", "油少量で手早く炒め、調味料で味を整える。"],
+    "酢の物": ["材料を下ごしらえし、やわらかくゆでて冷ます。", "甘酢で和えて冷やし、味をなじませる。"],
+    "サラダ・漬物": ["材料を下ごしらえする(加熱する場合はやわらかくゆで、浅漬けは塩もみする)。", "水気を切ってしっかり冷まし、調味料で和えてなじませる。"],
+    "焼き物": ["材料に下味をつける。", "焦がさないよう弱めの火でやわらかく焼き上げる。"],
+    "豆腐・卵": ["材料をやわらかく加熱する。", "調味してくずれないようやさしくまとめる。"],
+    "海藻・きのこ": ["材料をやわらかく煮て(和え物は下ゆでして)、味を含ませる。", "食べやすい大きさに整えて盛り付ける。"]
+  };
+  function getSideTypeTag(tags) {
+    const tag = (tags || []).map(String).find((item) => item.startsWith("副菜区分:"));
+    return tag ? tag.slice(5) : "";
+  }
+  function buildPrepStep(ingredients, coreJoined = "") {
+    const hints = [];
+    for (const partItem of ingredients) {
+      const label = getFoodLabel(partItem);
+      const hint = (partItem.prep && partItem.prep.trim()) || CUT_HINTS[partItem.foodId];
+      if (!hint || !label) continue;
+      if (coreJoined.includes(hint)) continue;
+      hints.push(`${label}は${hint}`);
+      if (hints.length >= 4) break;
+    }
+    return hints.length ? `【下処理】${hints.join("、")}。` : null;
+  }
+  function isGenericCoreSteps(steps) {
+    if (!Array.isArray(steps) || steps.length > 2) return false;
+    const joined = steps.join("");
+    return joined.includes("加熱または和え") || joined.includes("材料を食べやすく整える");
+  }
+  function enrichInstructions(def, steps, ingredients) {
+    if ((def.tags || []).includes("custom")) return steps;
+    const category = def.category || "";
+    let coreSteps = steps;
+    if (category === "副菜" && isGenericCoreSteps(steps)) {
+      const typeSteps = SIDE_TYPE_CORE_STEPS[getSideTypeTag(def.tags)];
+      if (typeSteps) coreSteps = typeSteps;
+    }
+    const joined = coreSteps.join("");
+    const out = [];
+    const prep = buildPrepStep(ingredients, joined);
+    if (prep && !joined.includes("【下処理】")) out.push(prep);
+    out.push(...coreSteps);
+    const isDessertLike = category === "デザート" || category === "おやつ";
+    const isColdSide = category === "副菜" && COLD_SIDE_TYPES.includes(getSideTypeTag(def.tags));
+    const hasAnimal = ingredients.some((partItem) => ANIMAL_FOOD_IDS.has(partItem.foodId));
+    const isBreadStaple = category === "主食" && ingredients.some((partItem) => BREAD_FOOD_IDS.has(partItem.foodId));
+    if (!isDessertLike && !joined.includes("中心温度") && (category === "主菜" || category === "単品料理" || category === "汁物" || hasAnimal)) {
+      out.push("【加熱確認】中心温度75℃・1分以上を確認し記録する。");
+    }
+    if (!joined.includes("【提供】")) {
+      if (isDessertLike) out.push("【提供】冷菓は10℃以下で保管し、焼き菓子・蒸し菓子は粗熱を取って食べやすい温度で提供する。");
+      else if (isColdSide) out.push("【提供】加熱後は速やかに冷却し、提供まで10℃以下で保管する。");
+      else if (isBreadStaple) out.push("【提供】乾燥を防ぎ、提供直前に盛り付ける。");
+      else out.push("【提供】65℃以上で保温し、温かいうちに盛り付けて提供する。");
+    }
+    return out;
+  }
   function createRecipe(def) {
     const ingredients = normalizeParts(def.ingredients || []);
     const seasonings = normalizeParts(def.seasonings || []);
-    const instructions = Array.isArray(def.steps) && def.steps.length
+    const baseInstructions = Array.isArray(def.steps) && def.steps.length
       ? def.steps
       : (Array.isArray(def.instructions) && def.instructions.length ? def.instructions : ["手順未設定"]);
+    const instructions = enrichInstructions(def, baseInstructions, ingredients);
     const nutrition = withKcalAlias(calcNutrition([...ingredients, ...seasonings]));
     return {
       id: def.id,
@@ -825,7 +901,9 @@
     };
   }
   function sideRecipe(id, name, cuisine, ingredients, seasonings, servingSize, rotationKey, tags) {
-    return createRecipe({ id, name, category: "副菜", cuisine, ingredients, seasonings, instructions: ["食べやすく加熱または和える。", "盛り付けて提供する。"], servingSize, rotationKey, tags });
+    const sideType = getSideTypeTag(tags);
+    const coreSteps = SIDE_TYPE_CORE_STEPS[sideType] || ["材料をやわらかく加熱または和える。", "盛り付けて提供する。"];
+    return createRecipe({ id, name, category: "副菜", cuisine, ingredients, seasonings, instructions: coreSteps, servingSize, rotationKey, tags });
   }
   function buildSoupSeries(target, prefix, cuisine, ingredientsList, methods) {
     ingredientsList.forEach(([name, ingredients], ingredientIndex) => {
@@ -840,11 +918,23 @@
           tags: method.tags,
           ingredients: [...ingredients, ...(method.ingredients || [])],
           seasonings: method.seasonings,
-          instructions: method.instructions || ["具材をやわらかく加熱する。", "調味して温かく仕上げる。"]
+          instructions: method.instructions || ["だし(スープ)を温め、具材を入れて弱火でやわらかく煮る。", "調味料で味を整え、ひと煮立ちさせて仕上げる。"]
         }));
       });
     });
   }
+  const MAIN_METHOD_STEPS = {
+    nimono: ["調味料とだしを煮立て、主材料を入れて落としぶたをし、弱火で10〜15分やわらかく煮含める。", "煮汁を軽く煮詰めて全体にかける。"],
+    miso: ["だしに調味料を溶き、主材料を入れて弱火でやわらかく煮込む。", "味噌の香りが飛ばないよう仕上げに味を整える。"],
+    teri: ["主材料を弱めの火でやわらかく焼く(蒸し焼きにするとやわらかく仕上がる)。", "合わせ調味料を加え、照りが出るまで絡める。"],
+    oroshi: ["主材料をやわらかく加熱する。", "だしに大根おろしを加え、水溶き片栗粉でとろみをつけたあんをかける。"],
+    yawaraka: ["主材料と玉ねぎをだしに入れ、弱火で15分程度、箸で切れるやわらかさまで煮る。"],
+    an: ["主材料と野菜をやわらかく加熱する。", "調味しただしに水溶き片栗粉でとろみをつけ、全体にあんをかける。"],
+    oyster: ["主材料と野菜をやわらかく加熱する。", "オイスターソースとだしを加え、煮からめて仕上げる。"],
+    "sweet-sour": ["主材料をやわらかく加熱する。", "ケチャップ・酢・砂糖で甘酢あんを作り、とろみをつけて全体に絡める。"],
+    ginger: ["主材料に野菜をのせ、蒸し器で10分程度やわらかく蒸す。", "しょうが風味のたれをかけて仕上げる。"],
+    stir: ["材料をやわらかく下ゆでする。", "油少量で手早く炒め、調味料で味を整える(強火で硬くしない)。"]
+  };
   function buildMainSeries(target, prefix, cuisine, proteins, methods) {
     proteins.forEach((protein, proteinIndex) => {
       methods.forEach((method) => {
@@ -858,7 +948,7 @@
           tags: method.tags,
           ingredients: [part(protein.id, protein.grams), ...method.ingredients],
           seasonings: method.seasonings,
-          instructions: method.instructions || ["主材料をやわらかく加熱する。", `${method.label.replace(/^の/, "")}で仕上げる。`]
+          instructions: method.instructions || MAIN_METHOD_STEPS[method.key] || ["主材料をやわらかく加熱する。", `${method.label.replace(/^の/, "")}で仕上げる。`]
         }));
       });
     });
@@ -1863,12 +1953,24 @@
   }
 
   const EXPANDED_RECIPES = buildRecipeMaster();
+  EXPANDED_RECIPES.push(
+    createRecipe({ id: "dessert-safe-mizuyokan", name: "やわらか水ようかん", category: "デザート", cuisine: "和食", servingSize: 70, rotationKey: "和菓子", tags: ["デザート", "やわらか", "和菓子", "安価"], description: "餅・団子の代わりに提供できる、飲み込みやすい和菓子です。", ingredients: [part("azuki_paste", 40)], seasonings: [part("sugar", 3), part("gelatin_powder", 1.5)], instructions: ["こしあんと砂糖を水で溶きのばし、ひと煮立ちさせる。", "ふやかしたゼラチンを加えて溶かし、型に流して冷やし固める。"] }),
+    createRecipe({ id: "dessert-safe-imoyokan", name: "やわらか芋ようかん", category: "デザート", cuisine: "和食", servingSize: 65, rotationKey: "和菓子", tags: ["デザート", "やわらか", "和菓子", "安価"], description: "さつまいもの自然な甘みの、なめらかな和菓子です。", ingredients: [part("sweet_potato", 55)], seasonings: [part("sugar", 5), part("gelatin_powder", 1)], instructions: ["さつまいもをやわらかく蒸してなめらかに裏ごしする。", "砂糖とゼラチンを加えて混ぜ、型に流して冷やし固める。"] }),
+    createRecipe({ id: "dessert-safe-milk-kuzu", name: "ミルクくずプリン", category: "デザート", cuisine: "和食", servingSize: 75, rotationKey: "和菓子", tags: ["デザート", "やわらか", "和菓子", "安価"], description: "とろりとした口あたりで、飲み込みやすいミルク菓子です。", ingredients: [part("milk", 60)], seasonings: [part("sugar", 5), part("starch", 5)], instructions: ["牛乳・砂糖・片栗粉を混ぜて弱火にかけ、とろみが出るまで練る。", "型に流して冷やし、なめらかに固める。"] })
+  );
   const GOALS = { energy: 550, protein: 22, fat: 18, carbs: 75, fiber: 6, salt: 3.0 };
 
   getAllFoods = function () { return [...EXPANDED_FOODS, ...(state.customFoods || [])]; };
   getFoodMap = function () { return new Map(getAllFoods().map((item) => [item.id, item])); };
   getAllRecipes = function () { return [...EXPANDED_RECIPES, ...normalizeCustomRecipes(state.customRecipes || [])]; };
-  getRecipeMap = function () { return new Map(getAllRecipes().map((recipe) => [recipe.id, recipe])); };
+  let _recipeMapCache = { listRef: null, map: null };
+  getRecipeMap = function () {
+    const list = getAllRecipes();
+    if (_recipeMapCache.map && _recipeMapCache.listRef === list) return _recipeMapCache.map;
+    const map = new Map(list.map((recipe) => [recipe.id, recipe]));
+    _recipeMapCache = { listRef: list, map };
+    return map;
+  };
   syncSelectedRecipe = function () {
     const recipes = getAllRecipes();
     if (!recipes.find((recipe) => recipe.id === state.selectedRecipeId)) state.selectedRecipeId = recipes[0]?.id || null;
@@ -2212,6 +2314,32 @@
     const map = getRecipeMap();
     return map.get(menu.mode === "basic" ? menu.basic.main : menu.exception.singleDish) || null;
   }
+  function getMainMethodToken(name) {
+    // 主菜の調理法 = 料理名の最後の「の」以降(例: 白身魚の甘酢あん → 甘酢あん)。「の」が無ければnull
+    if (!name) return null;
+    const i = name.lastIndexOf("の");
+    if (i <= 0 || i >= name.length - 1) return null;
+    return name.slice(i + 1);
+  }
+  function getSoupBaseToken(name) {
+    // 汁物の具材名 = スープ/汁/味噌汁等の接尾辞を除いた部分(例: トマトスープ → トマト、わかめの味噌汁 → わかめ)
+    if (!name) return null;
+    const stripped = name.replace(/(の)?(お)?(すまし汁|吸い物|味噌汁|みそ汁|ポタージュ|スープ|汁)$/u, "");
+    return stripped || name;
+  }
+  function getMenuSoupIds(menu) {
+    return (menu.mode === "basic" ? [menu.basic.soup] : [menu.exception.extraSoup]).filter(Boolean);
+  }
+  function hasSimilarToken(tokenSet, token) {
+    // 完全一致に加え前方一致も類似とみなす(コーンスープ×コーンコンソメスープ、甘酢あん×甘酢あんかけ等)
+    if (!tokenSet || !token) return false;
+    if (tokenSet.has(token)) return true;
+    if (token.length < 2) return false;
+    for (const t of tokenSet) {
+      if (t && t.length >= 2 && (t.startsWith(token) || token.startsWith(t))) return true;
+    }
+    return false;
+  }
   function scoreMenu(menu, context, targetCuisine) {
     const evaluation = evaluateDayMenu(menu);
     if (!evaluation.structurePass) return -999999;
@@ -2234,6 +2362,20 @@
     }
     getMenuRecipeIds(menu).forEach((id) => { score -= (context.recipeUseCount.get(id) || 0) * 36; });
     const map = getRecipeMap();
+    // --- 週内(月〜金)重複の禁止級ペナルティ: 同一料理ID/同名・主食・主菜調理法・汁物具材 ---
+    getMenuRecipeIds(menu).forEach((id) => {
+      if (context.usedRecipeIds?.has(id)) score -= 450;
+      else if (context.usedNames?.has(map.get(id)?.name)) score -= 450;
+    });
+    if (menu.mode === "basic" && menu.basic.staple && context.usedStapleIds?.has(menu.basic.staple)) score -= 420;
+    if (primary) {
+      const method = getMainMethodToken(primary.name);
+      if (method && hasSimilarToken(context.usedMainMethods, method)) score -= 430;
+    }
+    getMenuSoupIds(menu).forEach((id) => {
+      const base = getSoupBaseToken(map.get(id)?.name);
+      if (base && hasSimilarToken(context.usedSoupBases, base)) score -= 420;
+    });
     score -= applyCuisineConsistencyPenalty(menu, getPreferredCuisine(menu, targetCuisine), map);
     (menu.mode === "basic" ? [menu.basic.side1, menu.basic.side2] : [menu.exception.extraSide]).filter(Boolean).map((id) => map.get(id)).filter(Boolean).forEach((side) => {
       score -= (context.sideRotationCount.get(side.rotationKey) || 0) * 28;
@@ -2301,6 +2443,21 @@
       if (profile.freshFruit) context.freshFruitDessertCount += 1;
     }
     if (menu.snack) context.usedSnackIds.add(menu.snack);
+    // --- 週内重複トラッキング: 料理ID/料理名・主食ID・主菜調理法・汁物具材 ---
+    getMenuRecipeIds(menu).forEach((id) => {
+      context.usedRecipeIds?.add(id);
+      const recipe = map.get(id);
+      if (recipe) context.usedNames?.add(recipe.name);
+    });
+    if (menu.mode === "basic" && menu.basic.staple) context.usedStapleIds?.add(menu.basic.staple);
+    if (primary) {
+      const method = getMainMethodToken(primary.name);
+      if (method) context.usedMainMethods?.add(method);
+    }
+    getMenuSoupIds(menu).forEach((id) => {
+      const base = getSoupBaseToken(map.get(id)?.name);
+      if (base) context.usedSoupBases?.add(base);
+    });
   }
   function buildBasicCandidate(cuisine, context, date) {
     const staple = pickRecipe(filterRecipesLocal({ category: "主食", cuisine, minEnergy: 100, maxEnergy: 230 }), context, "staple");
@@ -2329,7 +2486,7 @@
   }
   function generateAutoWeek(weekStart) {
     const week = createEmptyWeekMenu(weekStart);
-    const context = { cuisineCounts: { 和食: 0, 洋食: 0, 中華: 0 }, recipeUseCount: new Map(), mainRotationCount: new Map(), sideRotationCount: new Map(), dessertRotationCount: new Map(), dessertFruitCount: new Map(), dessertBaseCount: new Map(), lastMainId: null, lastMainRotationKey: null, lastDessertRotationKey: null, lastDessertFruitTag: null, lastDessertBaseTag: null, lastSideRotationKeys: new Set(), freshFruitDessertCount: 0, usedSideIds: new Set(), usedSideNames: new Set(), usedSnackIds: new Set() };
+    const context = { cuisineCounts: { 和食: 0, 洋食: 0, 中華: 0 }, recipeUseCount: new Map(), mainRotationCount: new Map(), sideRotationCount: new Map(), dessertRotationCount: new Map(), dessertFruitCount: new Map(), dessertBaseCount: new Map(), lastMainId: null, lastMainRotationKey: null, lastDessertRotationKey: null, lastDessertFruitTag: null, lastDessertBaseTag: null, lastSideRotationKeys: new Set(), freshFruitDessertCount: 0, usedSideIds: new Set(), usedSideNames: new Set(), usedSnackIds: new Set(), usedRecipeIds: new Set(), usedNames: new Set(), usedStapleIds: new Set(), usedMainMethods: new Set(), usedSoupBases: new Set() };
     const exceptionDays = [...WEEKDAY_KEYS].sort(() => Math.random() - 0.5).slice(0, 1);
     WEEKDAY_KEYS.forEach((dayKey, index) => {
       const targetCuisine = chooseTargetCuisine(context.cuisineCounts, index);
@@ -2837,9 +2994,16 @@
   const SEKIHAN_ID = "special-sekihan";
 
   const previousRenderAll = renderAll;
+  let _recipeListCache = { hiddenRef: undefined, overridesRef: undefined, customRef: undefined, list: null };
   getAllRecipes = function () {
-    const hiddenDefaultRecipeIds = new Set((state.hiddenDefaultRecipeIds || []).filter(Boolean));
-    const recipeOverrides = state.customRecipeOverrides || {};
+    const hiddenRef = state.hiddenDefaultRecipeIds;
+    const overridesRef = state.customRecipeOverrides;
+    const customRef = state.customRecipes;
+    if (_recipeListCache.list && _recipeListCache.hiddenRef === hiddenRef && _recipeListCache.overridesRef === overridesRef && _recipeListCache.customRef === customRef) {
+      return _recipeListCache.list;
+    }
+    const hiddenDefaultRecipeIds = new Set((hiddenRef || []).filter(Boolean));
+    const recipeOverrides = overridesRef || {};
     const defaultRecipes = [...SPECIAL_MENU_RECIPES, ...EXPANDED_RECIPES, ...SNACK_MASTER]
       .map(applyRecipeDictionary)
       .filter((recipe) => recipe.name !== "軟飯")
@@ -2848,12 +3012,14 @@
         const override = recipeOverrides[recipe.id];
         return override ? normalizeCustomRecipes([{ ...recipe, ...override, id: recipe.id }])[0] : recipe;
       });
-    const recipes = [...defaultRecipes, ...normalizeCustomRecipes(state.customRecipes || [])];
+    const recipes = [...defaultRecipes, ...normalizeCustomRecipes(customRef || [])];
     const recipesById = new Map();
     recipes.forEach((recipe) => {
       recipesById.set(recipe.id, recipe);
     });
-    return [...recipesById.values()];
+    const list = [...recipesById.values()];
+    _recipeListCache = { hiddenRef, overridesRef, customRef, list };
+    return list;
   };
   createEmptyWeekMenu = function (weekStart) {
     const week = {};
@@ -3451,7 +3617,7 @@
       const basePool = recipePools[opts.category]?.[cuisineKey] || [];
       return basePool.filter((recipe) => !excludes.has(recipe.id) && recipe.nutrition.energy >= (opts.minEnergy || 0) && recipe.nutrition.energy <= (opts.maxEnergy || 9999));
     };
-    const context = { cuisineCounts: { 和食: 0, 洋食: 0, 中華: 0 }, recipeUseCount: new Map(), mainRotationCount: new Map(), sideRotationCount: new Map(), dessertRotationCount: new Map(), dessertFruitCount: new Map(), dessertBaseCount: new Map(), lastMainId: null, lastMainRotationKey: null, lastDessertRotationKey: null, lastDessertFruitTag: null, lastDessertBaseTag: null, lastSideRotationKeys: new Set(), freshFruitDessertCount: 0, usedSideIds: new Set(), usedSideNames: new Set(), usedSnackIds: new Set() };
+    const context = { cuisineCounts: { 和食: 0, 洋食: 0, 中華: 0 }, recipeUseCount: new Map(), mainRotationCount: new Map(), sideRotationCount: new Map(), dessertRotationCount: new Map(), dessertFruitCount: new Map(), dessertBaseCount: new Map(), lastMainId: null, lastMainRotationKey: null, lastDessertRotationKey: null, lastDessertFruitTag: null, lastDessertBaseTag: null, lastSideRotationKeys: new Set(), freshFruitDessertCount: 0, usedSideIds: new Set(), usedSideNames: new Set(), usedSnackIds: new Set(), usedRecipeIds: new Set(), usedNames: new Set(), usedStapleIds: new Set(), usedMainMethods: new Set(), usedSoupBases: new Set() };
     const usedSoupIds = new Set();
     const usedMainIds = new Set();
     const exceptionDays = [...WEEKDAY_KEYS].sort(() => Math.random() - 0.5).slice(0, 1);
@@ -4105,11 +4271,16 @@
         : `<article class="card recipe-detail"><div class="empty-state">\u6599\u7406\u3092\u9078\u3076\u3068\u8a73\u7d30\u304c\u8868\u793a\u3055\u308c\u307e\u3059\u3002</div></article>`);
     return `<div class="section-head"><div><p class="section-kicker">Recipe Master</p><h2>\u6599\u7406\u4e00\u89a7</h2></div></div><div class="recipe-master-filter-bar">${filterButtons}${searchField}${addButton}</div><div class="detail-grid"><div class="recipe-list">${recipeCards}</div>${recipeDetail}</div>`;
   }
-  function pickWeeklyEditorShuffleRecipe(recipes, currentValue, excludeIds = []) {
+  function pickWeeklyEditorShuffleRecipe(recipes, currentValue, excludeIds = [], excludeNames = null) {
     const safeRecipes = (recipes || []).filter((recipe) => !isChokingRisk(recipe));
     recipes = safeRecipes.length ? safeRecipes : recipes;
     if (!Array.isArray(recipes) || !recipes.length) {
       return currentValue || null;
+    }
+    // 他の曜日で使用中の料理名を候補から除外(全滅する場合のみ緩和して元プールに戻す)
+    if (excludeNames && excludeNames.size) {
+      const namedPool = recipes.filter((recipe) => !excludeNames.has(recipe.name));
+      if (namedPool.length) recipes = namedPool;
     }
     const freshPool = recipes.filter((recipe) => recipe.id !== currentValue && !excludeIds.includes(recipe.id));
     if (freshPool.length) {
@@ -4121,7 +4292,7 @@
     }
     return recipes[Math.floor(Math.random() * recipes.length)].id;
   }
-  function buildWeeklyEditorShuffledDayMenuCandidate(dayMenu) {
+  function buildWeeklyEditorShuffledDayMenuCandidate(dayMenu, excludeNames = null) {
     const recipes = getAllRecipes();
     const byCategory = (category) => recipes.filter((recipe) => recipe.category === category);
     const stapleRecipes = recipes.filter((recipe) => recipe.category === "主食" || recipe.category === "単品料理");
@@ -4131,25 +4302,25 @@
       exception: { ...dayMenu.exception }
     };
     if (dayMenu.mode === "exception") {
-      nextDayMenu.exception.singleDish = pickWeeklyEditorShuffleRecipe(stapleRecipes, dayMenu.exception.singleDish);
-      nextDayMenu.exception.extraSoup = pickWeeklyEditorShuffleRecipe(byCategory("汁物"), dayMenu.exception.extraSoup);
-      nextDayMenu.exception.extraSide = pickWeeklyEditorShuffleRecipe(byCategory("副菜"), dayMenu.exception.extraSide);
-      nextDayMenu.exception.extraDessert = pickWeeklyEditorShuffleRecipe(byCategory("デザート"), dayMenu.exception.extraDessert);
+      nextDayMenu.exception.singleDish = pickWeeklyEditorShuffleRecipe(stapleRecipes, dayMenu.exception.singleDish, [], excludeNames);
+      nextDayMenu.exception.extraSoup = pickWeeklyEditorShuffleRecipe(byCategory("汁物"), dayMenu.exception.extraSoup, [], excludeNames);
+      nextDayMenu.exception.extraSide = pickWeeklyEditorShuffleRecipe(byCategory("副菜"), dayMenu.exception.extraSide, [], excludeNames);
+      nextDayMenu.exception.extraDessert = pickWeeklyEditorShuffleRecipe(byCategory("デザート"), dayMenu.exception.extraDessert, [], excludeNames);
       return nextDayMenu;
     }
     const usedIds = [];
-    nextDayMenu.basic.staple = pickWeeklyEditorShuffleRecipe(stapleRecipes, dayMenu.basic.staple, usedIds);
+    nextDayMenu.basic.staple = pickWeeklyEditorShuffleRecipe(stapleRecipes, dayMenu.basic.staple, usedIds, excludeNames);
     if (nextDayMenu.basic.staple) usedIds.push(nextDayMenu.basic.staple);
-    nextDayMenu.basic.soup = pickWeeklyEditorShuffleRecipe(byCategory("汁物"), dayMenu.basic.soup, usedIds);
+    nextDayMenu.basic.soup = pickWeeklyEditorShuffleRecipe(byCategory("汁物"), dayMenu.basic.soup, usedIds, excludeNames);
     if (nextDayMenu.basic.soup) usedIds.push(nextDayMenu.basic.soup);
-    nextDayMenu.basic.main = pickWeeklyEditorShuffleRecipe(byCategory("主菜"), dayMenu.basic.main, usedIds);
+    nextDayMenu.basic.main = pickWeeklyEditorShuffleRecipe(byCategory("主菜"), dayMenu.basic.main, usedIds, excludeNames);
     if (nextDayMenu.basic.main) usedIds.push(nextDayMenu.basic.main);
-    nextDayMenu.basic.side1 = pickWeeklyEditorShuffleRecipe(byCategory("副菜"), dayMenu.basic.side1, usedIds);
+    nextDayMenu.basic.side1 = pickWeeklyEditorShuffleRecipe(byCategory("副菜"), dayMenu.basic.side1, usedIds, excludeNames);
     if (nextDayMenu.basic.side1) usedIds.push(nextDayMenu.basic.side1);
-    nextDayMenu.basic.side2 = pickWeeklyEditorShuffleRecipe(byCategory("副菜"), dayMenu.basic.side2, usedIds);
+    nextDayMenu.basic.side2 = pickWeeklyEditorShuffleRecipe(byCategory("副菜"), dayMenu.basic.side2, usedIds, excludeNames);
     if (nextDayMenu.basic.side2) usedIds.push(nextDayMenu.basic.side2);
-    nextDayMenu.basic.dessert = pickWeeklyEditorShuffleRecipe(byCategory("デザート"), dayMenu.basic.dessert, usedIds);
-    nextDayMenu.snack = pickWeeklyEditorShuffleRecipe(byCategory("おやつ"), dayMenu.snack);
+    nextDayMenu.basic.dessert = pickWeeklyEditorShuffleRecipe(byCategory("デザート"), dayMenu.basic.dessert, usedIds, excludeNames);
+    nextDayMenu.snack = pickWeeklyEditorShuffleRecipe(byCategory("おやつ"), dayMenu.snack, [], excludeNames);
     return nextDayMenu;
   }
   function scoreWeeklyEditorShuffledDayMenu(dayMenu) {
@@ -4159,18 +4330,18 @@
       + Math.abs(evaluation.totals.energy - 550) * 0.35
       + Math.max(0, evaluation.totals.salt - 3.0) * 120;
   }
-  function buildWeeklyEditorShuffledDayMenu(dayMenu) {
+  function buildWeeklyEditorShuffledDayMenu(dayMenu, excludeNames = null) {
     let bestMenu = null;
     let bestScore = Number.POSITIVE_INFINITY;
     for (let attempt = 0; attempt < 12; attempt += 1) {
-      const candidate = buildWeeklyEditorShuffledDayMenuCandidate(dayMenu);
+      const candidate = buildWeeklyEditorShuffledDayMenuCandidate(dayMenu, excludeNames);
       const score = scoreWeeklyEditorShuffledDayMenu(candidate);
       if (score < bestScore) {
         bestScore = score;
         bestMenu = candidate;
       }
     }
-    return bestMenu || buildWeeklyEditorShuffledDayMenuCandidate(dayMenu);
+    return bestMenu || buildWeeklyEditorShuffledDayMenuCandidate(dayMenu, excludeNames);
   }
   function applyWeeklyEditorShuffledDayMenu(dayKey, dayMenu) {
     const setInputValue = (selector, value) => {
@@ -4290,7 +4461,7 @@
       const basePool = recipePools[opts.category]?.[cuisineKey] || [];
       return basePool.filter((recipe) => !excludes.has(recipe.id) && recipe.nutrition.energy >= (opts.minEnergy || 0) && recipe.nutrition.energy <= (opts.maxEnergy || 9999));
     };
-    const context = { cuisineCounts: { 和食: 0, 洋食: 0, 中華: 0 }, recipeUseCount: new Map(), mainRotationCount: new Map(), sideRotationCount: new Map(), dessertRotationCount: new Map(), dessertFruitCount: new Map(), dessertBaseCount: new Map(), lastMainId: null, lastMainRotationKey: null, lastDessertRotationKey: null, lastDessertFruitTag: null, lastDessertBaseTag: null, lastSideRotationKeys: new Set(), freshFruitDessertCount: 0, usedSideIds: new Set(), usedSideNames: new Set(), usedSnackIds: new Set() };
+    const context = { cuisineCounts: { 和食: 0, 洋食: 0, 中華: 0 }, recipeUseCount: new Map(), mainRotationCount: new Map(), sideRotationCount: new Map(), dessertRotationCount: new Map(), dessertFruitCount: new Map(), dessertBaseCount: new Map(), lastMainId: null, lastMainRotationKey: null, lastDessertRotationKey: null, lastDessertFruitTag: null, lastDessertBaseTag: null, lastSideRotationKeys: new Set(), freshFruitDessertCount: 0, usedSideIds: new Set(), usedSideNames: new Set(), usedSnackIds: new Set(), usedRecipeIds: new Set(), usedNames: new Set(), usedStapleIds: new Set(), usedMainMethods: new Set(), usedSoupBases: new Set() };
     const usedSoupIds = new Set();
     const usedMainIds = new Set();
     const exceptionDays = [...WEEKDAY_KEYS].sort(() => Math.random() - 0.5).slice(0, 1);
@@ -4606,7 +4777,19 @@
         const draftWeek = collectWeekDraftFromDom();
         const currentDayMenu = draftWeek[dayKey];
         if (!currentDayMenu) return;
-        const nextDayMenu = buildWeeklyEditorShuffledDayMenu(currentDayMenu);
+        // 他の曜日で使用中の料理名を収集し、シャッフル候補から除外(週内の同名重複防止)
+        const recipeMapForShuffle = getRecipeMap();
+        const excludeNames = new Set();
+        WEEKDAY_KEYS.forEach((otherKey) => {
+          if (otherKey === dayKey) return;
+          const otherMenu = draftWeek[otherKey];
+          if (!otherMenu) return;
+          getMenuRecipeIds(otherMenu).forEach((id) => {
+            const recipe = recipeMapForShuffle.get(id);
+            if (recipe) excludeNames.add(recipe.name);
+          });
+        });
+        const nextDayMenu = buildWeeklyEditorShuffledDayMenu(currentDayMenu, excludeNames);
         applyWeeklyEditorShuffledDayMenu(dayKey, nextDayMenu);
       });
     });
