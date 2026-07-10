@@ -558,7 +558,35 @@
     }
   `;
   const style = document.createElement('style');
-  style.textContent = EXTRA_STYLE;
+  const IMPROVEMENT_STYLE = `
+    .risk-badge { display:inline-block; margin-left:6px; padding:2px 8px; border-radius:999px; background:rgba(179,63,63,0.14); color:#9b3b2d; font-size:0.78rem; font-weight:700; white-space:nowrap; }
+    tr.is-risk-row td { background:rgba(179,63,63,0.05); }
+    .texture-cell { min-width:180px; }
+    .texture-line { display:block; font-size:0.82rem; line-height:1.5; color:#5f5347; }
+    .texture-line.is-risk { color:#9b3b2d; font-weight:700; }
+    .haccp-section { margin-top:14px; }
+    .haccp-section h4 { margin:0 0 8px; }
+    .haccp-grid { display:grid; grid-template-columns:minmax(0,1.4fr) minmax(0,1fr); gap:14px; }
+    .haccp-title { margin:0 0 6px; font-size:0.85rem; font-weight:700; color:#6f533e; }
+    .haccp-table { width:100%; border-collapse:collapse; background:#fff; }
+    .haccp-table th, .haccp-table td { border:1px solid rgba(56,43,28,0.25); padding:6px 8px; font-size:0.85rem; text-align:left; }
+    .haccp-table .fill-cell { min-width:70px; height:26px; }
+    .order-table { width:100%; border-collapse:collapse; background:#fff; }
+    .order-table th, .order-table td { border:1px solid rgba(56,43,28,0.22); padding:6px 8px; font-size:0.88rem; text-align:left; }
+    .order-table td.num { text-align:right; white-space:nowrap; }
+    .order-table .order-total { font-weight:700; }
+    .order-table .order-memo { min-width:110px; }
+    .order-table thead th { background:rgba(201,100,41,0.08); }
+    .goals-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin-bottom:12px; }
+    .backup-import-label { display:inline-flex; align-items:center; cursor:pointer; }
+    #order-view.view.is-active { display:grid; gap:18px; }
+    @media (max-width: 900px) { .haccp-grid { grid-template-columns:minmax(0,1fr); } .goals-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+    .weekly-editor-check { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin-top:10px; }
+    .weekly-editor-check .check-card { padding:8px 10px; }
+    .weekly-editor-check .check-card p { font-size:0.78rem; margin:2px 0 0; }
+    @media print { .risk-badge { border:1px solid #9b3b2d; } .haccp-section { break-inside:avoid; } }
+  `;
+  style.textContent = EXTRA_STYLE + IMPROVEMENT_STYLE;
   document.head.append(style);
 
   const CUISINES = ["和食", "洋食", "中華"];
@@ -569,93 +597,132 @@
     { key: "fat", label: "脂質", unit: "g", digits: 1 },
     { key: "carbs", label: "炭水化物", unit: "g", digits: 1 },
     { key: "fiber", label: "食物繊維", unit: "g", digits: 1 },
-    { key: "salt", label: "食塩相当量", unit: "g", digits: 1 }
+    { key: "salt", label: "食塩相当量", unit: "g", digits: 1 },
+    { key: "ca", label: "カルシウム", unit: "mg", digits: 0 },
+    { key: "fe", label: "鉄", unit: "mg", digits: 1 },
+    { key: "vc", label: "ビタミンC", unit: "mg", digits: 0 }
   ];
+  const FULL_GOAL_DEFAULTS = { energy: 550, protein: 22, fat: 18, carbs: 75, salt: 3.0, fiber: 6, ca: 230, fe: 2.3, vc: 33 };
+  state.goals = { ...FULL_GOAL_DEFAULTS, ...(state.goals || {}) };
+  const CHOKING_RISK_PATTERNS = ["餅", "おもち", "大福", "みたらし団子", "チップス", "焼きとうもろこし", "こんにゃく", "するめ", "ナッツ", "せんべい"];
+  function isChokingRisk(recipe) {
+    if (!recipe || !recipe.name) return false;
+    return CHOKING_RISK_PATTERNS.some((pattern) => recipe.name.includes(pattern));
+  }
+  globalThis.isChokingRisk = isChokingRisk;
+  function textureAdviceLines(recipe) {
+    const category = recipe.category || "";
+    const isSoup = category === "汁物";
+    const isDessert = category === "デザート" || category === "おやつ";
+    const lines = [];
+    if (isSoup) {
+      lines.push("軟菜: 具をやわらかく煮る");
+      lines.push("きざみ: 具を5mm程度に刻む");
+      lines.push("ミキサー: 具ごとミキサーにかけ、とろみ調整剤で中間のとろみに");
+    } else if (isDessert) {
+      lines.push("軟菜: そのまま提供可（硬い果物は加熱・小切り）");
+      lines.push("きざみ: 果物・固形物を5mm程度に刻む");
+      lines.push("ミキサー: なめらかにつぶし、離水にとろみ調整剤で対応");
+    } else {
+      lines.push("軟菜: 歯ぐきでつぶせる硬さまでやわらかく加熱");
+      lines.push("きざみ: 5mm程度に刻み、パサつく場合はあん・とろみでまとめる");
+      lines.push("ミキサー: だし等を加えてミキサーにかけ、とろみ調整剤で物性を調整");
+    }
+    if (isChokingRisk(recipe)) {
+      lines.unshift("⚠ 窒息リスク食材: 常食以外は提供中止し代替品に変更");
+    }
+    return lines;
+  }
   const EXPANDED_FOODS = [
-    food("rice", "ごはん", 156, 2.5, 0.3, 37.1, 0.3, 0.0),
-    food("soft_rice", "軟飯", 120, 2.0, 0.2, 28.5, 0.2, 0.0),
-    food("bread", "食パン", 248, 8.9, 4.1, 46.7, 2.3, 1.3),
-    food("roll_bread", "ロールパン", 309, 9.7, 9.0, 47.1, 2.0, 1.2),
-    food("milk_bread", "ミルクパン", 280, 8.7, 6.1, 47.5, 1.9, 0.9),
-    food("udon", "ゆでうどん", 105, 2.6, 0.4, 21.6, 1.0, 0.1),
-    food("chinese_noodles", "中華めん", 149, 4.9, 0.7, 31.3, 1.3, 0.2),
-    food("pasta", "ゆでパスタ", 150, 5.8, 0.9, 29.8, 1.8, 0.0),
-    food("white_fish", "白身魚", 108, 22.3, 1.2, 0.1, 0.0, 0.1),
-    food("salmon", "鮭", 124, 22.3, 4.1, 0.1, 0.0, 0.1),
-    food("mackerel", "さば", 211, 20.7, 16.8, 0.2, 0.0, 0.1),
-    food("chicken_thigh", "鶏もも肉", 190, 16.6, 14.2, 0.0, 0.0, 0.1),
-    food("chicken_breast", "鶏むね肉", 133, 24.4, 1.9, 0.0, 0.0, 0.1),
-    food("pork_lean", "豚もも肉", 183, 20.5, 10.2, 0.2, 0.0, 0.1),
-    food("beef_mince", "合いびき肉", 224, 17.2, 17.4, 0.3, 0.0, 0.1),
-    food("pork_mince", "豚ひき肉", 221, 17.3, 17.2, 0.1, 0.0, 0.1),
-    food("tofu", "豆腐", 72, 6.6, 4.2, 1.6, 0.4, 0.0),
-    food("egg", "卵", 142, 12.3, 10.3, 0.3, 0.0, 0.4),
-    food("shrimp", "えび", 87, 18.4, 0.6, 0.2, 0.0, 0.6),
-    food("potato", "じゃがいも", 59, 1.8, 0.1, 14.0, 1.3, 0.0),
-    food("sweet_potato", "さつまいも", 126, 1.2, 0.2, 31.9, 2.8, 0.0),
-    food("pumpkin", "かぼちゃ", 78, 1.9, 0.3, 17.1, 3.5, 0.0),
-    food("spinach", "ほうれん草", 20, 2.2, 0.4, 3.1, 2.8, 0.1),
-    food("komatsuna", "小松菜", 14, 1.5, 0.2, 2.4, 1.9, 0.1),
-    food("broccoli", "ブロッコリー", 33, 4.3, 0.5, 5.2, 4.4, 0.0),
-    food("cabbage", "キャベツ", 23, 1.3, 0.2, 5.2, 1.8, 0.0),
-    food("chinese_cabbage", "白菜", 13, 0.8, 0.1, 3.2, 1.3, 0.0),
-    food("carrot", "にんじん", 39, 0.7, 0.2, 9.3, 2.8, 0.1),
-    food("onion", "玉ねぎ", 33, 1.0, 0.1, 8.8, 1.6, 0.0),
-    food("daikon", "大根", 18, 0.5, 0.1, 4.1, 1.4, 0.0),
-    food("burdock", "ごぼう", 58, 1.8, 0.1, 15.4, 5.7, 0.0),
-    food("lotus_root", "れんこん", 66, 1.9, 0.1, 15.5, 2.0, 0.1),
-    food("cucumber", "きゅうり", 13, 1.0, 0.1, 3.0, 1.1, 0.0),
-    food("tomato", "トマト", 20, 0.7, 0.1, 4.7, 1.0, 0.0),
-    food("corn", "コーン", 89, 3.5, 1.7, 16.8, 3.0, 0.0),
-    food("mushrooms", "きのこ", 18, 2.3, 0.3, 4.4, 2.7, 0.0),
-    food("bean_sprouts", "もやし", 15, 1.7, 0.1, 2.6, 1.3, 0.0),
-    food("green_peas", "グリーンピース", 93, 6.9, 0.6, 15.6, 7.7, 0.0),
-    food("bell_pepper", "ピーマン", 22, 0.9, 0.2, 5.1, 2.3, 0.0),
-    food("wakame", "わかめ", 16, 1.9, 0.2, 5.6, 3.0, 0.5),
-    food("apple", "りんご", 57, 0.1, 0.2, 15.5, 1.5, 0.0),
-    food("banana", "バナナ", 86, 1.1, 0.2, 22.5, 1.1, 0.0),
-    food("mandarin", "みかん", 49, 0.7, 0.1, 12.0, 1.0, 0.0),
-    food("peach", "白桃", 40, 0.6, 0.1, 10.2, 1.3, 0.0),
-    food("grape", "ぶどう", 59, 0.5, 0.1, 15.2, 0.5, 0.0),
-    food("orange", "オレンジ", 46, 0.8, 0.1, 11.3, 1.0, 0.0),
-    food("milk", "牛乳", 61, 3.3, 3.8, 4.8, 0.0, 0.1),
-    food("yogurt", "ヨーグルト", 62, 3.6, 3.0, 5.3, 0.0, 0.1),
-    food("pudding_base", "プリン", 126, 4.6, 5.8, 13.8, 0.0, 0.1),
-    food("jelly_base", "ゼリーベース", 78, 0.2, 0.0, 19.5, 0.3, 0.0),
-    food("milk_jelly", "ミルクゼリー", 92, 2.1, 2.8, 14.8, 0.0, 0.1),
-    food("steamed_cake", "蒸しパン", 250, 6.2, 6.1, 43.8, 1.2, 0.5),
-    food("miso", "味噌", 183, 12.5, 6.0, 25.6, 5.5, 12.4),
-    food("broth", "だし汁", 4, 0.6, 0.0, 0.2, 0.0, 0.2),
-    food("consomme", "コンソメ", 72, 3.0, 1.1, 12.0, 0.0, 13.0),
-    food("soy_sauce", "しょうゆ", 71, 7.7, 0.0, 10.1, 0.8, 14.5),
-    food("light_soy", "うすくちしょうゆ", 55, 5.5, 0.0, 8.0, 0.4, 16.0),
-    food("mirin", "みりん", 241, 0.3, 0.0, 54.9, 0.0, 0.0),
-    food("sugar", "砂糖", 391, 0.0, 0.0, 99.2, 0.0, 0.0),
-    food("salt", "塩", 0, 0.0, 0.0, 0.0, 0.0, 99.0),
-    food("pepper", "こしょう", 255, 11.0, 3.2, 64.8, 21.0, 0.0),
-    food("herb_mix", "乾燥ハーブ", 285, 9.0, 4.0, 60.0, 37.0, 0.1),
-    food("curry_roux", "カレールウ", 512, 7.0, 32.3, 48.9, 3.2, 7.8),
-    food("tomato_sauce", "トマトソース", 68, 1.7, 2.1, 11.0, 1.8, 0.9),
-    food("cream_sauce", "クリームソース", 163, 2.7, 13.5, 8.0, 0.0, 0.8),
-    food("ketchup", "ケチャップ", 120, 1.5, 0.2, 29.0, 0.4, 3.0),
-    food("mayonnaise", "マヨネーズ", 700, 1.4, 76.0, 2.1, 0.0, 1.8),
-    food("sesame_oil", "ごま油", 900, 0.0, 100.0, 0.0, 0.0, 0.0),
-    food("oyster_sauce", "オイスターソース", 134, 5.0, 0.0, 28.0, 0.2, 11.0),
-    food("vinegar", "酢", 24, 0.2, 0.0, 2.4, 0.0, 0.0),
-    food("ponzu", "ぽん酢", 46, 3.2, 0.0, 8.2, 0.2, 7.5),
-    food("butter", "バター", 745, 0.5, 81.0, 0.2, 0.0, 1.5),
-    food("cheese", "チーズ", 313, 22.7, 26.0, 1.3, 0.0, 2.8),
-    food("sesame", "ごま", 599, 20.3, 54.2, 18.5, 10.8, 0.0),
-    food("starch", "片栗粉", 330, 0.1, 0.1, 81.6, 0.0, 0.0),
-    food("flour", "小麦粉", 349, 8.3, 1.5, 75.8, 2.5, 0.0),
-    food("gelatin_powder", "ゼラチン", 344, 87.6, 0.3, 0.0, 0.0, 0.1),
-    food("baking_powder", "ベーキングパウダー", 53, 0.0, 0.0, 27.7, 0.0, 0.0),
-    food("azuki_paste", "こしあん", 244, 5.0, 0.2, 57.0, 4.0, 0.1)
+    food("rice", "ごはん", 156, 2.5, 0.3, 37.1, 0.3, 0.0, 3, 0.1, 0),
+    food("soft_rice", "軟飯", 120, 2.0, 0.2, 28.5, 0.2, 0.0, 3, 0.1, 0),
+    food("bread", "食パン", 248, 8.9, 4.1, 46.7, 2.3, 1.3, 22, 0.5, 0),
+    food("roll_bread", "ロールパン", 309, 9.7, 9.0, 47.1, 2.0, 1.2, 44, 0.7, 0),
+    food("milk_bread", "ミルクパン", 280, 8.7, 6.1, 47.5, 1.9, 0.9, 40, 0.6, 0),
+    food("udon", "ゆでうどん", 105, 2.6, 0.4, 21.6, 1.0, 0.1, 6, 0.2, 0),
+    food("chinese_noodles", "中華めん", 149, 4.9, 0.7, 31.3, 1.3, 0.2, 20, 0.3, 0),
+    food("pasta", "ゆでパスタ", 150, 5.8, 0.9, 29.8, 1.8, 0.0, 8, 0.7, 0),
+    food("white_fish", "白身魚", 108, 22.3, 1.2, 0.1, 0.0, 0.1, 32, 0.2, 0),
+    food("salmon", "鮭", 124, 22.3, 4.1, 0.1, 0.0, 0.1, 14, 0.5, 1),
+    food("mackerel", "さば", 211, 20.7, 16.8, 0.2, 0.0, 0.1, 6, 1.2, 1),
+    food("chicken_thigh", "鶏もも肉", 190, 16.6, 14.2, 0.0, 0.0, 0.1, 5, 0.6, 3),
+    food("chicken_breast", "鶏むね肉", 133, 24.4, 1.9, 0.0, 0.0, 0.1, 4, 0.3, 3),
+    food("pork_lean", "豚もも肉", 183, 20.5, 10.2, 0.2, 0.0, 0.1, 4, 0.7, 1),
+    food("beef_mince", "合いびき肉", 224, 17.2, 17.4, 0.3, 0.0, 0.1, 8, 2.1, 1),
+    food("pork_mince", "豚ひき肉", 221, 17.3, 17.2, 0.1, 0.0, 0.1, 6, 1.0, 1),
+    food("tofu", "豆腐", 72, 6.6, 4.2, 1.6, 0.4, 0.0, 93, 1.5, 0),
+    food("egg", "卵", 142, 12.3, 10.3, 0.3, 0.0, 0.4, 46, 1.5, 0),
+    food("shrimp", "えび", 87, 18.4, 0.6, 0.2, 0.0, 0.6, 45, 0.7, 0),
+    food("potato", "じゃがいも", 59, 1.8, 0.1, 14.0, 1.3, 0.0, 4, 0.4, 28),
+    food("sweet_potato", "さつまいも", 126, 1.2, 0.2, 31.9, 2.8, 0.0, 36, 0.6, 29),
+    food("pumpkin", "かぼちゃ", 78, 1.9, 0.3, 17.1, 3.5, 0.0, 15, 0.5, 43),
+    food("spinach", "ほうれん草", 20, 2.2, 0.4, 3.1, 2.8, 0.1, 49, 2.0, 35),
+    food("komatsuna", "小松菜", 14, 1.5, 0.2, 2.4, 1.9, 0.1, 170, 2.8, 39),
+    food("broccoli", "ブロッコリー", 33, 4.3, 0.5, 5.2, 4.4, 0.0, 50, 1.3, 140),
+    food("cabbage", "キャベツ", 23, 1.3, 0.2, 5.2, 1.8, 0.0, 43, 0.3, 41),
+    food("chinese_cabbage", "白菜", 13, 0.8, 0.1, 3.2, 1.3, 0.0, 43, 0.3, 19),
+    food("carrot", "にんじん", 39, 0.7, 0.2, 9.3, 2.8, 0.1, 28, 0.2, 6),
+    food("onion", "玉ねぎ", 33, 1.0, 0.1, 8.8, 1.6, 0.0, 21, 0.3, 7),
+    food("daikon", "大根", 18, 0.5, 0.1, 4.1, 1.4, 0.0, 24, 0.2, 12),
+    food("burdock", "ごぼう", 58, 1.8, 0.1, 15.4, 5.7, 0.0, 46, 0.7, 3),
+    food("lotus_root", "れんこん", 66, 1.9, 0.1, 15.5, 2.0, 0.1, 20, 0.5, 48),
+    food("cucumber", "きゅうり", 13, 1.0, 0.1, 3.0, 1.1, 0.0, 26, 0.3, 14),
+    food("tomato", "トマト", 20, 0.7, 0.1, 4.7, 1.0, 0.0, 7, 0.2, 15),
+    food("corn", "コーン", 89, 3.5, 1.7, 16.8, 3.0, 0.0, 3, 0.8, 8),
+    food("mushrooms", "きのこ", 18, 2.3, 0.3, 4.4, 2.7, 0.0, 1, 0.4, 0),
+    food("bean_sprouts", "もやし", 15, 1.7, 0.1, 2.6, 1.3, 0.0, 10, 0.2, 8),
+    food("green_peas", "グリーンピース", 93, 6.9, 0.6, 15.6, 7.7, 0.0, 23, 1.7, 19),
+    food("bell_pepper", "ピーマン", 22, 0.9, 0.2, 5.1, 2.3, 0.0, 11, 0.4, 76),
+    food("wakame", "わかめ", 16, 1.9, 0.2, 5.6, 3.0, 0.5, 42, 0.5, 0),
+    food("apple", "りんご", 57, 0.1, 0.2, 15.5, 1.5, 0.0, 3, 0.1, 4),
+    food("banana", "バナナ", 86, 1.1, 0.2, 22.5, 1.1, 0.0, 6, 0.3, 16),
+    food("mandarin", "みかん", 49, 0.7, 0.1, 12.0, 1.0, 0.0, 21, 0.2, 32),
+    food("peach", "白桃", 40, 0.6, 0.1, 10.2, 1.3, 0.0, 4, 0.1, 8),
+    food("grape", "ぶどう", 59, 0.5, 0.1, 15.2, 0.5, 0.0, 6, 0.1, 2),
+    food("orange", "オレンジ", 46, 0.8, 0.1, 11.3, 1.0, 0.0, 21, 0.3, 40),
+    food("milk", "牛乳", 61, 3.3, 3.8, 4.8, 0.0, 0.1, 110, 0.0, 1),
+    food("yogurt", "ヨーグルト", 62, 3.6, 3.0, 5.3, 0.0, 0.1, 120, 0.0, 1),
+    food("pudding_base", "プリン", 126, 4.6, 5.8, 13.8, 0.0, 0.1, 81, 0.5, 1),
+    food("jelly_base", "ゼリーベース", 78, 0.2, 0.0, 19.5, 0.3, 0.0, 5, 0.1, 10),
+    food("milk_jelly", "ミルクゼリー", 92, 2.1, 2.8, 14.8, 0.0, 0.1, 60, 0.1, 1),
+    food("steamed_cake", "蒸しパン", 250, 6.2, 6.1, 43.8, 1.2, 0.5, 60, 0.5, 0),
+    food("miso", "味噌", 183, 12.5, 6.0, 25.6, 5.5, 12.4, 100, 4.0, 0),
+    food("broth", "だし汁", 4, 0.6, 0.0, 0.2, 0.0, 0.2, 3, 0.0, 0),
+    food("consomme", "コンソメ", 72, 3.0, 1.1, 12.0, 0.0, 13.0, 40, 0.4, 0),
+    food("soy_sauce", "しょうゆ", 71, 7.7, 0.0, 10.1, 0.8, 14.5, 29, 1.7, 0),
+    food("light_soy", "うすくちしょうゆ", 55, 5.5, 0.0, 8.0, 0.4, 16.0, 24, 1.1, 0),
+    food("mirin", "みりん", 241, 0.3, 0.0, 54.9, 0.0, 0.0, 2, 0.0, 0),
+    food("sugar", "砂糖", 391, 0.0, 0.0, 99.2, 0.0, 0.0, 1, 0.0, 0),
+    food("salt", "塩", 0, 0.0, 0.0, 0.0, 0.0, 99.0, 22, 0.0, 0),
+    food("pepper", "こしょう", 255, 11.0, 3.2, 64.8, 21.0, 0.0, 410, 20.0, 0),
+    food("herb_mix", "乾燥ハーブ", 285, 9.0, 4.0, 60.0, 37.0, 0.1, 500, 30.0, 0),
+    food("curry_roux", "カレールウ", 512, 7.0, 32.3, 48.9, 3.2, 7.8, 90, 3.5, 0),
+    food("tomato_sauce", "トマトソース", 68, 1.7, 2.1, 11.0, 1.8, 0.9, 18, 0.9, 15),
+    food("cream_sauce", "クリームソース", 163, 2.7, 13.5, 8.0, 0.0, 0.8, 55, 0.2, 1),
+    food("ketchup", "ケチャップ", 120, 1.5, 0.2, 29.0, 0.4, 3.0, 16, 0.5, 8),
+    food("mayonnaise", "マヨネーズ", 700, 1.4, 76.0, 2.1, 0.0, 1.8, 8, 0.3, 0),
+    food("sesame_oil", "ごま油", 900, 0.0, 100.0, 0.0, 0.0, 0.0, 1, 0.1, 0),
+    food("oyster_sauce", "オイスターソース", 134, 5.0, 0.0, 28.0, 0.2, 11.0, 25, 1.2, 0),
+    food("vinegar", "酢", 24, 0.2, 0.0, 2.4, 0.0, 0.0, 2, 0.0, 0),
+    food("ponzu", "ぽん酢", 46, 3.2, 0.0, 8.2, 0.2, 7.5, 24, 0.7, 0),
+    food("butter", "バター", 745, 0.5, 81.0, 0.2, 0.0, 1.5, 15, 0.1, 0),
+    food("cheese", "チーズ", 313, 22.7, 26.0, 1.3, 0.0, 2.8, 630, 0.3, 0),
+    food("sesame", "ごま", 599, 20.3, 54.2, 18.5, 10.8, 0.0, 1200, 9.9, 0),
+    food("starch", "片栗粉", 330, 0.1, 0.1, 81.6, 0.0, 0.0, 10, 0.6, 0),
+    food("flour", "小麦粉", 349, 8.3, 1.5, 75.8, 2.5, 0.0, 20, 0.5, 0),
+    food("gelatin_powder", "ゼラチン", 344, 87.6, 0.3, 0.0, 0.0, 0.1, 16, 0.7, 0),
+    food("baking_powder", "ベーキングパウダー", 53, 0.0, 0.0, 27.7, 0.0, 0.0, 2400, 0.1, 0),
+    food("azuki_paste", "こしあん", 244, 5.0, 0.2, 57.0, 4.0, 0.1, 73, 2.8, 0),
+    food("soba_boiled", "そば（ゆで）", 130, 4.8, 1.0, 26.0, 2.9, 0.0, 9, 0.8, 0),
+    food("tenkasu", "天かす", 620, 4.0, 47.0, 45.0, 1.5, 0.2, 25, 0.3, 0),
+    food("sansai_mix", "山菜ミックス（水煮）", 20, 1.2, 0.1, 4.0, 2.5, 0.4, 25, 0.8, 0),
+    food("green_onion", "青ねぎ", 29, 1.9, 0.3, 6.5, 3.2, 0.0, 80, 1.0, 32),
+    food("naganegi", "長ねぎ", 35, 1.4, 0.1, 8.3, 2.5, 0.0, 36, 0.3, 14)
   ];
   const EXPANDED_FOOD_MAP = new Map(EXPANDED_FOODS.map((item) => [item.id, item]));
 
-  function food(id, name, energy, protein, fat, carbs, fiber, salt) {
-    return { id, name, nutrients: { energy, protein, fat, carbs, fiber, salt } };
+  function food(id, name, energy, protein, fat, carbs, fiber, salt, ca = 0, fe = 0, vc = 0) {
+    return { id, name, nutrients: { energy, protein, fat, carbs, fiber, salt, ca, fe, vc } };
   }
   function part(foodId, grams, meta = {}) {
     if (typeof meta === "string") {
@@ -688,7 +755,7 @@
     const foodItem = EXPANDED_FOOD_MAP.get(partItem.foodId) || getFoodMap().get(partItem.foodId);
     return partItem.label || foodItem?.name || partItem.foodId;
   }
-  function emptyNutrition() { return { energy: 0, protein: 0, fat: 0, carbs: 0, fiber: 0, salt: 0, kcal: 0 }; }
+  function emptyNutrition() { return { energy: 0, protein: 0, fat: 0, carbs: 0, fiber: 0, salt: 0, ca: 0, fe: 0, vc: 0, kcal: 0 }; }
   function withKcalAlias(nutrition) { return { ...nutrition, kcal: nutrition.energy }; }
   function addNutrition(left, right) {
     return withKcalAlias({
@@ -697,7 +764,10 @@
       fat: left.fat + right.fat,
       carbs: left.carbs + right.carbs,
       fiber: left.fiber + right.fiber,
-      salt: left.salt + right.salt
+      salt: left.salt + right.salt,
+      ca: (left.ca || 0) + (right.ca || 0),
+      fe: (left.fe || 0) + (right.fe || 0),
+      vc: (left.vc || 0) + (right.vc || 0)
     });
   }
   function calcNutrition(parts) {
@@ -712,6 +782,9 @@
         carbs: acc.carbs + foodItem.nutrients.carbs * ratio,
         fiber: acc.fiber + foodItem.nutrients.fiber * ratio,
         salt: acc.salt + foodItem.nutrients.salt * ratio,
+        ca: acc.ca + (foodItem.nutrients.ca || 0) * ratio,
+        fe: acc.fe + (foodItem.nutrients.fe || 0) * ratio,
+        vc: acc.vc + (foodItem.nutrients.vc || 0) * ratio,
         kcal: 0
       };
     }, emptyNutrition()));
@@ -722,7 +795,7 @@
     const instructions = Array.isArray(def.steps) && def.steps.length
       ? def.steps
       : (Array.isArray(def.instructions) && def.instructions.length ? def.instructions : ["手順未設定"]);
-    const nutrition = withKcalAlias(def.nutrition || calcNutrition([...ingredients, ...seasonings]));
+    const nutrition = withKcalAlias(calcNutrition([...ingredients, ...seasonings]));
     return {
       id: def.id,
       name: def.name,
@@ -1028,36 +1101,36 @@
       { id: "single-plus2-cn-egg-porridge", name: "中華風たまご粥", cuisine: "中華", servingSize: 280, rotationKey: "中華粥", tags: ["中華主食"], ingredients: [part("soft_rice", 140), part("egg", 25), part("onion", 15), part("komatsuna", 12)], seasonings: [part("broth", 75), part("salt", 0.3), part("sesame_oil", 1)], instructions: ["具材をやわらかく煮る。", "卵を加えて中華粥に仕上げる。"] },
       { id: "single-plus2-cn-champon-udon", name: "ちゃんぽん風うどん", cuisine: "中華", servingSize: 325, rotationKey: "うどん", tags: ["麺類"], ingredients: [part("udon", 190), part("chicken_breast", 35), part("chinese_cabbage", 20), part("carrot", 12), part("corn", 10)], seasonings: [part("broth", 88), part("soy_sauce", 3), part("sesame_oil", 1)], instructions: ["具材をやわらかく煮る。", "うどんに合わせてちゃんぽん風に仕上げる。"] },
       { id: "single-plus2-cn-gomoku-ankake-udon", name: "五目あんかけうどん", cuisine: "中華", servingSize: 325, rotationKey: "うどん", tags: ["麺類"], description: "やわらかく茹でたうどんに中華あんをかけた、食べやすい完成主食。", notes: "主食の完成メニューとして扱い、具とうどんを分割しないこと。", ingredients: [part("udon", 190), part("chicken_breast", 35), part("chinese_cabbage", 20), part("carrot", 12), part("mushrooms", 15)], seasonings: [part("broth", 88), part("soy_sauce", 3), part("sesame_oil", 1), part("starch", 2)], instructions: ["うどんをやわらかめに茹でる。", "野菜と具材を食べやすく煮る。", "中華あんを作ってとろみをつける。", "うどんにかけて仕上げる。"] },
-      { id: "single-plus2-jp-sansai-soba", name: "山菜そば", cuisine: "和食", servingSize: 320, rotationKey: "そば", tags: ["麺類", "そば"], description: "だしの旨味を活かした、食べやすいそばの完成主食です。", notes: "麺はやや短めにし、山菜はやわらかく煮て提供する。", ingredients: [part("udon", 180, { label: "そば", prep: "やや短めにしてやわらかく仕上げる" }), part("komatsuna", 20, { label: "山菜ミックス", prep: "食べやすい長さに整える" }), part("carrot", 10, { prep: "細切り" })], seasonings: [part("broth", 220, { label: "だし" }), part("light_soy", 7), part("mirin", 4)], instructions: ["そばをやわらかめに茹でて短めに整える。", "山菜とにんじんをだしでやわらかく煮る。", "調味してそばにかけて仕上げる。"], nutrition: { energy: 338, protein: 11.6, fat: 4.1, carbs: 61.8, fiber: 3.9, salt: 2.4 } },
-      { id: "single-plus2-jp-tanuki-soba", name: "たぬきそば", cuisine: "和食", servingSize: 315, rotationKey: "そば", tags: ["麺類", "そば"], description: "だしの香りを活かした、親しみやすいそばの完成主食です。", notes: "麺は短めにし、天かすは少量でつゆを含ませて食べやすくする。", ingredients: [part("udon", 180, { label: "そば", prep: "やや短めにしてやわらかく仕上げる" }), part("onion", 12, { label: "天かす", prep: "少量を使用" }), part("komatsuna", 12, { label: "青ねぎ", prep: "やわらかくする" })], seasonings: [part("broth", 220, { label: "だし" }), part("light_soy", 7), part("mirin", 4)], instructions: ["そばをやわらかめに茹でて短めに整える。", "だしを温めて調味する。", "そばに具をのせて仕上げる。"], nutrition: { energy: 352, protein: 10.9, fat: 6.3, carbs: 60.5, fiber: 2.8, salt: 2.5 } },
-      { id: "single-plus2-jp-kitsune-soba", name: "きつねそば", cuisine: "和食", servingSize: 325, rotationKey: "そば", tags: ["麺類", "そば"], description: "味を含ませた具材でやさしく仕上げる、定番のそば主食です。", notes: "油揚げは甘辛くやわらかく煮て、麺は短めに仕上げる。", ingredients: [part("udon", 180, { label: "そば", prep: "やや短めにしてやわらかく仕上げる" }), part("tofu", 35, { label: "油揚げ", prep: "やわらかく煮る" }), part("komatsuna", 12, { label: "青ねぎ", prep: "やわらかくする" })], seasonings: [part("broth", 220, { label: "だし" }), part("light_soy", 7), part("mirin", 5), part("sugar", 2)], instructions: ["油揚げを甘辛くやわらかく煮る。", "そばをやわらかめに茹でて短めに整える。", "だしを温めて具をのせて仕上げる。"], nutrition: { energy: 361, protein: 12.4, fat: 6.8, carbs: 60.9, fiber: 3.1, salt: 2.5 } },
-      { id: "single-plus2-jp-tsukimi-soba", name: "月見そば", cuisine: "和食", servingSize: 320, rotationKey: "そば", tags: ["麺類", "そば"], description: "卵のやわらかさを活かし、のどごし良く仕上げたそばの完成主食です。", notes: "卵はやわらかく仕上げ、麺は短めにして提供する。", ingredients: [part("udon", 180, { label: "そば", prep: "やや短めにしてやわらかく仕上げる" }), part("egg", 35, { prep: "やわらかく加熱する" }), part("komatsuna", 10, { label: "青ねぎ", prep: "やわらかくする" })], seasonings: [part("broth", 220, { label: "だし" }), part("light_soy", 7), part("mirin", 4)], instructions: ["そばをやわらかめに茹でて短めに整える。", "だしを温めて調味する。", "卵をやわらかく加熱してのせ、仕上げる。"], nutrition: { energy: 348, protein: 13.1, fat: 6.2, carbs: 58.7, fiber: 2.6, salt: 2.4 } },
-      { id: "single-plus2-jp-kakitama-soba", name: "かき玉そば", cuisine: "和食", servingSize: 325, rotationKey: "そば", tags: ["麺類", "そば"], description: "卵でつゆをやさしくまとめた、飲み込みやすいそばの完成主食です。", notes: "卵はふんわり仕上げ、軽いとろみでつゆをまとわせる。", ingredients: [part("udon", 180, { label: "そば", prep: "やや短めにしてやわらかく仕上げる" }), part("egg", 40), part("onion", 12, { label: "長ねぎ", prep: "やわらかく煮る" })], seasonings: [part("broth", 220, { label: "だし" }), part("light_soy", 7), part("mirin", 4), part("starch", 2)], instructions: ["そばをやわらかめに茹でて短めに整える。", "だしを温めて軽くとろみをつける。", "溶き卵を流し入れてふんわり仕上げる。"], nutrition: { energy: 354, protein: 13.6, fat: 6.1, carbs: 59.8, fiber: 2.5, salt: 2.5 } },
-      { id: "single-plus2-jp-nishin-soba", name: "にしんそば", cuisine: "和食", servingSize: 330, rotationKey: "そば", tags: ["麺類", "そば"], description: "やわらかく煮た魚をのせ、だしの旨味で食べやすくしたそばの完成主食です。", notes: "魚は骨に注意し、やわらかく煮てから提供する。", ingredients: [part("udon", 180, { label: "そば", prep: "やや短めにしてやわらかく仕上げる" }), part("salmon", 45, { label: "にしん甘露煮風", prep: "骨に注意してやわらかく煮る" }), part("onion", 10, { label: "長ねぎ", prep: "やわらかく煮る" })], seasonings: [part("broth", 220, { label: "だし" }), part("light_soy", 7), part("mirin", 5), part("sugar", 2)], instructions: ["魚をやわらかく煮て味を含ませる。", "そばをやわらかめに茹でて短めに整える。", "だしを温め、魚をのせて仕上げる。"], nutrition: { energy: 372, protein: 16.2, fat: 7.3, carbs: 58.9, fiber: 2.4, salt: 2.6 } },
-      { id: "single-plus2-jp-tori-nanban-soba", name: "鶏南蛮そば", cuisine: "和食", servingSize: 330, rotationKey: "そば", tags: ["麺類", "そば"], description: "鶏肉と長ねぎをやわらかく仕上げた、だしの風味豊かなそばの完成主食です。", notes: "鶏肉は小さめにし、長ねぎは十分にやわらかく煮る。", ingredients: [part("udon", 180, { label: "そば", prep: "やや短めにしてやわらかく仕上げる" }), part("chicken_thigh", 45, { prep: "小さめに切る" }), part("onion", 20, { label: "長ねぎ", prep: "やわらかく煮る" })], seasonings: [part("broth", 220, { label: "だし" }), part("light_soy", 7), part("mirin", 5)], instructions: ["鶏肉と長ねぎをだしでやわらかく煮る。", "そばをやわらかめに茹でて短めに整える。", "温かいつゆを注いで仕上げる。"], nutrition: { energy: 381, protein: 16.8, fat: 7.8, carbs: 60.1, fiber: 2.7, salt: 2.6 } },
-      { id: "single-plus2-jp-gomoku-ankake-soba", name: "五目あんかけそば", cuisine: "中華", servingSize: 340, rotationKey: "そば", tags: ["麺類", "そば", "とろみ"], description: "具だくさんのあんをかけ、とろみでまとめた食べやすいそばの完成主食です。", notes: "主食の完成メニューとして扱い、具とそばを分割しない。具材は小さめにそろえる。", ingredients: [part("udon", 180, { label: "そば", prep: "やや短めにしてやわらかく仕上げる" }), part("chicken_breast", 30, { label: "鶏肉", prep: "小さめに切る" }), part("chinese_cabbage", 20, { label: "白菜", prep: "やわらかく煮る" }), part("carrot", 15, { prep: "細切り" }), part("mushrooms", 12, { label: "しいたけ", prep: "小さめに切る" })], seasonings: [part("broth", 220, { label: "中華だし" }), part("soy_sauce", 7), part("mirin", 3), part("starch", 3)], instructions: ["具材を食べやすい大きさにそろえてやわらかく煮る。", "調味して片栗粉でとろみをつける。", "そばにあんをかけて仕上げる。"], nutrition: { energy: 392, protein: 15.2, fat: 6.8, carbs: 64.5, fiber: 3.6, salt: 2.7 } },
-      { id: "single-plus2-jp-yawaraka-niku-soba", name: "やわらか肉そば", cuisine: "和食", servingSize: 330, rotationKey: "そば", tags: ["麺類", "そば"], description: "薄切り肉をやわらかく煮てのせた、食べやすいそばの完成主食です。", notes: "肉は薄切りでやわらかく煮含め、麺は短めにして提供する。", ingredients: [part("udon", 180, { label: "そば", prep: "やや短めにしてやわらかく仕上げる" }), part("pork_lean", 45, { label: "やわらか肉", prep: "薄切りでやわらかく煮る" }), part("onion", 18, { label: "長ねぎ", prep: "やわらかく煮る" })], seasonings: [part("broth", 220, { label: "だし" }), part("light_soy", 7), part("mirin", 5), part("sugar", 2)], instructions: ["肉を薄切りでやわらかく煮含める。", "そばをやわらかめに茹でて短めに整える。", "温かいつゆと一緒に盛り付ける。"], nutrition: { energy: 387, protein: 16.4, fat: 8.1, carbs: 60.3, fiber: 2.7, salt: 2.6 } },
-      { id: "single-plus2-jp-kinoko-negi-soba", name: "きのこと長ねぎのそば", cuisine: "和食", servingSize: 320, rotationKey: "そば", tags: ["麺類", "そば", "きのこ"], description: "きのこの旨味と長ねぎの甘みを活かした、やさしい味わいのそばの完成主食です。", notes: "きのこは細かめにし、長ねぎはやわらかく煮て食べやすくする。", ingredients: [part("udon", 180, { label: "そば", prep: "やや短めにしてやわらかく仕上げる" }), part("mushrooms", 25, { label: "きのこ", prep: "食べやすく切る" }), part("onion", 22, { label: "長ねぎ", prep: "やわらかく煮る" })], seasonings: [part("broth", 220, { label: "だし" }), part("light_soy", 7), part("mirin", 4)], instructions: ["きのこと長ねぎをだしでやわらかく煮る。", "そばをやわらかめに茹でて短めに整える。", "温かいつゆを注いで仕上げる。"], nutrition: { energy: 341, protein: 11.9, fat: 4.5, carbs: 61.2, fiber: 3.4, salt: 2.5 } },
-      { id: "single-plus2-west-meat-sauce-spaghetti-2", name: "ミートソーススパゲティ", cuisine: "洋食", servingSize: 275, rotationKey: "パスタ", tags: ["パスタ"], description: "しっとりしたミートソースで食べやすく仕上げたパスタ主食です。", notes: "麺はやや短めにし、ひき肉と野菜は細かくしてなじませる。", ingredients: [part("pasta", 180, { prep: "やや短めに仕上げる" }), part("beef_mince", 42), part("onion", 20), part("carrot", 12), part("tomato", 28)], seasonings: [part("ketchup", 8), part("consomme", 2), part("butter", 2)], instructions: ["パスタをやわらかめに茹でる。", "具材を細かくしてやわらかく煮る。", "ソースと合わせてしっとり仕上げる。"], nutrition: { energy: 386, protein: 14.8, fat: 8.2, carbs: 61.5, fiber: 3.8, salt: 2.2 } },
-      { id: "single-plus2-west-napolitan-soft-2", name: "ナポリタン", cuisine: "洋食", servingSize: 272, rotationKey: "パスタ", tags: ["パスタ"], description: "ケチャップのやさしい酸味で食べやすくまとめたパスタ主食です。", notes: "麺は短めにし、具材は小さめでやわらかく仕上げる。", ingredients: [part("pasta", 180, { prep: "やや短めに仕上げる" }), part("chicken_breast", 35), part("onion", 18), part("bell_pepper", 10), part("carrot", 10)], seasonings: [part("ketchup", 9), part("consomme", 2), part("butter", 2)], instructions: ["パスタをやわらかめに茹でる。", "具材を食べやすく加熱する。", "ケチャップ味でしっとり仕上げる。"], nutrition: { energy: 378, protein: 14.2, fat: 7.4, carbs: 60.8, fiber: 3.3, salt: 2.1 } },
-      { id: "single-plus2-west-cream-pasta-soft-2", name: "クリームパスタ", cuisine: "洋食", servingSize: 274, rotationKey: "パスタ", tags: ["パスタ"], description: "なめらかなソースでしっとり食べやすく仕上げたパスタ主食です。", notes: "麺は短めにし、ソースはゆるめにして飲み込みやすくする。", ingredients: [part("pasta", 180, { prep: "やや短めに仕上げる" }), part("chicken_breast", 34), part("onion", 15), part("milk", 38)], seasonings: [part("milk", 38), part("butter", 3), part("flour", 4), part("consomme", 1), part("salt", 0.2)], instructions: ["パスタをやわらかめに茹でる。", "具材をやわらかく加熱する。", "クリームソースと合わせてしっとり仕上げる。"], nutrition: { energy: 382, protein: 14.6, fat: 8.7, carbs: 58.9, fiber: 2.3, salt: 1.9 } },
-      { id: "single-plus2-jp-wafu-kinoko-pasta-2", name: "和風きのこパスタ", cuisine: "和食", servingSize: 265, rotationKey: "パスタ", tags: ["パスタ"], description: "だしときのこの旨味を活かした、やさしい和風のパスタ主食です。", notes: "麺は短めにし、きのこは細かくして食べやすくする。", ingredients: [part("pasta", 175, { prep: "やや短めに仕上げる" }), part("mushrooms", 30), part("onion", 15), part("chicken_breast", 28)], seasonings: [part("soy_sauce", 4), part("butter", 2), part("broth", 20, { label: "和風だし" })], instructions: ["パスタをやわらかめに茹でる。", "きのこと具材をやわらかく加熱する。", "和風の味でしっとり仕上げる。"], nutrition: { energy: 371, protein: 14.9, fat: 6.9, carbs: 59.6, fiber: 3.4, salt: 2.0 } },
-      { id: "single-plus2-west-tarako-pasta", name: "たらこパスタ", cuisine: "洋食", servingSize: 260, rotationKey: "パスタ", tags: ["パスタ"], description: "たらこの旨味をやさしくまとめた、食べやすいパスタ主食です。", notes: "麺は短めにし、たらこは全体になじませて塩分が強くなりすぎないようにする。", ingredients: [part("pasta", 175, { prep: "やや短めに仕上げる" }), part("salmon", 25, { label: "たらこ", prep: "全体にほぐしてなじませる" }), part("onion", 12), part("broccoli", 16, { label: "刻みのり風彩り", prep: "やわらかく仕上げる" })], seasonings: [part("butter", 3), part("light_soy", 2), part("broth", 12, { label: "だし" })], instructions: ["パスタをやわらかめに茹でる。", "具材をなじませるように温める。", "全体を和えてしっとり仕上げる。"], nutrition: { energy: 364, protein: 13.8, fat: 7.1, carbs: 58.1, fiber: 2.8, salt: 1.9 } },
-      { id: "single-plus2-west-tuna-spinach-pasta", name: "ツナとほうれん草のパスタ", cuisine: "洋食", servingSize: 268, rotationKey: "パスタ", tags: ["パスタ"], description: "ツナの旨味とほうれん草の彩りを活かした食べやすいパスタ主食です。", notes: "麺は短めにし、ツナは細かくして全体になじませる。", ingredients: [part("pasta", 175, { prep: "やや短めに仕上げる" }), part("salmon", 32, { label: "ツナ", prep: "細かくほぐす" }), part("spinach", 18), part("onion", 14)], seasonings: [part("consomme", 2), part("butter", 2), part("milk", 16)], instructions: ["パスタをやわらかめに茹でる。", "具材を食べやすく加熱する。", "全体を合わせてしっとり仕上げる。"], nutrition: { energy: 372, protein: 15.1, fat: 7.6, carbs: 58.7, fiber: 3.2, salt: 1.8 } },
-      { id: "single-plus2-west-kinoko-tomato-pasta", name: "きのこのトマトパスタ", cuisine: "洋食", servingSize: 270, rotationKey: "パスタ", tags: ["パスタ"], description: "きのこの旨味をトマトでまとめた、やさしい味わいのパスタ主食です。", notes: "麺は短めにし、きのこは小さくして口当たりをやわらかくする。", ingredients: [part("pasta", 180, { prep: "やや短めに仕上げる" }), part("mushrooms", 30), part("tomato", 30), part("onion", 16)], seasonings: [part("ketchup", 7), part("consomme", 2), part("butter", 2)], instructions: ["パスタをやわらかめに茹でる。", "きのこと野菜をやわらかく煮る。", "トマト味でしっとり仕上げる。"], nutrition: { energy: 368, protein: 12.6, fat: 6.8, carbs: 60.4, fiber: 3.7, salt: 2.0 } },
-      { id: "single-plus2-west-chicken-vegetable-soft-pasta", name: "鶏肉と野菜のやわらかパスタ", cuisine: "洋食", servingSize: 275, rotationKey: "パスタ", tags: ["パスタ"], description: "鶏肉と野菜をやわらかく合わせた、しっとり食べやすいパスタ主食です。", notes: "麺は短めにし、鶏肉と野菜は小さめにそろえてやわらかくする。", ingredients: [part("pasta", 180, { prep: "やや短めに仕上げる" }), part("chicken_breast", 38), part("carrot", 12), part("broccoli", 18), part("onion", 16)], seasonings: [part("consomme", 2), part("milk", 18), part("butter", 2)], instructions: ["パスタをやわらかめに茹でる。", "鶏肉と野菜を食べやすく加熱する。", "ソースと合わせてしっとり仕上げる。"], nutrition: { energy: 379, protein: 15.4, fat: 7.5, carbs: 59.3, fiber: 3.5, salt: 1.9 } },
-      { id: "single-plus2-west-pumpkin-cream-pasta-2", name: "かぼちゃのクリームパスタ", cuisine: "洋食", servingSize: 272, rotationKey: "パスタ", tags: ["パスタ"], description: "かぼちゃの甘みを活かし、なめらかに仕上げたパスタ主食です。", notes: "麺は短めにし、かぼちゃはしっかりやわらかくしてソースになじませる。", ingredients: [part("pasta", 180, { prep: "やや短めに仕上げる" }), part("pumpkin", 28), part("onion", 14), part("milk", 36)], seasonings: [part("milk", 36), part("butter", 3), part("flour", 4), part("consomme", 1), part("salt", 0.2)], instructions: ["パスタをやわらかめに茹でる。", "かぼちゃをやわらかく煮る。", "クリームソースと合わせてなめらかに仕上げる。"], nutrition: { energy: 381, protein: 13.2, fat: 8.4, carbs: 60.2, fiber: 3.3, salt: 1.8 } },
-      { id: "single-plus2-west-cabbage-bacon-style-pasta", name: "キャベツとベーコン風パスタ", cuisine: "洋食", servingSize: 270, rotationKey: "パスタ", tags: ["パスタ"], description: "キャベツの甘みとベーコン風の旨味を合わせた食べやすいパスタ主食です。", notes: "麺は短めにし、ベーコン風具材はかたさと塩分に配慮してやわらかく仕上げる。", ingredients: [part("pasta", 178, { prep: "やや短めに仕上げる" }), part("pork_lean", 32, { label: "ベーコン風", prep: "小さくしてやわらかく加熱する" }), part("cabbage", 22), part("onion", 14)], seasonings: [part("consomme", 2), part("butter", 2), part("milk", 12)], instructions: ["パスタをやわらかめに茹でる。", "具材を食べやすくやわらかく加熱する。", "全体を合わせてしっとり仕上げる。"], nutrition: { energy: 376, protein: 14.1, fat: 7.8, carbs: 58.9, fiber: 3.1, salt: 2.0 } },
-      { id: "single-plus2-jp-kitsune-udon-2", name: "きつねうどん", cuisine: "和食", servingSize: 325, rotationKey: "うどん", tags: ["麺類", "うどん"], description: "だしの旨味を活かした、食べやすいうどんの完成主食です。", notes: "麺はやや短めにし、油揚げはやわらかく煮て提供する。", ingredients: [part("udon", 190, { prep: "やや短めにしてやわらかく仕上げる" }), part("tofu", 35, { label: "油揚げ", prep: "やわらかく煮る" }), part("onion", 12, { label: "長ねぎ", prep: "やわらかく煮る" })], seasonings: [part("broth", 220, { label: "だし" }), part("light_soy", 7), part("mirin", 5), part("sugar", 2)], instructions: ["油揚げを甘辛くやわらかく煮る。", "うどんをやわらかめに茹でて短めに整える。", "だしを温めて盛り付ける。"], nutrition: { energy: 368, protein: 11.9, fat: 6.7, carbs: 63.1, fiber: 2.8, salt: 2.5 } },
-      { id: "single-plus2-jp-tanuki-udon-2", name: "たぬきうどん", cuisine: "和食", servingSize: 318, rotationKey: "うどん", tags: ["麺類", "うどん"], description: "だしの風味を活かし、やさしい味わいに仕上げたうどんの完成主食です。", notes: "麺は短めにし、天かすは少量でつゆを含ませて食べやすくする。", ingredients: [part("udon", 190, { prep: "やや短めにしてやわらかく仕上げる" }), part("onion", 12, { label: "天かす", prep: "少量を使用" }), part("komatsuna", 12, { label: "青ねぎ", prep: "やわらかくする" })], seasonings: [part("broth", 220, { label: "だし" }), part("light_soy", 7), part("mirin", 4)], instructions: ["うどんをやわらかめに茹でて短めに整える。", "だしを温めて調味する。", "具をのせて温かく仕上げる。"], nutrition: { energy: 359, protein: 10.7, fat: 6.1, carbs: 62.0, fiber: 2.3, salt: 2.4 } },
-      { id: "single-plus2-jp-tsukimi-udon-2", name: "月見うどん", cuisine: "和食", servingSize: 322, rotationKey: "うどん", tags: ["麺類", "うどん"], description: "卵のやわらかさを活かし、のどごし良く仕上げたうどんの完成主食です。", notes: "卵はやわらかく仕上げ、麺は短めにして提供する。", ingredients: [part("udon", 190, { prep: "やや短めにしてやわらかく仕上げる" }), part("egg", 35, { prep: "やわらかく加熱する" }), part("onion", 10, { label: "長ねぎ", prep: "やわらかく煮る" })], seasonings: [part("broth", 220, { label: "だし" }), part("light_soy", 7), part("mirin", 4)], instructions: ["うどんをやわらかめに茹でて短めに整える。", "だしを温めて調味する。", "卵をやわらかく加熱してのせ、仕上げる。"], nutrition: { energy: 362, protein: 12.8, fat: 5.8, carbs: 62.4, fiber: 1.9, salt: 2.4 } },
-      { id: "single-plus2-jp-kakitama-udon-2", name: "かき玉うどん", cuisine: "和食", servingSize: 328, rotationKey: "うどん", tags: ["麺類", "うどん", "とろみ"], description: "卵でつゆをやさしくまとめた、飲み込みやすいうどんの完成主食です。", notes: "卵はふんわり仕上げ、軽いとろみでつゆをまとわせる。", ingredients: [part("udon", 190, { prep: "やや短めにしてやわらかく仕上げる" }), part("egg", 40), part("onion", 12, { label: "長ねぎ", prep: "やわらかく煮る" })], seasonings: [part("broth", 220, { label: "だし" }), part("light_soy", 7), part("mirin", 4), part("starch", 2)], instructions: ["うどんをやわらかめに茹でて短めに整える。", "だしを温めて軽くとろみをつける。", "溶き卵を流し入れてふんわり仕上げる。"], nutrition: { energy: 371, protein: 13.4, fat: 5.9, carbs: 63.0, fiber: 1.9, salt: 2.5 } },
-      { id: "single-plus2-jp-niku-udon-2", name: "肉うどん", cuisine: "和食", servingSize: 332, rotationKey: "うどん", tags: ["麺類", "うどん"], description: "やわらかい肉とだしの旨味で食べやすく仕上げたうどんの完成主食です。", notes: "肉は薄切りでやわらかく煮含め、長ねぎは十分にやわらかくする。", ingredients: [part("udon", 190, { prep: "やや短めにしてやわらかく仕上げる" }), part("pork_lean", 45, { label: "やわらか肉", prep: "薄切りでやわらかく煮る" }), part("onion", 18, { label: "長ねぎ", prep: "やわらかく煮る" })], seasonings: [part("broth", 220, { label: "だし" }), part("light_soy", 7), part("mirin", 5), part("sugar", 2)], instructions: ["肉を薄切りでやわらかく煮含める。", "うどんをやわらかめに茹でて短めに整える。", "温かいつゆと一緒に盛り付ける。"], nutrition: { energy: 389, protein: 16.1, fat: 8.0, carbs: 61.2, fiber: 2.0, salt: 2.6 } },
-      { id: "single-plus2-jp-tori-nanban-udon-2", name: "鶏南蛮うどん", cuisine: "和食", servingSize: 332, rotationKey: "うどん", tags: ["麺類", "うどん"], description: "鶏肉と長ねぎをやわらかく仕上げた、だしの風味豊かなうどんの完成主食です。", notes: "鶏肉は小さめにし、長ねぎは十分にやわらかく煮る。", ingredients: [part("udon", 190, { prep: "やや短めにしてやわらかく仕上げる" }), part("chicken_thigh", 45, { prep: "小さめに切る" }), part("onion", 20, { label: "長ねぎ", prep: "やわらかく煮る" })], seasonings: [part("broth", 220, { label: "だし" }), part("light_soy", 7), part("mirin", 5)], instructions: ["鶏肉と長ねぎをだしでやわらかく煮る。", "うどんをやわらかめに茹でて短めに整える。", "温かいつゆを注いで仕上げる。"], nutrition: { energy: 384, protein: 16.5, fat: 7.6, carbs: 61.0, fiber: 2.1, salt: 2.6 } },
-      { id: "single-plus2-cn-gomoku-ankake-udon-2", name: "五目あんかけうどん", cuisine: "中華", servingSize: 340, rotationKey: "うどん", tags: ["麺類", "うどん", "とろみ"], description: "具だくさんのあんをかけ、とろみでまとめた食べやすいうどんの完成主食です。", notes: "主食の完成メニューとして扱い、具とうどんを分割しない。具材は小さめにそろえる。", ingredients: [part("udon", 190, { prep: "やや短めにしてやわらかく仕上げる" }), part("chicken_breast", 30, { label: "鶏肉", prep: "小さめに切る" }), part("chinese_cabbage", 20, { label: "白菜", prep: "やわらかく煮る" }), part("carrot", 15, { prep: "細切り" }), part("mushrooms", 12, { label: "しいたけ", prep: "小さめに切る" })], seasonings: [part("broth", 220, { label: "中華だし" }), part("soy_sauce", 7), part("mirin", 3), part("starch", 3)], instructions: ["具材を食べやすい大きさにそろえてやわらかく煮る。", "調味して片栗粉でとろみをつける。", "うどんにあんをかけて仕上げる。"], nutrition: { energy: 396, protein: 15.0, fat: 6.7, carbs: 65.9, fiber: 3.5, salt: 2.7 } },
-      { id: "single-plus2-jp-kinoko-ankake-udon-2", name: "きのこあんかけうどん", cuisine: "和食", servingSize: 324, rotationKey: "うどん", tags: ["麺類", "うどん", "きのこ", "とろみ"], description: "きのこの旨味を活かし、とろみで食べやすくまとめたうどんの完成主食です。", notes: "麺は短めにし、きのこは細かくしてあんになじませる。", ingredients: [part("udon", 190, { prep: "やや短めにしてやわらかく仕上げる" }), part("mushrooms", 28, { label: "きのこ", prep: "食べやすく切る" }), part("tofu", 35), part("komatsuna", 12)], seasonings: [part("broth", 220, { label: "だし" }), part("soy_sauce", 4), part("light_soy", 2), part("starch", 3)], instructions: ["きのこをやわらかく煮る。", "調味して軽いとろみをつける。", "うどんにあんをかけて仕上げる。"], nutrition: { energy: 374, protein: 13.1, fat: 5.3, carbs: 64.2, fiber: 3.0, salt: 2.5 } },
-      { id: "single-plus2-jp-soft-curry-udon", name: "やわらかカレーうどん", cuisine: "和食", servingSize: 338, rotationKey: "うどん", tags: ["麺類", "うどん", "カレー"], description: "辛味を控えめにし、だしの旨味で食べやすく仕上げたカレーうどんの完成主食です。", notes: "麺は短めにし、カレーは辛味を控えめにしてやわらかくまとめる。", ingredients: [part("udon", 190, { prep: "やや短めにしてやわらかく仕上げる" }), part("chicken_thigh", 38), part("onion", 20, { label: "長ねぎ", prep: "やわらかく煮る" }), part("carrot", 12)], seasonings: [part("broth", 220, { label: "だし" }), part("curry_roux", 12), part("mirin", 3), part("starch", 2)], instructions: ["具材をやわらかく煮る。", "だしでのばしたカレーで味を整える。", "うどんにかけて温かく仕上げる。"], nutrition: { energy: 401, protein: 14.2, fat: 8.3, carbs: 66.1, fiber: 2.6, salt: 2.6 } },
-      { id: "single-plus2-jp-wakame-udon-2", name: "わかめうどん", cuisine: "和食", servingSize: 318, rotationKey: "うどん", tags: ["麺類", "うどん"], description: "わかめの風味を活かした、やさしい味わいのうどんの完成主食です。", notes: "麺は短めにし、わかめはやわらかく戻して食べやすくする。", ingredients: [part("udon", 190, { prep: "やや短めにしてやわらかく仕上げる" }), part("wakame", 8, { prep: "やわらかく戻して食べやすく切る" }), part("onion", 10, { label: "長ねぎ", prep: "やわらかく煮る" })], seasonings: [part("broth", 220, { label: "だし" }), part("light_soy", 7), part("mirin", 4)], instructions: ["わかめをやわらかく戻す。", "うどんをやわらかめに茹でて短めに整える。", "だしを温めて盛り付ける。"], nutrition: { energy: 349, protein: 10.8, fat: 4.4, carbs: 62.3, fiber: 2.5, salt: 2.4 } }
+      { id: "single-plus2-jp-sansai-soba", name: "山菜そば", cuisine: "和食", servingSize: 320, rotationKey: "そば", tags: ["麺類", "そば"], description: "だしの旨味を活かした、食べやすいそばの完成主食です。", notes: "麺はやや短めにし、山菜はやわらかく煮て提供する。", ingredients: [part("soba_boiled", 180, { prep: "やや短めにしてやわらかく仕上げる" }), part("sansai_mix", 30, { prep: "食べやすい長さに整える" }), part("carrot", 10, { prep: "細切り" })], seasonings: [part("broth", 220, { label: "だし" }), part("light_soy", 7), part("mirin", 4)], instructions: ["そばをやわらかめに茹でて短めに整える。", "山菜とにんじんをだしでやわらかく煮る。", "調味してそばにかけて仕上げる。"] },
+      { id: "single-plus2-jp-tanuki-soba", name: "たぬきそば", cuisine: "和食", servingSize: 315, rotationKey: "そば", tags: ["麺類", "そば"], description: "だしの香りを活かした、親しみやすいそばの完成主食です。", notes: "麺は短めにし、天かすは少量でつゆを含ませて食べやすくする。", ingredients: [part("soba_boiled", 180, { prep: "やや短めにしてやわらかく仕上げる" }), part("tenkasu", 6, { prep: "少量を使用" }), part("green_onion", 12, { prep: "小口に切りやわらかくする" })], seasonings: [part("broth", 220, { label: "だし" }), part("light_soy", 7), part("mirin", 4)], instructions: ["そばをやわらかめに茹でて短めに整える。", "だしを温めて調味する。", "そばに具をのせて仕上げる。"] },
+      { id: "single-plus2-jp-kitsune-soba", name: "きつねそば", cuisine: "和食", servingSize: 325, rotationKey: "そば", tags: ["麺類", "そば"], description: "味を含ませた具材でやさしく仕上げる、定番のそば主食です。", notes: "油揚げは甘辛くやわらかく煮て、麺は短めに仕上げる。", ingredients: [part("soba_boiled", 180, { prep: "やや短めにしてやわらかく仕上げる" }), part("tofu", 35, { label: "油揚げ", prep: "やわらかく煮る" }), part("green_onion", 12, { prep: "小口に切りやわらかくする" })], seasonings: [part("broth", 220, { label: "だし" }), part("light_soy", 7), part("mirin", 5), part("sugar", 2)], instructions: ["油揚げを甘辛くやわらかく煮る。", "そばをやわらかめに茹でて短めに整える。", "だしを温めて具をのせて仕上げる。"] },
+      { id: "single-plus2-jp-tsukimi-soba", name: "月見そば", cuisine: "和食", servingSize: 320, rotationKey: "そば", tags: ["麺類", "そば"], description: "卵のやわらかさを活かし、のどごし良く仕上げたそばの完成主食です。", notes: "卵はやわらかく仕上げ、麺は短めにして提供する。", ingredients: [part("soba_boiled", 180, { prep: "やや短めにしてやわらかく仕上げる" }), part("egg", 35, { prep: "やわらかく加熱する" }), part("green_onion", 10, { prep: "小口に切りやわらかくする" })], seasonings: [part("broth", 220, { label: "だし" }), part("light_soy", 7), part("mirin", 4)], instructions: ["そばをやわらかめに茹でて短めに整える。", "だしを温めて調味する。", "卵をやわらかく加熱してのせ、仕上げる。"] },
+      { id: "single-plus2-jp-kakitama-soba", name: "かき玉そば", cuisine: "和食", servingSize: 325, rotationKey: "そば", tags: ["麺類", "そば"], description: "卵でつゆをやさしくまとめた、飲み込みやすいそばの完成主食です。", notes: "卵はふんわり仕上げ、軽いとろみでつゆをまとわせる。", ingredients: [part("soba_boiled", 180, { prep: "やや短めにしてやわらかく仕上げる" }), part("egg", 40), part("naganegi", 12, { prep: "やわらかく煮る" })], seasonings: [part("broth", 220, { label: "だし" }), part("light_soy", 7), part("mirin", 4), part("starch", 2)], instructions: ["そばをやわらかめに茹でて短めに整える。", "だしを温めて軽くとろみをつける。", "溶き卵を流し入れてふんわり仕上げる。"] },
+      { id: "single-plus2-jp-nishin-soba", name: "にしんそば", cuisine: "和食", servingSize: 330, rotationKey: "そば", tags: ["麺類", "そば"], description: "やわらかく煮た魚をのせ、だしの旨味で食べやすくしたそばの完成主食です。", notes: "魚は骨に注意し、やわらかく煮てから提供する。", ingredients: [part("soba_boiled", 180, { prep: "やや短めにしてやわらかく仕上げる" }), part("salmon", 45, { label: "にしん甘露煮風", prep: "骨に注意してやわらかく煮る" }), part("naganegi", 10, { prep: "やわらかく煮る" })], seasonings: [part("broth", 220, { label: "だし" }), part("light_soy", 7), part("mirin", 5), part("sugar", 2)], instructions: ["魚をやわらかく煮て味を含ませる。", "そばをやわらかめに茹でて短めに整える。", "だしを温め、魚をのせて仕上げる。"] },
+      { id: "single-plus2-jp-tori-nanban-soba", name: "鶏南蛮そば", cuisine: "和食", servingSize: 330, rotationKey: "そば", tags: ["麺類", "そば"], description: "鶏肉と長ねぎをやわらかく仕上げた、だしの風味豊かなそばの完成主食です。", notes: "鶏肉は小さめにし、長ねぎは十分にやわらかく煮る。", ingredients: [part("soba_boiled", 180, { prep: "やや短めにしてやわらかく仕上げる" }), part("chicken_thigh", 45, { prep: "小さめに切る" }), part("naganegi", 20, { prep: "やわらかく煮る" })], seasonings: [part("broth", 220, { label: "だし" }), part("light_soy", 7), part("mirin", 5)], instructions: ["鶏肉と長ねぎをだしでやわらかく煮る。", "そばをやわらかめに茹でて短めに整える。", "温かいつゆを注いで仕上げる。"] },
+      { id: "single-plus2-jp-gomoku-ankake-soba", name: "五目あんかけそば", cuisine: "中華", servingSize: 340, rotationKey: "そば", tags: ["麺類", "そば", "とろみ"], description: "具だくさんのあんをかけ、とろみでまとめた食べやすいそばの完成主食です。", notes: "主食の完成メニューとして扱い、具とそばを分割しない。具材は小さめにそろえる。", ingredients: [part("soba_boiled", 180, { prep: "やや短めにしてやわらかく仕上げる" }), part("chicken_breast", 30, { label: "鶏肉", prep: "小さめに切る" }), part("chinese_cabbage", 20, { label: "白菜", prep: "やわらかく煮る" }), part("carrot", 15, { prep: "細切り" }), part("mushrooms", 12, { label: "しいたけ", prep: "小さめに切る" })], seasonings: [part("broth", 220, { label: "中華だし" }), part("soy_sauce", 7), part("mirin", 3), part("starch", 3)], instructions: ["具材を食べやすい大きさにそろえてやわらかく煮る。", "調味して片栗粉でとろみをつける。", "そばにあんをかけて仕上げる。"] },
+      { id: "single-plus2-jp-yawaraka-niku-soba", name: "やわらか肉そば", cuisine: "和食", servingSize: 330, rotationKey: "そば", tags: ["麺類", "そば"], description: "薄切り肉をやわらかく煮てのせた、食べやすいそばの完成主食です。", notes: "肉は薄切りでやわらかく煮含め、麺は短めにして提供する。", ingredients: [part("soba_boiled", 180, { prep: "やや短めにしてやわらかく仕上げる" }), part("pork_lean", 45, { label: "やわらか肉", prep: "薄切りでやわらかく煮る" }), part("naganegi", 18, { prep: "やわらかく煮る" })], seasonings: [part("broth", 220, { label: "だし" }), part("light_soy", 7), part("mirin", 5), part("sugar", 2)], instructions: ["肉を薄切りでやわらかく煮含める。", "そばをやわらかめに茹でて短めに整える。", "温かいつゆと一緒に盛り付ける。"] },
+      { id: "single-plus2-jp-kinoko-negi-soba", name: "きのこと長ねぎのそば", cuisine: "和食", servingSize: 320, rotationKey: "そば", tags: ["麺類", "そば", "きのこ"], description: "きのこの旨味と長ねぎの甘みを活かした、やさしい味わいのそばの完成主食です。", notes: "きのこは細かめにし、長ねぎはやわらかく煮て食べやすくする。", ingredients: [part("soba_boiled", 180, { prep: "やや短めにしてやわらかく仕上げる" }), part("mushrooms", 25, { label: "きのこ", prep: "食べやすく切る" }), part("naganegi", 22, { prep: "やわらかく煮る" })], seasonings: [part("broth", 220, { label: "だし" }), part("light_soy", 7), part("mirin", 4)], instructions: ["きのこと長ねぎをだしでやわらかく煮る。", "そばをやわらかめに茹でて短めに整える。", "温かいつゆを注いで仕上げる。"] },
+      { id: "single-plus2-west-meat-sauce-spaghetti-2", name: "ミートソーススパゲティ", cuisine: "洋食", servingSize: 275, rotationKey: "パスタ", tags: ["パスタ"], description: "しっとりしたミートソースで食べやすく仕上げたパスタ主食です。", notes: "麺はやや短めにし、ひき肉と野菜は細かくしてなじませる。", ingredients: [part("pasta", 180, { prep: "やや短めに仕上げる" }), part("beef_mince", 42), part("onion", 20), part("carrot", 12), part("tomato", 28)], seasonings: [part("ketchup", 8), part("consomme", 2), part("butter", 2)], instructions: ["パスタをやわらかめに茹でる。", "具材を細かくしてやわらかく煮る。", "ソースと合わせてしっとり仕上げる。"] },
+      { id: "single-plus2-west-napolitan-soft-2", name: "ナポリタン", cuisine: "洋食", servingSize: 272, rotationKey: "パスタ", tags: ["パスタ"], description: "ケチャップのやさしい酸味で食べやすくまとめたパスタ主食です。", notes: "麺は短めにし、具材は小さめでやわらかく仕上げる。", ingredients: [part("pasta", 180, { prep: "やや短めに仕上げる" }), part("chicken_breast", 35), part("onion", 18), part("bell_pepper", 10), part("carrot", 10)], seasonings: [part("ketchup", 9), part("consomme", 2), part("butter", 2)], instructions: ["パスタをやわらかめに茹でる。", "具材を食べやすく加熱する。", "ケチャップ味でしっとり仕上げる。"] },
+      { id: "single-plus2-west-cream-pasta-soft-2", name: "クリームパスタ", cuisine: "洋食", servingSize: 274, rotationKey: "パスタ", tags: ["パスタ"], description: "なめらかなソースでしっとり食べやすく仕上げたパスタ主食です。", notes: "麺は短めにし、ソースはゆるめにして飲み込みやすくする。", ingredients: [part("pasta", 180, { prep: "やや短めに仕上げる" }), part("chicken_breast", 34), part("onion", 15), part("milk", 38)], seasonings: [part("milk", 38), part("butter", 3), part("flour", 4), part("consomme", 1), part("salt", 0.2)], instructions: ["パスタをやわらかめに茹でる。", "具材をやわらかく加熱する。", "クリームソースと合わせてしっとり仕上げる。"] },
+      { id: "single-plus2-jp-wafu-kinoko-pasta-2", name: "和風きのこパスタ", cuisine: "和食", servingSize: 265, rotationKey: "パスタ", tags: ["パスタ"], description: "だしときのこの旨味を活かした、やさしい和風のパスタ主食です。", notes: "麺は短めにし、きのこは細かくして食べやすくする。", ingredients: [part("pasta", 175, { prep: "やや短めに仕上げる" }), part("mushrooms", 30), part("onion", 15), part("chicken_breast", 28)], seasonings: [part("soy_sauce", 4), part("butter", 2), part("broth", 20, { label: "和風だし" })], instructions: ["パスタをやわらかめに茹でる。", "きのこと具材をやわらかく加熱する。", "和風の味でしっとり仕上げる。"] },
+      { id: "single-plus2-west-tarako-pasta", name: "たらこパスタ", cuisine: "洋食", servingSize: 260, rotationKey: "パスタ", tags: ["パスタ"], description: "たらこの旨味をやさしくまとめた、食べやすいパスタ主食です。", notes: "麺は短めにし、たらこは全体になじませて塩分が強くなりすぎないようにする。", ingredients: [part("pasta", 175, { prep: "やや短めに仕上げる" }), part("salmon", 25, { label: "たらこ", prep: "全体にほぐしてなじませる" }), part("onion", 12), part("broccoli", 16, { label: "刻みのり風彩り", prep: "やわらかく仕上げる" })], seasonings: [part("butter", 3), part("light_soy", 2), part("broth", 12, { label: "だし" })], instructions: ["パスタをやわらかめに茹でる。", "具材をなじませるように温める。", "全体を和えてしっとり仕上げる。"] },
+      { id: "single-plus2-west-tuna-spinach-pasta", name: "ツナとほうれん草のパスタ", cuisine: "洋食", servingSize: 268, rotationKey: "パスタ", tags: ["パスタ"], description: "ツナの旨味とほうれん草の彩りを活かした食べやすいパスタ主食です。", notes: "麺は短めにし、ツナは細かくして全体になじませる。", ingredients: [part("pasta", 175, { prep: "やや短めに仕上げる" }), part("salmon", 32, { label: "ツナ", prep: "細かくほぐす" }), part("spinach", 18), part("onion", 14)], seasonings: [part("consomme", 2), part("butter", 2), part("milk", 16)], instructions: ["パスタをやわらかめに茹でる。", "具材を食べやすく加熱する。", "全体を合わせてしっとり仕上げる。"] },
+      { id: "single-plus2-west-kinoko-tomato-pasta", name: "きのこのトマトパスタ", cuisine: "洋食", servingSize: 270, rotationKey: "パスタ", tags: ["パスタ"], description: "きのこの旨味をトマトでまとめた、やさしい味わいのパスタ主食です。", notes: "麺は短めにし、きのこは小さくして口当たりをやわらかくする。", ingredients: [part("pasta", 180, { prep: "やや短めに仕上げる" }), part("mushrooms", 30), part("tomato", 30), part("onion", 16)], seasonings: [part("ketchup", 7), part("consomme", 2), part("butter", 2)], instructions: ["パスタをやわらかめに茹でる。", "きのこと野菜をやわらかく煮る。", "トマト味でしっとり仕上げる。"] },
+      { id: "single-plus2-west-chicken-vegetable-soft-pasta", name: "鶏肉と野菜のやわらかパスタ", cuisine: "洋食", servingSize: 275, rotationKey: "パスタ", tags: ["パスタ"], description: "鶏肉と野菜をやわらかく合わせた、しっとり食べやすいパスタ主食です。", notes: "麺は短めにし、鶏肉と野菜は小さめにそろえてやわらかくする。", ingredients: [part("pasta", 180, { prep: "やや短めに仕上げる" }), part("chicken_breast", 38), part("carrot", 12), part("broccoli", 18), part("onion", 16)], seasonings: [part("consomme", 2), part("milk", 18), part("butter", 2)], instructions: ["パスタをやわらかめに茹でる。", "鶏肉と野菜を食べやすく加熱する。", "ソースと合わせてしっとり仕上げる。"] },
+      { id: "single-plus2-west-pumpkin-cream-pasta-2", name: "かぼちゃのクリームパスタ", cuisine: "洋食", servingSize: 272, rotationKey: "パスタ", tags: ["パスタ"], description: "かぼちゃの甘みを活かし、なめらかに仕上げたパスタ主食です。", notes: "麺は短めにし、かぼちゃはしっかりやわらかくしてソースになじませる。", ingredients: [part("pasta", 180, { prep: "やや短めに仕上げる" }), part("pumpkin", 28), part("onion", 14), part("milk", 36)], seasonings: [part("milk", 36), part("butter", 3), part("flour", 4), part("consomme", 1), part("salt", 0.2)], instructions: ["パスタをやわらかめに茹でる。", "かぼちゃをやわらかく煮る。", "クリームソースと合わせてなめらかに仕上げる。"] },
+      { id: "single-plus2-west-cabbage-bacon-style-pasta", name: "キャベツとベーコン風パスタ", cuisine: "洋食", servingSize: 270, rotationKey: "パスタ", tags: ["パスタ"], description: "キャベツの甘みとベーコン風の旨味を合わせた食べやすいパスタ主食です。", notes: "麺は短めにし、ベーコン風具材はかたさと塩分に配慮してやわらかく仕上げる。", ingredients: [part("pasta", 178, { prep: "やや短めに仕上げる" }), part("pork_lean", 32, { label: "ベーコン風", prep: "小さくしてやわらかく加熱する" }), part("cabbage", 22), part("onion", 14)], seasonings: [part("consomme", 2), part("butter", 2), part("milk", 12)], instructions: ["パスタをやわらかめに茹でる。", "具材を食べやすくやわらかく加熱する。", "全体を合わせてしっとり仕上げる。"] },
+      { id: "single-plus2-jp-kitsune-udon-2", name: "きつねうどん", cuisine: "和食", servingSize: 325, rotationKey: "うどん", tags: ["麺類", "うどん"], description: "だしの旨味を活かした、食べやすいうどんの完成主食です。", notes: "麺はやや短めにし、油揚げはやわらかく煮て提供する。", ingredients: [part("udon", 190, { prep: "やや短めにしてやわらかく仕上げる" }), part("tofu", 35, { label: "油揚げ", prep: "やわらかく煮る" }), part("naganegi", 12, { prep: "やわらかく煮る" })], seasonings: [part("broth", 220, { label: "だし" }), part("light_soy", 7), part("mirin", 5), part("sugar", 2)], instructions: ["油揚げを甘辛くやわらかく煮る。", "うどんをやわらかめに茹でて短めに整える。", "だしを温めて盛り付ける。"] },
+      { id: "single-plus2-jp-tanuki-udon-2", name: "たぬきうどん", cuisine: "和食", servingSize: 318, rotationKey: "うどん", tags: ["麺類", "うどん"], description: "だしの風味を活かし、やさしい味わいに仕上げたうどんの完成主食です。", notes: "麺は短めにし、天かすは少量でつゆを含ませて食べやすくする。", ingredients: [part("udon", 190, { prep: "やや短めにしてやわらかく仕上げる" }), part("tenkasu", 6, { prep: "少量を使用" }), part("green_onion", 12, { prep: "小口に切りやわらかくする" })], seasonings: [part("broth", 220, { label: "だし" }), part("light_soy", 7), part("mirin", 4)], instructions: ["うどんをやわらかめに茹でて短めに整える。", "だしを温めて調味する。", "具をのせて温かく仕上げる。"] },
+      { id: "single-plus2-jp-tsukimi-udon-2", name: "月見うどん", cuisine: "和食", servingSize: 322, rotationKey: "うどん", tags: ["麺類", "うどん"], description: "卵のやわらかさを活かし、のどごし良く仕上げたうどんの完成主食です。", notes: "卵はやわらかく仕上げ、麺は短めにして提供する。", ingredients: [part("udon", 190, { prep: "やや短めにしてやわらかく仕上げる" }), part("egg", 35, { prep: "やわらかく加熱する" }), part("naganegi", 10, { prep: "やわらかく煮る" })], seasonings: [part("broth", 220, { label: "だし" }), part("light_soy", 7), part("mirin", 4)], instructions: ["うどんをやわらかめに茹でて短めに整える。", "だしを温めて調味する。", "卵をやわらかく加熱してのせ、仕上げる。"] },
+      { id: "single-plus2-jp-kakitama-udon-2", name: "かき玉うどん", cuisine: "和食", servingSize: 328, rotationKey: "うどん", tags: ["麺類", "うどん", "とろみ"], description: "卵でつゆをやさしくまとめた、飲み込みやすいうどんの完成主食です。", notes: "卵はふんわり仕上げ、軽いとろみでつゆをまとわせる。", ingredients: [part("udon", 190, { prep: "やや短めにしてやわらかく仕上げる" }), part("egg", 40), part("naganegi", 12, { prep: "やわらかく煮る" })], seasonings: [part("broth", 220, { label: "だし" }), part("light_soy", 7), part("mirin", 4), part("starch", 2)], instructions: ["うどんをやわらかめに茹でて短めに整える。", "だしを温めて軽くとろみをつける。", "溶き卵を流し入れてふんわり仕上げる。"] },
+      { id: "single-plus2-jp-niku-udon-2", name: "肉うどん", cuisine: "和食", servingSize: 332, rotationKey: "うどん", tags: ["麺類", "うどん"], description: "やわらかい肉とだしの旨味で食べやすく仕上げたうどんの完成主食です。", notes: "肉は薄切りでやわらかく煮含め、長ねぎは十分にやわらかくする。", ingredients: [part("udon", 190, { prep: "やや短めにしてやわらかく仕上げる" }), part("pork_lean", 45, { label: "やわらか肉", prep: "薄切りでやわらかく煮る" }), part("naganegi", 18, { prep: "やわらかく煮る" })], seasonings: [part("broth", 220, { label: "だし" }), part("light_soy", 7), part("mirin", 5), part("sugar", 2)], instructions: ["肉を薄切りでやわらかく煮含める。", "うどんをやわらかめに茹でて短めに整える。", "温かいつゆと一緒に盛り付ける。"] },
+      { id: "single-plus2-jp-tori-nanban-udon-2", name: "鶏南蛮うどん", cuisine: "和食", servingSize: 332, rotationKey: "うどん", tags: ["麺類", "うどん"], description: "鶏肉と長ねぎをやわらかく仕上げた、だしの風味豊かなうどんの完成主食です。", notes: "鶏肉は小さめにし、長ねぎは十分にやわらかく煮る。", ingredients: [part("udon", 190, { prep: "やや短めにしてやわらかく仕上げる" }), part("chicken_thigh", 45, { prep: "小さめに切る" }), part("naganegi", 20, { prep: "やわらかく煮る" })], seasonings: [part("broth", 220, { label: "だし" }), part("light_soy", 7), part("mirin", 5)], instructions: ["鶏肉と長ねぎをだしでやわらかく煮る。", "うどんをやわらかめに茹でて短めに整える。", "温かいつゆを注いで仕上げる。"] },
+      { id: "single-plus2-cn-gomoku-ankake-udon-2", name: "五目あんかけうどん", cuisine: "中華", servingSize: 340, rotationKey: "うどん", tags: ["麺類", "うどん", "とろみ"], description: "具だくさんのあんをかけ、とろみでまとめた食べやすいうどんの完成主食です。", notes: "主食の完成メニューとして扱い、具とうどんを分割しない。具材は小さめにそろえる。", ingredients: [part("udon", 190, { prep: "やや短めにしてやわらかく仕上げる" }), part("chicken_breast", 30, { label: "鶏肉", prep: "小さめに切る" }), part("chinese_cabbage", 20, { label: "白菜", prep: "やわらかく煮る" }), part("carrot", 15, { prep: "細切り" }), part("mushrooms", 12, { label: "しいたけ", prep: "小さめに切る" })], seasonings: [part("broth", 220, { label: "中華だし" }), part("soy_sauce", 7), part("mirin", 3), part("starch", 3)], instructions: ["具材を食べやすい大きさにそろえてやわらかく煮る。", "調味して片栗粉でとろみをつける。", "うどんにあんをかけて仕上げる。"] },
+      { id: "single-plus2-jp-kinoko-ankake-udon-2", name: "きのこあんかけうどん", cuisine: "和食", servingSize: 324, rotationKey: "うどん", tags: ["麺類", "うどん", "きのこ", "とろみ"], description: "きのこの旨味を活かし、とろみで食べやすくまとめたうどんの完成主食です。", notes: "麺は短めにし、きのこは細かくしてあんになじませる。", ingredients: [part("udon", 190, { prep: "やや短めにしてやわらかく仕上げる" }), part("mushrooms", 28, { label: "きのこ", prep: "食べやすく切る" }), part("tofu", 35), part("komatsuna", 12)], seasonings: [part("broth", 220, { label: "だし" }), part("soy_sauce", 4), part("light_soy", 2), part("starch", 3)], instructions: ["きのこをやわらかく煮る。", "調味して軽いとろみをつける。", "うどんにあんをかけて仕上げる。"] },
+      { id: "single-plus2-jp-soft-curry-udon", name: "やわらかカレーうどん", cuisine: "和食", servingSize: 338, rotationKey: "うどん", tags: ["麺類", "うどん", "カレー"], description: "辛味を控えめにし、だしの旨味で食べやすく仕上げたカレーうどんの完成主食です。", notes: "麺は短めにし、カレーは辛味を控えめにしてやわらかくまとめる。", ingredients: [part("udon", 190, { prep: "やや短めにしてやわらかく仕上げる" }), part("chicken_thigh", 38), part("naganegi", 20, { prep: "やわらかく煮る" }), part("carrot", 12)], seasonings: [part("broth", 220, { label: "だし" }), part("curry_roux", 12), part("mirin", 3), part("starch", 2)], instructions: ["具材をやわらかく煮る。", "だしでのばしたカレーで味を整える。", "うどんにかけて温かく仕上げる。"] },
+      { id: "single-plus2-jp-wakame-udon-2", name: "わかめうどん", cuisine: "和食", servingSize: 318, rotationKey: "うどん", tags: ["麺類", "うどん"], description: "わかめの風味を活かした、やさしい味わいのうどんの完成主食です。", notes: "麺は短めにし、わかめはやわらかく戻して食べやすくする。", ingredients: [part("udon", 190, { prep: "やや短めにしてやわらかく仕上げる" }), part("wakame", 8, { prep: "やわらかく戻して食べやすく切る" }), part("naganegi", 10, { prep: "やわらかく煮る" })], seasonings: [part("broth", 220, { label: "だし" }), part("light_soy", 7), part("mirin", 4)], instructions: ["わかめをやわらかく戻す。", "うどんをやわらかめに茹でて短めに整える。", "だしを温めて盛り付ける。"] }
     ];
     return definitions.map(dish);
   }
@@ -1333,7 +1406,7 @@
       "炒め物": [
         { id: "itame-broccoli", name: "ブロッコリーの炒め物", ingredients: [part("broccoli", 54), part("onion", 10)], seasonings: [part("soy_sauce", 1.5), part("sesame_oil", 1)], servingSize: 64, rotationKey: "ブロッコリー", cuisine: "洋食" },
         { id: "itame-paprika-piman", name: "パプリカとピーマンの炒め物", ingredients: [part("bell_pepper", 26, { label: "パプリカ" }), part("bell_pepper", 22)], seasonings: [part("soy_sauce", 1.5), part("sesame_oil", 1)], servingSize: 58, rotationKey: "ピーマン", cuisine: "中華" },
-        { id: "itame-naganegi", name: "長ねぎの炒め物", ingredients: [part("onion", 50, { label: "長ねぎ" })], seasonings: [part("soy_sauce", 1.5), part("sesame_oil", 1)], servingSize: 56, rotationKey: "長ねぎ" },
+        { id: "itame-naganegi", name: "長ねぎの炒め物", ingredients: [part("naganegi", 50, { prep: "やわらかく煮る" })], seasonings: [part("soy_sauce", 1.5), part("sesame_oil", 1)], servingSize: 56, rotationKey: "長ねぎ" },
         { id: "itame-chingensai-tofu", name: "チンゲン菜と豆腐の炒め物", ingredients: [part("komatsuna", 34, { label: "チンゲン菜" }), part("tofu", 24)], seasonings: [part("soy_sauce", 1.5), part("sesame_oil", 1)], servingSize: 66, rotationKey: "チンゲン菜", cuisine: "中華" },
         { id: "itame-satsumaimo-bacon", name: "さつまいもとベーコンの炒め物", ingredients: [part("sweet_potato", 44), part("pork_lean", 12, { label: "ベーコン" })], seasonings: [part("consomme", 1), part("butter", 1.5)], servingSize: 66, rotationKey: "さつまいも", cuisine: "洋食" },
         { id: "itame-gobo-carrot-kinpira", name: "ごぼうと人参のきんぴら", ingredients: [part("burdock", 34), part("carrot", 16)], seasonings: [part("soy_sauce", 2), part("mirin", 1.5), part("sesame_oil", 1)], servingSize: 58, rotationKey: "ごぼう" },
@@ -1841,7 +1914,16 @@
     const recipes = getMenuRecipeIds(dayMenu).map((id) => map.get(id)).filter(Boolean);
     const totals = recipes.reduce((acc, recipe) => addNutrition(acc, recipe.nutrition), emptyNutrition());
     const structurePass = dayMenu.mode === "basic" ? ["staple", "soup", "main", "side1", "side2", "dessert"].every((key) => Boolean(dayMenu.basic[key])) : Boolean(dayMenu.exception.singleDish);
-    return { recipes, totals, structurePass, energyPass: totals.energy >= 500 && totals.energy <= 600, saltPass: totals.salt <= 3.0 };
+    const goalEnergy = Number(state.goals.energy) || 550;
+    const goalSalt = Number(state.goals.salt) || 3.0;
+    const energyMin = Math.round(goalEnergy * 0.9);
+    const energyMax = Math.round(goalEnergy * 1.1);
+    const riskRecipes = recipes.filter((recipe) => isChokingRisk(recipe));
+    if (dayMenu.snack) {
+      const snackRecipe = map.get(dayMenu.snack);
+      if (snackRecipe && isChokingRisk(snackRecipe)) riskRecipes.push(snackRecipe);
+    }
+    return { recipes, totals, structurePass, energyPass: totals.energy >= energyMin && totals.energy <= energyMax, saltPass: totals.salt <= goalSalt, energyMin, energyMax, goalSalt, riskRecipes, riskPass: riskRecipes.length === 0 };
   };
   menuSlotsForDisplay = function (dayMenu) {
     return dayMenu.mode === "basic" ? [["主食", dayMenu.basic.staple], ["汁物", dayMenu.basic.soup], ["主菜", dayMenu.basic.main], ["副菜1", dayMenu.basic.side1], ["副菜2", dayMenu.basic.side2], ["デザート", dayMenu.basic.dessert]] : [["単品料理", dayMenu.exception.singleDish], ["追加汁物", dayMenu.exception.extraSoup], ["追加副菜", dayMenu.exception.extraSide], ["追加デザート", dayMenu.exception.extraDessert]].filter(([, value]) => value);
@@ -2109,6 +2191,8 @@
   }
   function pickRecipe(pool, context, role, options = {}) {
     const excludeRotationKeys = options.excludeRotationKeys || new Set();
+    const safePool = pool.filter((recipe) => !isChokingRisk(recipe));
+    pool = safePool.length ? safePool : pool;
     const filtered = pool.filter((recipe) => !(excludeRotationKeys.has(recipe.rotationKey) || (role === "main" && options.excludeMainRotation && recipe.rotationKey === options.excludeMainRotation)));
     const source = filtered.length ? filtered : pool;
     if (!source.length) return null;
@@ -2123,10 +2207,14 @@
     const evaluation = evaluateDayMenu(menu);
     if (!evaluation.structurePass) return -999999;
     let score = 1000;
-    score -= Math.abs(evaluation.totals.energy - 550) * 4;
-    if (evaluation.totals.energy < 500) score -= (500 - evaluation.totals.energy) * 4;
-    if (evaluation.totals.energy > 600) score -= (evaluation.totals.energy - 600) * 5;
-    if (evaluation.totals.salt > 3.0) score -= (evaluation.totals.salt - 3.0) * 260; else score += (3.0 - evaluation.totals.salt) * 4;
+    const goalEnergy = Number(state.goals.energy) || 550;
+    const goalSalt = Number(state.goals.salt) || 3.0;
+    const energyMin = goalEnergy * 0.9;
+    const energyMax = goalEnergy * 1.1;
+    score -= Math.abs(evaluation.totals.energy - goalEnergy) * 4;
+    if (evaluation.totals.energy < energyMin) score -= (energyMin - evaluation.totals.energy) * 4;
+    if (evaluation.totals.energy > energyMax) score -= (evaluation.totals.energy - energyMax) * 5;
+    if (evaluation.totals.salt > goalSalt) score -= (evaluation.totals.salt - goalSalt) * 260; else score += (goalSalt - evaluation.totals.salt) * 4;
     const primary = getPrimaryRecipeLocal(menu);
     if (primary) {
       if (primary.id === context.lastMainId) score -= 220;
@@ -2286,7 +2374,10 @@
       ["脂質", `${formatNumber(safeNutrition.fat, 1)}g`],
       ["炭水化物", `${formatNumber(safeNutrition.carbs, 1)}g`],
       ["食物繊維", `${formatNumber(safeNutrition.fiber, 1)}g`],
-      ["食塩相当量", `${formatNumber(safeNutrition.salt, 1)}g`]
+      ["食塩相当量", `${formatNumber(safeNutrition.salt, 1)}g`],
+      ["カルシウム", `${formatNumber(safeNutrition.ca || 0, 0)}mg`],
+      ["鉄", `${formatNumber(safeNutrition.fe || 0, 1)}mg`],
+      ["ビタミンC", `${formatNumber(safeNutrition.vc || 0, 0)}mg`]
     ];
     return `<section class="recipe-nutrition-section"><h4>食品成分</h4><div class="recipe-nutrition-list">${nutritionItems.map(([label, value]) => `<div class="recipe-nutrition-item"><span>${label}</span><strong>${value}</strong></div>`).join("")}</div></section>`;
   }
@@ -2294,7 +2385,16 @@
     return `<section><h4>食品成分</h4><div class="metrics-grid six">${METRIC_META.map((item) => `<article class="metric-card"><span>${item.label}</span><strong>${formatNumber(nutrition[item.key], item.digits)} ${item.unit}</strong></article>`).join("")}</div></section>`;
   }
   renderConditionCards = function (evaluation) {
-    const cards = [{ label: "構成", pass: evaluation.structurePass, detail: evaluation.structurePass ? "必要な構成がそろっています。" : "必要な構成が不足しています。" }, { label: "エネルギー", pass: evaluation.energyPass, detail: `${formatNumber(evaluation.totals.energy, 0)} kcal / 目安 500〜600 kcal` }, { label: "塩分", pass: evaluation.saltPass, detail: `${formatNumber(evaluation.totals.salt, 1)} g / 上限 3.0 g` }];
+    const energyMin = evaluation.energyMin || 500;
+    const energyMax = evaluation.energyMax || 600;
+    const goalSalt = evaluation.goalSalt || 3.0;
+    const riskRecipes = evaluation.riskRecipes || [];
+    const cards = [
+      { label: "構成", pass: evaluation.structurePass, detail: evaluation.structurePass ? "必要な構成がそろっています。" : "必要な構成が不足しています。" },
+      { label: "エネルギー", pass: evaluation.energyPass, detail: `${formatNumber(evaluation.totals.energy, 0)} kcal / 目安 ${energyMin}〜${energyMax} kcal` },
+      { label: "塩分", pass: evaluation.saltPass, detail: `${formatNumber(evaluation.totals.salt, 1)} g / 上限 ${formatNumber(goalSalt, 1)} g` },
+      { label: "安全", pass: riskRecipes.length === 0, detail: riskRecipes.length === 0 ? "窒息リスクの高い料理はありません。" : `要注意: ${riskRecipes.map((recipe) => recipe.name).join("、")}（食形態に応じて代替を検討）` }
+    ];
     return cards.map((card) => `<article class="check-card ${card.pass ? "pass" : "fail"}"><span>${card.label}</span><strong>${card.pass ? "適合" : "要調整"}</strong><p class="muted">${card.detail}</p></article>`).join("");
   };
   function shouldHideDuplicateSide2(dayMenu, recipeMap) {
@@ -2498,15 +2598,15 @@
       createRecipe({ id: "snack-simple-yogurt", name: "ヨーグルト", category: "おやつ", cuisine: "洋食", servingSize: 80, rotationKey: "乳製品", tags: ["おやつ", "乳製品", "安価"], notes: "市販の個食ヨーグルトを使用する。", ingredients: [part("yogurt", 80, { label: "ヨーグルト 1個", prep: "冷蔵保管する" })], seasonings: [], instructions: ["冷蔵保管し、提供前に人数分を配る。"] }),
       createRecipe({ id: "snack-simple-jelly", name: "ゼリー", category: "おやつ", cuisine: "洋食", servingSize: 85, rotationKey: "ゼリー", tags: ["おやつ", "ゼリー", "安価"], notes: "市販のカップゼリーを使用する。", ingredients: [part("jelly_base", 85, { label: "市販ゼリー 1個", prep: "冷蔵保管する" })], seasonings: [], instructions: ["冷蔵保管し、提供前に人数分を配る。"] }),
       createRecipe({ id: "snack-simple-pudding", name: "プリン", category: "おやつ", cuisine: "洋食", servingSize: 85, rotationKey: "プリン", tags: ["おやつ", "プリン", "安価"], notes: "市販の個食プリンを使用する。", ingredients: [part("pudding_base", 85, { label: "市販プリン 1個", prep: "冷蔵保管する" })], seasonings: [], instructions: ["冷蔵保管し、提供前に人数分を配る。"] }),
-      createRecipe({ id: "snack-simple-castella", name: "カステラ", category: "おやつ", cuisine: "和食", servingSize: 70, rotationKey: "焼き菓子", tags: ["おやつ", "和菓子", "焼き菓子", "安価"], notes: "市販のカステラを食べやすい大きさで提供する。", ingredients: [part("bread", 70, { label: "市販カステラ 1切", prep: "乾燥しないよう保管する" })], seasonings: [], instructions: ["乾燥しないよう保管し、提供前に皿へ盛り付ける。"], nutrition: { energy: 155, protein: 3.9, fat: 2.9, carbs: 32.0, fiber: 0.5, salt: 0.2 } }),
-      createRecipe({ id: "snack-simple-dorayaki", name: "どら焼き", category: "おやつ", cuisine: "和食", servingSize: 74, rotationKey: "和菓子", tags: ["おやつ", "和菓子", "安価"], notes: "通常のあん入り市販どら焼きを使用する。", ingredients: [part("azuki_paste", 74, { label: "市販どら焼き 1個", prep: "個包装のまま、または皿にのせて提供できるよう準備する" })], seasonings: [], instructions: ["個包装のまま、または皿にのせて提供する。"], nutrition: { energy: 156, protein: 3.9, fat: 2.1, carbs: 31.2, fiber: 1.8, salt: 0.2 } }),
-      createRecipe({ id: "snack-simple-yokan", name: "水ようかん", category: "おやつ", cuisine: "和食", servingSize: 72, rotationKey: "和菓子", tags: ["おやつ", "和菓子", "やわらかい", "安価"], notes: "市販の水ようかんを冷やして提供する。", ingredients: [part("azuki_paste", 72, { label: "市販水ようかん 1個", prep: "冷蔵保管し、よく冷やす" })], seasonings: [], instructions: ["冷蔵保管し、提供前に人数分を配る。"], nutrition: { energy: 132, protein: 2.8, fat: 0.1, carbs: 30.5, fiber: 2.2, salt: 0.1 } }),
-      createRecipe({ id: "snack-simple-baum", name: "バウムクーヘン", category: "おやつ", cuisine: "洋食", servingSize: 68, rotationKey: "焼き菓子", tags: ["おやつ", "洋菓子", "焼き菓子"], notes: "市販のバウムクーヘンを食べやすい量で提供する。", ingredients: [part("bread", 68, { label: "市販バウムクーヘン 1切", prep: "食べやすい厚さを確認する" })], seasonings: [], instructions: ["個包装のまま、または皿にのせて提供する。"], nutrition: { energy: 150, protein: 3.1, fat: 7.0, carbs: 19.8, fiber: 0.4, salt: 0.2 } }),
-      createRecipe({ id: "snack-simple-rollcake", name: "ロールケーキ", category: "おやつ", cuisine: "洋食", servingSize: 76, rotationKey: "洋菓子", tags: ["おやつ", "洋菓子", "やわらかい"], notes: "市販のロールケーキを崩れないよう提供する。", ingredients: [part("bread", 76, { label: "市販ロールケーキ 1切", prep: "形崩れしないよう冷蔵保管する" })], seasonings: [], instructions: ["冷蔵保管し、提供前に皿へ盛り付ける。"], nutrition: { energy: 148, protein: 3.8, fat: 7.3, carbs: 16.9, fiber: 0.3, salt: 0.2 } }),
-      createRecipe({ id: "snack-simple-chiffon", name: "シフォンケーキ", category: "おやつ", cuisine: "洋食", servingSize: 72, rotationKey: "洋菓子", tags: ["おやつ", "洋菓子", "やわらかい"], notes: "市販のシフォンケーキをやわらかい状態で提供する。", ingredients: [part("bread", 72, { label: "市販シフォンケーキ 1切", prep: "つぶれや乾燥がないか確認する" })], seasonings: [], instructions: ["乾燥しないよう保管し、提供前に皿へ盛り付ける。"], nutrition: { energy: 142, protein: 3.7, fat: 4.8, carbs: 21.4, fiber: 0.4, salt: 0.2 } }),
-      createRecipe({ id: "snack-simple-amashoku", name: "甘食", category: "おやつ", cuisine: "和食", servingSize: 68, rotationKey: "焼き菓子", tags: ["おやつ", "焼き菓子", "安価"], notes: "市販の甘食を食べやすい状態で提供する。", ingredients: [part("bread", 68, { label: "市販甘食 1個", prep: "硬すぎない製品を使用する" })], seasonings: [], instructions: ["個包装のまま、または皿にのせて提供する。"], nutrition: { energy: 150, protein: 3.4, fat: 4.6, carbs: 23.7, fiber: 0.4, salt: 0.2 } }),
-      createRecipe({ id: "snack-simple-waffle", name: "ワッフル", category: "おやつ", cuisine: "洋食", servingSize: 70, rotationKey: "焼き菓子", tags: ["おやつ", "洋菓子", "焼き菓子"], notes: "市販のワッフルを食べやすい状態で提供する。", ingredients: [part("bread", 70, { label: "市販ワッフル 1個", prep: "食べやすい大きさを確認する" })], seasonings: [], instructions: ["個包装のまま、または皿にのせて提供する。"], nutrition: { energy: 156, protein: 3.5, fat: 5.8, carbs: 22.8, fiber: 0.4, salt: 0.2 } }),
-      createRecipe({ id: "snack-simple-minicake", name: "ミニケーキ", category: "おやつ", cuisine: "洋食", servingSize: 70, rotationKey: "洋菓子", tags: ["おやつ", "洋菓子"], notes: "市販のミニケーキを人数分配りやすい形で使用する。", ingredients: [part("bread", 70, { label: "市販ミニケーキ 1個", prep: "個包装または皿で提供できるよう準備する" })], seasonings: [], instructions: ["個包装のまま、または皿にのせて提供する。"], nutrition: { energy: 152, protein: 3.2, fat: 6.1, carbs: 21.6, fiber: 0.4, salt: 0.2 } })
+      createRecipe({ id: "snack-simple-castella", name: "カステラ", category: "おやつ", cuisine: "和食", servingSize: 70, rotationKey: "焼き菓子", tags: ["おやつ", "和菓子", "焼き菓子", "安価"], notes: "市販のカステラを食べやすい大きさで提供する。", ingredients: [part("bread", 70, { label: "市販カステラ 1切", prep: "乾燥しないよう保管する" })], seasonings: [], instructions: ["乾燥しないよう保管し、提供前に皿へ盛り付ける。"] }),
+      createRecipe({ id: "snack-simple-dorayaki", name: "どら焼き", category: "おやつ", cuisine: "和食", servingSize: 74, rotationKey: "和菓子", tags: ["おやつ", "和菓子", "安価"], notes: "通常のあん入り市販どら焼きを使用する。", ingredients: [part("azuki_paste", 74, { label: "市販どら焼き 1個", prep: "個包装のまま、または皿にのせて提供できるよう準備する" })], seasonings: [], instructions: ["個包装のまま、または皿にのせて提供する。"] }),
+      createRecipe({ id: "snack-simple-yokan", name: "水ようかん", category: "おやつ", cuisine: "和食", servingSize: 72, rotationKey: "和菓子", tags: ["おやつ", "和菓子", "やわらかい", "安価"], notes: "市販の水ようかんを冷やして提供する。", ingredients: [part("azuki_paste", 72, { label: "市販水ようかん 1個", prep: "冷蔵保管し、よく冷やす" })], seasonings: [], instructions: ["冷蔵保管し、提供前に人数分を配る。"] }),
+      createRecipe({ id: "snack-simple-baum", name: "バウムクーヘン", category: "おやつ", cuisine: "洋食", servingSize: 68, rotationKey: "焼き菓子", tags: ["おやつ", "洋菓子", "焼き菓子"], notes: "市販のバウムクーヘンを食べやすい量で提供する。", ingredients: [part("bread", 68, { label: "市販バウムクーヘン 1切", prep: "食べやすい厚さを確認する" })], seasonings: [], instructions: ["個包装のまま、または皿にのせて提供する。"] }),
+      createRecipe({ id: "snack-simple-rollcake", name: "ロールケーキ", category: "おやつ", cuisine: "洋食", servingSize: 76, rotationKey: "洋菓子", tags: ["おやつ", "洋菓子", "やわらかい"], notes: "市販のロールケーキを崩れないよう提供する。", ingredients: [part("bread", 76, { label: "市販ロールケーキ 1切", prep: "形崩れしないよう冷蔵保管する" })], seasonings: [], instructions: ["冷蔵保管し、提供前に皿へ盛り付ける。"] }),
+      createRecipe({ id: "snack-simple-chiffon", name: "シフォンケーキ", category: "おやつ", cuisine: "洋食", servingSize: 72, rotationKey: "洋菓子", tags: ["おやつ", "洋菓子", "やわらかい"], notes: "市販のシフォンケーキをやわらかい状態で提供する。", ingredients: [part("bread", 72, { label: "市販シフォンケーキ 1切", prep: "つぶれや乾燥がないか確認する" })], seasonings: [], instructions: ["乾燥しないよう保管し、提供前に皿へ盛り付ける。"] }),
+      createRecipe({ id: "snack-simple-amashoku", name: "甘食", category: "おやつ", cuisine: "和食", servingSize: 68, rotationKey: "焼き菓子", tags: ["おやつ", "焼き菓子", "安価"], notes: "市販の甘食を食べやすい状態で提供する。", ingredients: [part("bread", 68, { label: "市販甘食 1個", prep: "硬すぎない製品を使用する" })], seasonings: [], instructions: ["個包装のまま、または皿にのせて提供する。"] }),
+      createRecipe({ id: "snack-simple-waffle", name: "ワッフル", category: "おやつ", cuisine: "洋食", servingSize: 70, rotationKey: "焼き菓子", tags: ["おやつ", "洋菓子", "焼き菓子"], notes: "市販のワッフルを食べやすい状態で提供する。", ingredients: [part("bread", 70, { label: "市販ワッフル 1個", prep: "食べやすい大きさを確認する" })], seasonings: [], instructions: ["個包装のまま、または皿にのせて提供する。"] }),
+      createRecipe({ id: "snack-simple-minicake", name: "ミニケーキ", category: "おやつ", cuisine: "洋食", servingSize: 70, rotationKey: "洋菓子", tags: ["おやつ", "洋菓子"], notes: "市販のミニケーキを人数分配りやすい形で使用する。", ingredients: [part("bread", 70, { label: "市販ミニケーキ 1個", prep: "個包装または皿で提供できるよう準備する" })], seasonings: [], instructions: ["個包装のまま、または皿にのせて提供する。"] })
     ];
     return [...simpleSnacks, ...buildAdditionalSnackRecipes(), ...buildBirthdayCakeRecipes()];
   }
@@ -3300,6 +3400,8 @@
   }
   function pickRecipeWithHistory(pool, context, role, targetDate, options = {}) {
     const excludeRotationKeys = options.excludeRotationKeys || new Set();
+    const safePool = pool.filter((recipe) => !isChokingRisk(recipe));
+    pool = safePool.length ? safePool : pool;
     const filtered = pool.filter((recipe) => {
       if (excludeRotationKeys.has(recipe.rotationKey)) return false;
       if (role === "main" && options.excludeMainRotation && recipe.rotationKey === options.excludeMainRotation) return false;
@@ -3444,9 +3546,14 @@
       const recipeRows = [...grouped.entries()].map(([recipeId, slotLabels]) => {
         const recipe = map.get(recipeId);
         if (!recipe) return "";
-        return `<tr><td>${escapeHtml(slotLabels.join(" / "))}</td><td>${escapeHtml(recipe.name)}</td><td>${formatNumber(recipe.servingSize, 0)} g</td><td>${formatPartLines(recipe.ingredients, state.settings.kitchenServings, "ingredient")}</td><td>${formatPartLines(recipe.seasonings, state.settings.kitchenServings, "seasoning")}</td><td>${escapeHtml(recipe.instructions.join(" / "))}</td><td>${formatNumber(recipe.nutrition.energy, 0)} kcal<br>塩分 ${formatNumber(recipe.nutrition.salt, 1)} g</td></tr>`;
-      }).join("") || '<tr><td colspan="7">献立が未設定です。</td></tr>';
-      return `<article class="panel kitchen-day-sheet page-print-break"><div class="section-head"><div><p class="section-kicker">${WEEKDAY_LABELS[dayKey]}曜日</p><h2>${formatDate(dayMenu.date)} 調理士向け指示書</h2></div></div><div class="kitchen-page-stack"><div class="kitchen-day-meta"><table class="kitchen-summary-table"><tbody>${summaryRows}</tbody></table>${renderKitchenNutritionSummary(evaluation.totals)}</div><table class="kitchen-day-table"><thead><tr><th>献立枠</th><th>料理名</th><th>1人前量</th><th>材料</th><th>調味料</th><th>作業指示</th><th>栄養価</th></tr></thead><tbody>${recipeRows}</tbody></table></div></article>`;
+        const riskBadge = isChokingRisk(recipe) ? '<span class="risk-badge">⚠ 窒息注意</span>' : "";
+        const textureCell = textureAdviceLines(recipe).map((line) => `<span class="texture-line${line.startsWith("⚠") ? " is-risk" : ""}">${escapeHtml(line)}</span>`).join("");
+        return `<tr class="${isChokingRisk(recipe) ? "is-risk-row" : ""}"><td>${escapeHtml(slotLabels.join(" / "))}</td><td>${escapeHtml(recipe.name)}${riskBadge}</td><td>${formatNumber(recipe.servingSize, 0)} g</td><td>${formatPartLines(recipe.ingredients, state.settings.kitchenServings, "ingredient")}</td><td>${formatPartLines(recipe.seasonings, state.settings.kitchenServings, "seasoning")}</td><td>${escapeHtml(recipe.instructions.join(" / "))}</td><td class="texture-cell">${textureCell}</td><td>${formatNumber(recipe.nutrition.energy, 0)} kcal<br>塩分 ${formatNumber(recipe.nutrition.salt, 1)} g</td></tr>`;
+      }).join("") || '<tr><td colspan="8">献立が未設定です。</td></tr>';
+      const heatedRecipes = [...grouped.entries()].map(([recipeId]) => map.get(recipeId)).filter((recipe) => recipe && recipe.category !== "デザート" && recipe.category !== "おやつ");
+      const haccpRows = heatedRecipes.map((recipe) => `<tr><td>${escapeHtml(recipe.name)}</td><td class="fill-cell"></td><td class="fill-cell"></td><td class="fill-cell"></td></tr>`).join("") || '<tr><td colspan="4">対象料理なし</td></tr>';
+      const haccpBlock = `<section class="haccp-section"><h4>衛生管理記録（大量調理施設衛生管理マニュアル準拠）</h4><div class="haccp-grid"><div><p class="haccp-title">加熱調理記録（中心温度 75℃・1分以上 ※二枚貝等は85〜90℃・90秒以上）</p><table class="haccp-table"><thead><tr><th>料理名</th><th>中心温度（℃）</th><th>確認時刻</th><th>確認者</th></tr></thead><tbody>${haccpRows}</tbody></table></div><div><p class="haccp-title">検食・保存食</p><table class="haccp-table"><tbody><tr><th>検食者</th><td class="fill-cell"></td><th>検食時刻</th><td class="fill-cell"></td></tr><tr><th>味付け・加熱・異物</th><td colspan="3" class="fill-cell"></td></tr><tr><th>保存食</th><td colspan="3">□ 原材料・調理済み食品を各50g以上、-20℃以下で2週間以上保存</td></tr></tbody></table></div></div></section>`;
+      return `<article class="panel kitchen-day-sheet page-print-break"><div class="section-head"><div><p class="section-kicker">${WEEKDAY_LABELS[dayKey]}曜日</p><h2>${formatDate(dayMenu.date)} 調理士向け指示書</h2></div></div><div class="kitchen-page-stack"><div class="kitchen-day-meta"><table class="kitchen-summary-table"><tbody>${summaryRows}</tbody></table>${renderKitchenNutritionSummary(evaluation.totals)}</div><div class="check-grid">${renderConditionCards(evaluation)}</div><table class="kitchen-day-table"><thead><tr><th>献立枠</th><th>料理名</th><th>1人前量</th><th>材料</th><th>調味料</th><th>作業指示</th><th>食形態対応</th><th>栄養価</th></tr></thead><tbody>${recipeRows}</tbody></table>${haccpBlock}</div></article>`;
     }).join("");
     elements.kitchenView.innerHTML = `<article class="panel kitchen-intro"><div class="section-head"><div><p class="section-kicker">Kitchen Sheets</p><h2>調理師向け 5日分指示書</h2></div></div></article>${sheets}`;
   };
@@ -3454,7 +3561,7 @@
     const week = getWeekMenus(state.settings.weekStart); const recipes = getAllRecipes(); const foods = getAllFoods(); const selectedRecipe = recipes.find((recipe) => recipe.id === state.selectedRecipeId) || null; const catalog = summarizeCatalog(recipes); const byCategory = (category) => recipes.filter((recipe) => recipe.category === category).sort((a, b) => a.name.localeCompare(b.name, 'ja'));
     const historyCount = Object.keys(state.menuHistory || {}).length;
     const editorCards = WEEKDAY_KEYS.map((dayKey) => { const dayMenu = week[dayKey]; const evaluation = evaluateDayMenu(dayMenu); return `<article class="menu-card"><div class="sub-head"><div><p class="section-kicker">${WEEKDAY_LABELS[dayKey]}曜日</p><h3>${formatDate(dayMenu.date)}</h3></div><span class="pill">${dayMenu.mode === "basic" ? "通常献立" : "例外献立"}</span></div><div class="stack"><label class="field"><span>献立タイプ</span><select data-menu-day="${dayKey}" data-menu-field="mode"><option value="basic" ${dayMenu.mode === "basic" ? "selected" : ""}>通常献立</option><option value="exception" ${dayMenu.mode === "exception" ? "selected" : ""}>例外献立</option></select></label><div class="grid-two">${renderSlotSelect(dayKey, "basic", "staple", "主食", dayMenu.basic.staple, byCategory("主食"))}${renderSlotSelect(dayKey, "basic", "soup", "汁物", dayMenu.basic.soup, byCategory("汁物"))}${renderSlotSelect(dayKey, "basic", "main", "主菜", dayMenu.basic.main, byCategory("主菜"))}${renderSlotSelect(dayKey, "basic", "side1", "副菜1", dayMenu.basic.side1, byCategory("副菜"))}${renderSlotSelect(dayKey, "basic", "side2", "副菜2", dayMenu.basic.side2, byCategory("副菜"))}${renderSlotSelect(dayKey, "basic", "dessert", "デザート", dayMenu.basic.dessert, byCategory("デザート"))}</div><div class="grid-two">${renderSlotSelect(dayKey, "exception", "singleDish", "単品料理", dayMenu.exception.singleDish, byCategory("単品料理"))}${renderSlotSelect(dayKey, "exception", "extraSoup", "追加汁物", dayMenu.exception.extraSoup, byCategory("汁物"), true)}${renderSlotSelect(dayKey, "exception", "extraSide", "追加副菜", dayMenu.exception.extraSide, byCategory("副菜"), true)}${renderSlotSelect(dayKey, "exception", "extraDessert", "追加デザート", dayMenu.exception.extraDessert, byCategory("デザート"), true)}</div><div class="grid-two">${renderSlotSelect(dayKey, "snack", "snack", "3時のおやつ", dayMenu.snack, byCategory("おやつ"))}</div><label class="field"><span>メモ</span><textarea data-menu-day="${dayKey}" data-menu-field="memo">${escapeHtml(dayMenu.memo || "")}</textarea></label><div class="check-grid">${renderConditionCards(evaluation)}</div></div></article>`; }).join("");
-    elements.adminView.innerHTML = `<article class="panel"><div class="section-head"><div><p class="section-kicker">Admin</p><h2>管理画面</h2></div></div><div class="toolbar"><label class="field"><span>週の開始日</span><input id="admin-week-start" type="date" value="${escapeHtml(state.settings.weekStart)}"></label><label class="field"><span>調理人数</span><input id="admin-kitchen-servings" type="number" min="1" step="1" value="${escapeHtml(state.settings.kitchenServings)}"></label><label class="field"><span>誕生日週ルールを第3週に適用</span><input id="admin-birthday-week" type="checkbox" ${isBirthdayRuleEnabled() ? "checked" : ""}></label><button type="button" class="button button-primary" id="auto-generate-button">自動で5日分の献立を作成</button></div><p class="print-note">3週目ルール ${isThirdWeekRuleWeek(state.settings.weekStart) ? "適用中: 主食はお赤飯固定" : "対象外"} / 誕生日週ルール ${!isBirthdayRuleEnabled() ? "OFF" : (isThirdWeekRuleWeek(state.settings.weekStart) ? "適用中: 第3週のため お赤飯 + ケーキ" : "待機中: 第3週のみ適用")}</p></article><article class="panel catalog-panel"><div class="section-head"><div><p class="section-kicker">Catalog</p><h2>料理マスタ概要</h2></div></div><div class="catalog-stats catalog-stats--compact"><article class="metric-card"><span>総料理数</span><strong>${catalog.total}</strong></article><article class="metric-card"><span>和食 / 洋食 / 中華</span><strong>${catalog.byCuisine["和食"]} / ${catalog.byCuisine["洋食"]} / ${catalog.byCuisine["中華"]}</strong></article><article class="metric-card"><span>副菜数</span><strong>${catalog.byCategory["副菜"]}</strong></article><article class="metric-card"><span>デザート / おやつ</span><strong>${catalog.byCategory["デザート"]} / ${catalog.byCategory["おやつ"]}</strong></article></div></article><article class="panel"><div class="section-head"><div><p class="section-kicker">Weekly Editor</p><h2>5日分献立編集</h2></div></div><div class="weekly-grid">${editorCards}</div></article><article class="panel"><div class="section-head"><div><p class="section-kicker">Recipe Master</p><h2>料理一覧</h2></div></div><div class="detail-grid"><div class="recipe-list">${recipes.map((recipe) => `<article class="recipe-card ${recipe.id === state.selectedRecipeId ? "is-active" : ""}" data-recipe-card="${recipe.id}"><div class="sub-head"><div><h3>${escapeHtml(recipe.name)}</h3><span class="tag">${escapeHtml(recipe.cuisine)} / ${escapeHtml(recipe.category)}</span></div><span class="pill">${formatNumber(recipe.nutrition.energy, 0)} kcal</span></div><p class="muted">rotation ${escapeHtml(recipe.rotationKey)} / ${escapeHtml(recipe.tags.join("・"))}</p></article>`).join("")}</div>${renderRecipeDetailPanel(selectedRecipe)}</div></article><article class="panel"><div class="section-head"><div><p class="section-kicker">Food Master</p><h2>食品マスタ</h2></div><p class="section-note">食品成分表ベースの100gあたり栄養価です。</p></div><div class="food-list">${foods.map((food) => `<article class="card"><div class="sub-head"><strong>${escapeHtml(food.name)}</strong><span class="pill">100g</span></div><p class="muted">エネルギー ${formatNumber(food.nutrients.energy, 0)} kcal / たんぱく質 ${formatNumber(food.nutrients.protein, 1)} g / 脂質 ${formatNumber(food.nutrients.fat, 1)} g / 炭水化物 ${formatNumber(food.nutrients.carbs, 1)} g / 食物繊維 ${formatNumber(food.nutrients.fiber, 1)} g / 塩分 ${formatNumber(food.nutrients.salt, 1)} g</p></article>`).join("")}</div></article>`;
+    elements.adminView.innerHTML = `<article class="panel"><div class="section-head"><div><p class="section-kicker">Admin</p><h2>管理画面</h2></div></div><div class="toolbar"><label class="field"><span>週の開始日</span><input id="admin-week-start" type="date" value="${escapeHtml(state.settings.weekStart)}"></label><label class="field"><span>調理人数</span><input id="admin-kitchen-servings" type="number" min="1" step="1" value="${escapeHtml(state.settings.kitchenServings)}"></label><label class="field"><span>誕生日週ルールを第3週に適用</span><input id="admin-birthday-week" type="checkbox" ${isBirthdayRuleEnabled() ? "checked" : ""}></label><button type="button" class="button button-primary" id="auto-generate-button">自動で5日分の献立を作成</button></div><p class="print-note">3週目ルール ${isThirdWeekRuleWeek(state.settings.weekStart) ? "適用中: 主食はお赤飯固定" : "対象外"} / 誕生日週ルール ${!isBirthdayRuleEnabled() ? "OFF" : (isThirdWeekRuleWeek(state.settings.weekStart) ? "適用中: 第3週のため お赤飯 + ケーキ" : "待機中: 第3週のみ適用")}</p></article><article class="panel goals-panel"><div class="section-head"><div><p class="section-kicker">Targets</p><h2>昼食の目標値（1食あたり）</h2></div><p class="section-note">献立チェックと自動生成の判定に使用します。施設の給与栄養目標量に合わせて調整してください。</p></div><div class="goals-grid">${[["energy", "エネルギー", "kcal"], ["protein", "たんぱく質", "g"], ["fat", "脂質", "g"], ["carbs", "炭水化物", "g"], ["salt", "塩分上限", "g"], ["fiber", "食物繊維", "g"], ["ca", "カルシウム", "mg"], ["fe", "鉄", "mg"], ["vc", "ビタミンC", "mg"]].map(([key, label, unit]) => `<label class="field"><span>${label}（${unit}）</span><input type="number" step="0.1" min="0" class="goal-input" data-goal-key="${key}" value="${escapeHtml(state.goals[key] ?? 0)}"></label>`).join("")}</div><div class="toolbar"><button type="button" class="button button-primary" id="goals-save-button">目標値を保存</button><span class="hint">エネルギーは目標値±10%、塩分は上限として判定します。</span></div></article><article class="panel backup-panel"><div class="section-head"><div><p class="section-kicker">Backup</p><h2>データのバックアップ</h2></div><p class="section-note">献立・レシピ・設定はこのブラウザ内（localStorage）にのみ保存されます。定期的に書き出して保管してください。</p></div><div class="toolbar"><button type="button" class="button button-secondary" id="backup-export-button">バックアップを書き出す（JSON）</button><label class="button button-secondary backup-import-label">バックアップを読み込む<input type="file" id="backup-import-input" accept="application/json" hidden></label></div></article><article class="panel catalog-panel"><div class="section-head"><div><p class="section-kicker">Catalog</p><h2>料理マスタ概要</h2></div></div><div class="catalog-stats catalog-stats--compact"><article class="metric-card"><span>総料理数</span><strong>${catalog.total}</strong></article><article class="metric-card"><span>和食 / 洋食 / 中華</span><strong>${catalog.byCuisine["和食"]} / ${catalog.byCuisine["洋食"]} / ${catalog.byCuisine["中華"]}</strong></article><article class="metric-card"><span>副菜数</span><strong>${catalog.byCategory["副菜"]}</strong></article><article class="metric-card"><span>デザート / おやつ</span><strong>${catalog.byCategory["デザート"]} / ${catalog.byCategory["おやつ"]}</strong></article></div></article><article class="panel"><div class="section-head"><div><p class="section-kicker">Weekly Editor</p><h2>5日分献立編集</h2></div></div><div class="weekly-grid">${editorCards}</div></article><article class="panel"><div class="section-head"><div><p class="section-kicker">Recipe Master</p><h2>料理一覧</h2></div></div><div class="detail-grid"><div class="recipe-list">${recipes.map((recipe) => `<article class="recipe-card ${recipe.id === state.selectedRecipeId ? "is-active" : ""}" data-recipe-card="${recipe.id}"><div class="sub-head"><div><h3>${escapeHtml(recipe.name)}</h3><span class="tag">${escapeHtml(recipe.cuisine)} / ${escapeHtml(recipe.category)}</span></div><span class="pill">${formatNumber(recipe.nutrition.energy, 0)} kcal</span></div><p class="muted">rotation ${escapeHtml(recipe.rotationKey)} / ${escapeHtml(recipe.tags.join("・"))}</p></article>`).join("")}</div>${renderRecipeDetailPanel(selectedRecipe)}</div></article><article class="panel"><div class="section-head"><div><p class="section-kicker">Food Master</p><h2>食品マスタ</h2></div><p class="section-note">食品成分表ベースの100gあたり栄養価です。</p></div><div class="food-list">${foods.map((food) => `<article class="card"><div class="sub-head"><strong>${escapeHtml(food.name)}</strong><span class="pill">100g</span></div><p class="muted">エネルギー ${formatNumber(food.nutrients.energy, 0)} kcal / たんぱく質 ${formatNumber(food.nutrients.protein, 1)} g / 脂質 ${formatNumber(food.nutrients.fat, 1)} g / 炭水化物 ${formatNumber(food.nutrients.carbs, 1)} g / 食物繊維 ${formatNumber(food.nutrients.fiber, 1)} g / 塩分 ${formatNumber(food.nutrients.salt, 1)} g</p></article>`).join("")}</div></article>`;
     bindAdminViewEvents();
   };
   collectWeekDraftFromDom = function () {
@@ -3839,7 +3946,13 @@
       }
     };
   }
+  function isStaticHostingWithoutApi() {
+    return window.location.protocol === "file:" || /(^|\.)github\.io$/.test(window.location.hostname);
+  }
   function renderRecipeMasterAiRow() {
+    if (isStaticHostingWithoutApi()) {
+      return `<div class="recipe-master-ai-row"><p class="recipe-master-ai-note">AI下書きはサーバー接続時のみ利用できます（GitHub Pages では利用できません）。材料・調味料は下の欄に直接入力してください。</p></div>`;
+    }
     return `<div class="recipe-master-ai-row"><p class="recipe-master-ai-note">AI下書き。内容確認後に保存してください。</p><button type="button" class="button button-secondary recipe-master-ai-button${state.recipeMasterAiLoading ? " is-loading" : ""}" id="recipe-master-ai-button" ${state.recipeMasterAiLoading ? "disabled" : ""}>${state.recipeMasterAiLoading ? "AIで下書き作成中..." : "AIで下書き作成"}</button></div>`;
   }
   const RECIPE_MASTER_AI_ENDPOINT = "/api/recipe-autofill";
@@ -3984,6 +4097,8 @@
     return `<div class="section-head"><div><p class="section-kicker">Recipe Master</p><h2>\u6599\u7406\u4e00\u89a7</h2></div></div><div class="recipe-master-filter-bar">${filterButtons}${searchField}${addButton}</div><div class="detail-grid"><div class="recipe-list">${recipeCards}</div>${recipeDetail}</div>`;
   }
   function pickWeeklyEditorShuffleRecipe(recipes, currentValue, excludeIds = []) {
+    const safeRecipes = (recipes || []).filter((recipe) => !isChokingRisk(recipe));
+    recipes = safeRecipes.length ? safeRecipes : recipes;
     if (!Array.isArray(recipes) || !recipes.length) {
       return currentValue || null;
     }
@@ -4112,7 +4227,9 @@
       const unifiedFields = dayMenu.mode === "basic"
         ? `${renderWeeklyEditorSlotSelect(dayKey, "basic", "staple", "主食", dayMenu.basic.staple, stapleItems)}${renderWeeklyEditorSlotSelect(dayKey, "basic", "soup", "汁物", dayMenu.basic.soup, byCategory("汁物"))}${renderWeeklyEditorSlotSelect(dayKey, "basic", "main", "主菜", dayMenu.basic.main, byCategory("主菜"))}${renderWeeklyEditorSlotSelect(dayKey, "basic", "side1", "副菜1", dayMenu.basic.side1, byCategory("副菜"))}${renderWeeklyEditorSlotSelect(dayKey, "basic", "side2", "副菜2", dayMenu.basic.side2, byCategory("副菜"))}${renderWeeklyEditorSlotSelect(dayKey, "basic", "dessert", "デザート", dayMenu.basic.dessert, byCategory("デザート"))}`
         : `${renderWeeklyEditorSlotSelect(dayKey, "exception", "singleDish", "主食", dayMenu.exception.singleDish, stapleItems)}${renderWeeklyEditorSlotSelect(dayKey, "exception", "extraSoup", "汁物", dayMenu.exception.extraSoup, byCategory("汁物"), true)}${renderWeeklyEditorPlaceholderField("主菜")}${renderWeeklyEditorSlotSelect(dayKey, "exception", "extraSide", "副菜1", dayMenu.exception.extraSide, byCategory("副菜"), true)}${renderWeeklyEditorPlaceholderField("副菜2")}${renderWeeklyEditorSlotSelect(dayKey, "exception", "extraDessert", "デザート", dayMenu.exception.extraDessert, byCategory("デザート"), true)}`;
-      return `<article class="menu-card weekly-editor-day-card" data-weekly-card="${dayKey}"><div class="weekly-editor-day-head"><div class="weekly-editor-day-meta"><div><p class="section-kicker">${WEEKDAY_LABELS[dayKey]}曜日</p><h3>${formatDate(dayMenu.date)}</h3></div><div class="weekly-editor-day-actions"><button type="button" class="button button-secondary weekly-editor-save-button${state.adminWeeklySavedDayKey === dayKey ? " is-saving-day" : ""}" data-save-day="${dayKey}">保存</button><button type="button" class="button button-secondary weekly-editor-shuffle-button" data-shuffle-day="${dayKey}">シャッフル</button></div></div><input type="hidden" data-menu-day="${dayKey}" data-menu-field="mode" value="${escapeHtml(dayMenu.mode)}"></div><div class="weekly-editor-card-body"><section class="weekly-editor-card-section"><div class="weekly-editor-fields">${unifiedFields}</div></section><section class="weekly-editor-card-section"><p class="weekly-editor-section-title">3時のおやつ</p><div class="weekly-editor-fields">${renderWeeklyEditorSlotSelect(dayKey, "snack", "snack", "", dayMenu.snack, byCategory("おやつ"))}</div></section><section class="weekly-editor-card-section"><p class="weekly-editor-section-title">メモ</p><label class="field"><textarea data-menu-day="${dayKey}" data-menu-field="memo">${escapeHtml(dayMenu.memo || "")}</textarea></label></section></div></article>`;
+      const dayEvaluation = evaluateDayMenu(dayMenu);
+      const dayCheckStrip = `<div class="weekly-editor-check">${renderConditionCards(dayEvaluation)}</div>`;
+      return `<article class="menu-card weekly-editor-day-card" data-weekly-card="${dayKey}"><div class="weekly-editor-day-head"><div class="weekly-editor-day-meta"><div><p class="section-kicker">${WEEKDAY_LABELS[dayKey]}曜日</p><h3>${formatDate(dayMenu.date)}</h3></div><div class="weekly-editor-day-actions"><button type="button" class="button button-secondary weekly-editor-save-button${state.adminWeeklySavedDayKey === dayKey ? " is-saving-day" : ""}" data-save-day="${dayKey}">保存</button><button type="button" class="button button-secondary weekly-editor-shuffle-button" data-shuffle-day="${dayKey}">シャッフル</button></div></div><input type="hidden" data-menu-day="${dayKey}" data-menu-field="mode" value="${escapeHtml(dayMenu.mode)}"></div><div class="weekly-editor-card-body"><section class="weekly-editor-card-section"><div class="weekly-editor-fields">${unifiedFields}</div></section><section class="weekly-editor-card-section"><p class="weekly-editor-section-title">3時のおやつ</p><div class="weekly-editor-fields">${renderWeeklyEditorSlotSelect(dayKey, "snack", "snack", "", dayMenu.snack, byCategory("おやつ"))}</div></section><section class="weekly-editor-card-section"><p class="weekly-editor-section-title">メモ</p><label class="field"><textarea data-menu-day="${dayKey}" data-menu-field="memo">${escapeHtml(dayMenu.memo || "")}</textarea></label></section>${dayCheckStrip}</div></article>`;
     }).join("");
     return `<div class="section-head weekly-editor-head"><div><p class="section-kicker">Weekly Editor</p><h2>5日分献立編集</h2></div>${settingsMarkup}</div><div class="weekly-editor-scroll"><div class="weekly-editor-card-grid">${cards}</div></div>`;
   }
@@ -5228,6 +5345,7 @@
     const viewMap = {
       'resident-view': elements.residentView,
       'kitchen-view': elements.kitchenView,
+      'order-view': elements.orderView,
       'admin-view': elements.adminView
     };
     Object.entries(viewMap).forEach(([viewId, view]) => {
@@ -5244,14 +5362,60 @@
     updateTopNavigationActionButtons();
     console.log('[nav] renderViews', { selectedView: state.selectedView, printTarget: state.printTarget });
   };
+
+  function collectWeeklyOrderData(weekStart) {
+    const week = getWeekMenus(weekStart);
+    const map = getRecipeMap();
+    const servings = Number(state.settings.kitchenServings) || 1;
+    const totals = new Map();
+    WEEKDAY_KEYS.forEach((dayKey) => {
+      const dayMenu = week[dayKey];
+      if (!dayMenu) return;
+      const recipeIds = getMenuRecipeIds(dayMenu).concat(dayMenu.snack ? [dayMenu.snack] : []);
+      recipeIds.forEach((recipeId) => {
+        const recipe = map.get(recipeId);
+        if (!recipe) return;
+        [["材料", recipe.ingredients || []], ["調味料", recipe.seasonings || []]].forEach(([kind, parts]) => {
+          parts.forEach((partItem) => {
+            const label = getFoodLabel(partItem);
+            const key = `${kind}::${label}`;
+            if (!totals.has(key)) totals.set(key, { kind, label, days: { mon: 0, tue: 0, wed: 0, thu: 0, fri: 0 }, total: 0 });
+            const entry = totals.get(key);
+            const grams = (Number(partItem.grams) || 0) * servings;
+            entry.days[dayKey] += grams;
+            entry.total += grams;
+          });
+        });
+      });
+    });
+    return [...totals.values()].sort((a, b) => a.kind === b.kind ? b.total - a.total : (a.kind === "材料" ? -1 : 1));
+  }
+  function formatOrderAmount(grams) {
+    if (grams >= 1000) return `${(grams / 1000).toFixed(2)} kg`;
+    return `${Math.ceil(grams)} g`;
+  }
+  function renderOrderView() {
+    if (!elements.orderView) return;
+    const weekStart = state.settings.weekStart;
+    const rows = collectWeeklyOrderData(weekStart);
+    const servings = Number(state.settings.kitchenServings) || 1;
+    const bodyRows = rows.map((row) => `<tr><td>${escapeHtml(row.kind)}</td><td>${escapeHtml(row.label)}</td>${WEEKDAY_KEYS.map((dayKey) => `<td class="num">${row.days[dayKey] ? formatOrderAmount(row.days[dayKey]) : ""}</td>`).join("")}<td class="num order-total">${formatOrderAmount(row.total)}</td><td class="fill-cell order-memo"></td></tr>`).join("") || '<tr><td colspan="9">献立が未設定です。</td></tr>';
+    const week = getWeekMenus(weekStart);
+    const firstDay = week[WEEKDAY_KEYS[0]];
+    const lastDay = week[WEEKDAY_KEYS[WEEKDAY_KEYS.length - 1]];
+    elements.orderView.innerHTML = `<article class="panel order-panel"><div class="section-head"><div><p class="section-kicker">Weekly Order</p><h2>週間 食材発注集計表</h2></div><p class="section-note">対象週 ${formatDate(firstDay.date)}〜${formatDate(lastDay.date)} / ${servings}食分で自動集計。使用日別の必要量と週合計を表示します（廃棄率・ロスは含みません）。</p></div><table class="order-table"><thead><tr><th>区分</th><th>食品名</th>${WEEKDAY_KEYS.map((dayKey) => `<th>${WEEKDAY_LABELS[dayKey]}</th>`).join("")}<th>週合計</th><th>発注メモ</th></tr></thead><tbody>${bodyRows}</tbody></table><p class="print-note">発注時は納品単位・廃棄率を考慮して切り上げてください。</p></article>`;
+  }
+  globalThis.renderOrderView = renderOrderView;
   function getCurrentTopView() {
     if (state.selectedView === 'resident-view') return 'resident';
     if (state.selectedView === 'kitchen-view') return 'kitchen';
+    if (state.selectedView === 'order-view') return 'order';
     return 'admin';
   }
   function getActiveViewForPrint() {
     const resident = document.getElementById('resident-view');
     const kitchen = document.getElementById('kitchen-view');
+    const order = document.getElementById('order-view');
     const admin = document.getElementById('admin-view');
     const isVisible = (element) => {
       if (!element) return false;
@@ -5262,6 +5426,7 @@
         && (element.classList.contains('is-active') || element.offsetParent !== null);
     };
     if (isVisible(kitchen)) return 'kitchen';
+    if (isVisible(order)) return 'order';
     if (isVisible(resident)) return 'resident';
     if (isVisible(admin)) return 'admin';
     return state.currentView || getCurrentTopView();
@@ -5279,7 +5444,7 @@
       button.classList.remove('nav-button--action-resident', 'nav-button--action-kitchen', 'nav-button--action-disabled');
       if (currentView === 'resident') {
         button.classList.add('nav-button--action-resident');
-      } else if (currentView === 'kitchen') {
+      } else if (currentView === 'kitchen' || currentView === 'order') {
         button.classList.add('nav-button--action-kitchen');
       } else {
         button.classList.add('nav-button--action-disabled');
@@ -5288,10 +5453,11 @@
   }
   let viewRenderCycle = 0;
   let deferredViewRenderCycle = 0;
-  const renderedViewCycle = { resident: 0, kitchen: 0, admin: 0 };
+  const renderedViewCycle = { resident: 0, kitchen: 0, admin: 0, order: 0 };
   function invalidateMenuDisplayViews() {
     renderedViewCycle.resident = -1;
     renderedViewCycle.kitchen = -1;
+    renderedViewCycle.order = -1;
   }
   function syncMenuDisplayViewsAfterWeekSave() {
     invalidateMenuDisplayViews();
@@ -5326,6 +5492,11 @@
       renderedViewCycle.kitchen = viewRenderCycle;
       return;
     }
+    if (viewId === 'order-view') {
+      renderOrderView();
+      renderedViewCycle.order = viewRenderCycle;
+      return;
+    }
     if (viewId === 'admin-view') {
       renderAdminView();
       renderedViewCycle.admin = viewRenderCycle;
@@ -5337,6 +5508,10 @@
       return;
     }
     if (viewId === 'kitchen-view' && renderedViewCycle.kitchen !== viewRenderCycle) {
+      renderNamedView(viewId);
+      return;
+    }
+    if (viewId === 'order-view' && renderedViewCycle.order !== viewRenderCycle) {
       renderNamedView(viewId);
       return;
     }
@@ -5361,7 +5536,7 @@
     });
   }
   function printIsolatedView(view) {
-    const sourceId = view === 'resident' ? 'resident-view' : 'kitchen-view';
+    const sourceId = view === 'resident' ? 'resident-view' : (view === 'order' ? 'order-view' : 'kitchen-view');
     const source = document.getElementById(sourceId);
     if (!source) return;
     const iframe = document.createElement('iframe');
@@ -5378,7 +5553,7 @@
     const copiedStyles = Array.from(document.querySelectorAll('style, link[rel="stylesheet"]'))
       .map((node) => node.outerHTML)
       .join('\n');
-    const pageCss = view === 'resident'
+    const pageCss = (view === 'resident' || view === 'order')
       ? '@page { size: A4 landscape; margin: 6mm; }'
       : '@page { size: A4 portrait; margin: 7mm; }';
     printDocument.open();
@@ -5411,13 +5586,13 @@
   function bindTopNavigationButtons() {
     const syncViewState = (viewId) => {
       state.selectedView = viewId;
-      state.currentView = viewId === 'resident-view' ? 'resident' : (viewId === 'kitchen-view' ? 'kitchen' : 'admin');
+      state.currentView = viewId === 'resident-view' ? 'resident' : (viewId === 'kitchen-view' ? 'kitchen' : (viewId === 'order-view' ? 'order' : 'admin'));
       state.printTarget = viewId === 'admin-view' ? '' : viewId;
       updatePrintBodyClass('');
     };
     const activateView = (viewId, buttonName) => {
       syncViewState(viewId);
-      if (viewId === 'resident-view' || viewId === 'kitchen-view') {
+      if (viewId === 'resident-view' || viewId === 'kitchen-view' || viewId === 'order-view') {
         renderNamedView(viewId);
       } else {
         ensureViewRendered(viewId);
@@ -5435,17 +5610,19 @@
         showUnavailableMessage();
         return;
       }
-      state.printTarget = currentView === 'resident' ? 'resident-view' : 'kitchen-view';
+      state.printTarget = currentView === 'resident' ? 'resident-view' : (currentView === 'order' ? 'order-view' : 'kitchen-view');
       renderViews();
       console.log('[nav] 印刷 clicked', { currentView: state.currentView, selectedView: state.selectedView, printTarget: state.printTarget });
       printIsolatedView(currentView);
     };
     const residentButton = document.querySelector('.nav-button[data-view="resident-view"]');
     const kitchenButton = document.querySelector('.nav-button[data-view="kitchen-view"]');
+    const orderButton = document.querySelector('.nav-button[data-view="order-view"]');
     const adminButton = document.querySelector('.nav-button[data-view="admin-view"]');
     const printButton = document.querySelector('#print-current-button');
     if (residentButton) residentButton.onclick = () => activateView('resident-view', '献立表');
     if (kitchenButton) kitchenButton.onclick = () => activateView('kitchen-view', '指示書');
+    if (orderButton) orderButton.onclick = () => activateView('order-view', '発注表');
     if (adminButton) adminButton.onclick = () => activateView('admin-view', '管理画面');
     if (printButton) printButton.onclick = openPrintDialogForCurrentView;
     if (!window.__moguTopNavAfterPrintBound) {
@@ -5469,10 +5646,65 @@
     if (typeof renderViews === 'function') renderViews();
     ensureViewRendered('resident-view');
     if (state.selectedView === 'kitchen-view') ensureViewRendered('kitchen-view');
+    if (state.selectedView === 'order-view') ensureViewRendered('order-view');
     if (state.selectedView === 'admin-view') ensureViewRendered('admin-view');
     bindTopNavigationButtons();
     scheduleDeferredViews();
   };
+  document.addEventListener("click", (event) => {
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+    if (target.id === "goals-save-button") {
+      document.querySelectorAll(".goal-input[data-goal-key]").forEach((input) => {
+        const key = input.dataset.goalKey;
+        const value = Number(input.value);
+        if (key && Number.isFinite(value) && value >= 0) state.goals[key] = value;
+      });
+      saveStorage(STORAGE_KEYS.goals, state.goals);
+      invalidateMenuDisplayViews();
+      renderAll();
+      return;
+    }
+    if (target.id === "backup-export-button") {
+      const payload = {};
+      Object.values(STORAGE_KEYS).forEach((storageKey) => {
+        try {
+          const raw = localStorage.getItem(storageKey);
+          if (raw !== null) payload[storageKey] = JSON.parse(raw);
+        } catch (error) {}
+      });
+      const blob = new Blob([JSON.stringify({ app: "mogu-sapo-kun", exportedAt: new Date().toISOString(), data: payload }, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `mogu-sapo-backup-${formatLocalDateKey(new Date())}.json`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.setTimeout(() => URL.revokeObjectURL(url), 500);
+    }
+  });
+  document.addEventListener("change", (event) => {
+    const target = event.target;
+    if (!(target instanceof Element) || target.id !== "backup-import-input") return;
+    const file = target.files && target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const parsed = JSON.parse(String(reader.result || ""));
+        const data = parsed && parsed.data;
+        if (!data || typeof data !== "object") throw new Error("形式が違います");
+        Object.entries(data).forEach(([storageKey, value]) => {
+          if (Object.values(STORAGE_KEYS).includes(storageKey)) localStorage.setItem(storageKey, JSON.stringify(value));
+        });
+        window.location.reload();
+      } catch (error) {
+        window.alert("バックアップの読み込みに失敗しました。ファイルを確認してください。");
+      }
+    };
+    reader.readAsText(file);
+  });
   syncCurrentWeekMenuOnStartup();
   syncSelectedRecipe();
   renderAll();

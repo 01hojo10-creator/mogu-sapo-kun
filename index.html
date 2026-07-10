@@ -946,6 +946,7 @@
       <div class="nav-group nav-group--views">
         <button type="button" class="nav-button nav-button--resident is-active" data-view="resident-view">献立表</button>
         <button type="button" class="nav-button nav-button--kitchen" data-view="kitchen-view">指示書</button>
+        <button type="button" class="nav-button nav-button--kitchen" data-view="order-view">発注表</button>
       </div>
       <div class="nav-divider" aria-hidden="true"></div>
       <div class="nav-group nav-group--actions">
@@ -958,6 +959,7 @@
     </nav>
     <section id="resident-view" class="view is-active is-print-target"></section>
     <section id="kitchen-view" class="view"></section>
+    <section id="order-view" class="view"></section>
     <section id="admin-view" class="view admin-only"></section>
   </div>
 
@@ -1067,13 +1069,12 @@
       heroEnergy: document.querySelector("#hero-energy"),
       residentView: document.querySelector("#resident-view"),
       kitchenView: document.querySelector("#kitchen-view"),
+      orderView: document.querySelector("#order-view"),
       adminView: document.querySelector("#admin-view"),
       navButtons: Array.from(document.querySelectorAll(".nav-button[data-view]")),
       printCurrentButton: document.querySelector("#print-current-button"),
     };
     globalThis.elements = elements;
-
-    init();
 
     function init() {
       syncCurrentWeekMenuOnStartup();
@@ -1120,6 +1121,10 @@
     }
 
     function renderNamedView(viewId) {
+      if (viewId === "order-view") {
+        if (typeof globalThis.renderOrderView === "function") globalThis.renderOrderView();
+        return;
+      }
       if (viewId === "resident-view") {
         renderResidentView();
         renderedViewCycle.resident = viewRenderCycle;
@@ -1174,7 +1179,7 @@
     function renderAll() {
       viewRenderCycle += 1;
       if (elements.heroWeekLabel) {
-        elements.heroWeekLabel.textContent = `蟇ｾ雎｡騾ｱ ${formatWeekLabel(state.settings.weekStart)}`;
+        elements.heroWeekLabel.textContent = `対象週 ${formatWeekLabel(state.settings.weekStart)}`;
       }
       updateHeroSummary();
       renderViews();
@@ -1396,7 +1401,7 @@
         {
           label: "エネルギー",
           pass: evaluation.energyPass,
-          detail: `${formatNumber(evaluation.totals.energy, 0)} kcal / 逶ｮ讓・500縲・00 kcal`,
+          detail: `${formatNumber(evaluation.totals.energy, 0)} kcal / 目標 500〜600 kcal`,
         },
         {
           label: "塩分",
@@ -2335,18 +2340,20 @@ function formatWeekLabel(weekStart) {
 
       return draft;
     }
+
+    init();
   </script><script src="./enhancements.js?v=20260429-syncviews1"></script>
   <script>
     (function () {
-      const viewIds = ["resident-view", "kitchen-view", "admin-view"];
+      const viewIds = ["resident-view", "kitchen-view", "order-view", "admin-view"];
 
       function setActiveView(viewId, logLabel) {
-        const currentView = viewId === "resident-view" ? "resident" : (viewId === "kitchen-view" ? "kitchen" : "admin");
+        const currentView = viewId === "resident-view" ? "resident" : (viewId === "kitchen-view" ? "kitchen" : (viewId === "order-view" ? "order" : "admin"));
         if (window.state) {
           window.state.selectedView = viewId;
           window.state.currentView = currentView;
         }
-        if (viewId === "resident-view" || viewId === "kitchen-view") {
+        if (viewId === "resident-view" || viewId === "kitchen-view" || viewId === "order-view") {
           renderNamedView(viewId);
         } else {
           ensureViewRendered(viewId);
@@ -2370,7 +2377,7 @@ function formatWeekLabel(weekStart) {
 
       function bindTopButtons() {
         const syncViewState = function (viewId) {
-          const currentView = viewId === "resident-view" ? "resident" : (viewId === "kitchen-view" ? "kitchen" : "admin");
+          const currentView = viewId === "resident-view" ? "resident" : (viewId === "kitchen-view" ? "kitchen" : (viewId === "order-view" ? "order" : "admin"));
           if (window.state) {
             window.state.selectedView = viewId;
             window.state.currentView = currentView;
@@ -2380,11 +2387,13 @@ function formatWeekLabel(weekStart) {
         };
         const residentButton = document.querySelector('.nav-button[data-view="resident-view"]');
         const kitchenButton = document.querySelector('.nav-button[data-view="kitchen-view"]');
+        const orderButton = document.querySelector('.nav-button[data-view="order-view"]');
         const adminButton = document.querySelector('.nav-button[data-view="admin-view"]');
         const printButton = document.getElementById("print-current-button");
         const getActiveViewForPrint = function () {
           const resident = document.getElementById("resident-view");
           const kitchen = document.getElementById("kitchen-view");
+          const order = document.getElementById("order-view");
           const admin = document.getElementById("admin-view");
           const isVisible = function (element) {
             if (!element) {
@@ -2397,6 +2406,7 @@ function formatWeekLabel(weekStart) {
               && (element.classList.contains("is-active") || element.offsetParent !== null);
           };
           if (isVisible(kitchen)) return "kitchen";
+          if (isVisible(order)) return "order";
           if (isVisible(resident)) return "resident";
           if (isVisible(admin)) return "admin";
           return window.state?.currentView || "resident";
@@ -2419,7 +2429,7 @@ function formatWeekLabel(weekStart) {
             button.classList.remove("nav-button--action-resident", "nav-button--action-kitchen", "nav-button--action-disabled");
             if (currentView === "resident") {
               button.classList.add("nav-button--action-resident");
-            } else if (currentView === "kitchen") {
+            } else if (currentView === "kitchen" || currentView === "order") {
               button.classList.add("nav-button--action-kitchen");
             } else {
               button.classList.add("nav-button--action-disabled");
@@ -2430,7 +2440,7 @@ function formatWeekLabel(weekStart) {
           window.alert("献立表または指示書を選択してください");
         };
         const printIsolatedView = function (view) {
-          const sourceId = view === "resident" ? "resident-view" : "kitchen-view";
+          const sourceId = view === "resident" ? "resident-view" : (view === "order" ? "order-view" : "kitchen-view");
           const source = document.getElementById(sourceId);
           if (!source) {
             return;
@@ -2449,7 +2459,7 @@ function formatWeekLabel(weekStart) {
           const copiedStyles = Array.from(document.querySelectorAll('style, link[rel="stylesheet"]'))
             .map((node) => node.outerHTML)
             .join("\n");
-          const pageCss = view === "resident"
+          const pageCss = (view === "resident" || view === "order")
             ? "@page { size: A4 landscape; margin: 6mm; }"
             : "@page { size: A4 portrait; margin: 7mm; }";
           printDocument.open();
@@ -2489,7 +2499,7 @@ function formatWeekLabel(weekStart) {
           }
           if (window.state) {
             window.state.currentView = currentView;
-            window.state.printTarget = currentView === "resident" ? "resident-view" : "kitchen-view";
+            window.state.printTarget = currentView === "resident" ? "resident-view" : (currentView === "order" ? "order-view" : "kitchen-view");
           }
           printIsolatedView(currentView);
         };
@@ -2510,6 +2520,13 @@ function formatWeekLabel(weekStart) {
           kitchenButton.onclick = function () {
             syncViewState("kitchen-view");
             setActiveView("kitchen-view", "調理室向け指示書 clicked");
+            updateActionButtons();
+          };
+        }
+        if (orderButton) {
+          orderButton.onclick = function () {
+            syncViewState("order-view");
+            setActiveView("order-view", "発注表 clicked");
             updateActionButtons();
           };
         }
