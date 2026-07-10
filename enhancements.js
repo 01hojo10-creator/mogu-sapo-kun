@@ -2195,7 +2195,23 @@
       createRecipe({ id: "cn-sg-chanpon", name: "ちゃんぽん風やわらか麺", category: "単品料理", cuisine: "中華", servingSize: 345, rotationKey: "麺類", tags: ["定番料理", "お楽しみ", "例外献立"], ingredients: [part("chinese_noodles", 180, { prep: "やわらかくゆで5cm程度に切る" }), part("shrimp", 15), part("pork_lean", 15), part("cabbage", 20), part("corn", 10)], seasonings: [part("broth", 200), part("milk", 20), part("salt", 0.4), part("sesame_oil", 1)], instructions: ["具だくさんのまろやかスープで麺をやわらかく煮る。"] })
     ];
   }
-  const EXPANDED_RECIPES = [...buildCuratedRecipeMaster(), ...buildCuratedSnacks(), ...buildWorldRecipes()];
+  function buildNoodleRecipes() {
+    return [
+      createRecipe({ id: "nd-shoyu-ramen", name: "やわらか醤油ラーメン", category: "単品料理", cuisine: "中華", servingSize: 350, rotationKey: "ラーメン", tags: ["定番料理", "例外献立", "麺類"], ingredients: [part("chinese_noodles", 190, { prep: "やわらかくゆで5cm程度に切る" }), part("chicken_breast", 20), part("bean_sprouts", 15), part("naganegi", 5), part("wakame", 3)], seasonings: [part("broth", 220), part("soy_sauce", 6), part("sesame_oil", 1)], instructions: ["鶏だしの醤油スープを作り、やわらかい麺と具材を合わせる。"] }),
+      createRecipe({ id: "nd-miso-ramen", name: "やわらか味噌ラーメン", category: "単品料理", cuisine: "中華", servingSize: 355, rotationKey: "ラーメン", tags: ["定番料理", "例外献立", "麺類"], ingredients: [part("chinese_noodles", 185, { prep: "やわらかくゆで5cm程度に切る" }), part("pork_lean", 15), part("corn", 10), part("bean_sprouts", 15), part("naganegi", 5)], seasonings: [part("broth", 210), part("miso", 8), part("sesame_oil", 1)], instructions: ["味噌スープを作り、やわらかい麺と具材を合わせる。"] }),
+      createRecipe({ id: "nd-shio-ramen", name: "やわらか塩ラーメン", category: "単品料理", cuisine: "中華", servingSize: 350, rotationKey: "ラーメン", tags: ["定番料理", "例外献立", "麺類"], ingredients: [part("chinese_noodles", 185, { prep: "やわらかくゆで5cm程度に切る" }), part("egg", 15), part("cabbage", 15), part("naganegi", 5), part("wakame", 3)], seasonings: [part("broth", 220), part("salt", 0.6), part("sesame_oil", 1)], instructions: ["あっさり塩スープを作り、やわらかい麺と具材を合わせる。"] }),
+      createRecipe({ id: "nd-kitsune-soba", name: "きつねそば", category: "単品料理", cuisine: "和食", servingSize: 345, rotationKey: "そば", tags: ["定番料理", "例外献立", "麺類"], ingredients: [part("soba_boiled", 210, { prep: "やや短めにしてやわらかく仕上げる" }), part("aburaage", 15, { prep: "油抜きして甘く煮る" }), part("green_onion", 3)], seasonings: [part("broth", 220), part("light_soy", 6), part("mirin", 4), part("sugar", 1)], instructions: ["甘く煮た油揚げをのせ、温かいだしをかける。"] }),
+      createRecipe({ id: "nd-tsukimi-soba", name: "月見そば", category: "単品料理", cuisine: "和食", servingSize: 340, rotationKey: "そば", tags: ["定番料理", "例外献立", "麺類"], ingredients: [part("soba_boiled", 210, { prep: "やや短めにしてやわらかく仕上げる" }), part("egg", 30), part("wakame", 3), part("green_onion", 3)], seasonings: [part("broth", 220), part("light_soy", 6), part("mirin", 3)], instructions: ["温かいだしに卵を落とし、やわらかく火を通してのせる。"] }),
+      createRecipe({ id: "nd-tanuki-soba", name: "たぬきそば", category: "単品料理", cuisine: "和食", servingSize: 340, rotationKey: "そば", tags: ["定番料理", "例外献立", "麺類"], ingredients: [part("soba_boiled", 210, { prep: "やや短めにしてやわらかく仕上げる" }), part("tenkasu", 7, { prep: "つゆを含ませて食べやすくする" }), part("green_onion", 3)], seasonings: [part("broth", 220), part("light_soy", 6), part("mirin", 3)], instructions: ["天かすはつゆを含ませ、やわらかくして提供する。"] }),
+      createRecipe({ id: "nd-torinanban-soba", name: "鶏南蛮そば", category: "単品料理", cuisine: "和食", servingSize: 345, rotationKey: "そば", tags: ["定番料理", "例外献立", "麺類"], ingredients: [part("soba_boiled", 200, { prep: "やや短めにしてやわらかく仕上げる" }), part("chicken_thigh", 30), part("naganegi", 12)], seasonings: [part("broth", 220), part("light_soy", 6), part("mirin", 4)], instructions: ["鶏肉とねぎをだしで煮て、そばにのせる。"] }),
+      createRecipe({ id: "nd-tsukimi-udon", name: "月見うどん", category: "単品料理", cuisine: "和食", servingSize: 340, rotationKey: "うどん", tags: ["定番料理", "例外献立", "麺類"], ingredients: [part("udon", 260, { prep: "やわらかくゆで5cm程度に切る" }), part("egg", 30), part("wakame", 3), part("green_onion", 3)], seasonings: [part("broth", 220), part("light_soy", 6), part("mirin", 3)], instructions: ["温かいだしに卵を落とし、やわらかく火を通してのせる。"] }),
+      createRecipe({ id: "nd-curry-udon", name: "カレーうどん", category: "単品料理", cuisine: "和食", servingSize: 345, rotationKey: "うどん", tags: ["定番料理", "例外献立", "麺類"], ingredients: [part("udon", 240, { prep: "やわらかくゆで5cm程度に切る" }), part("chicken_thigh", 20), part("onion", 15), part("carrot", 8)], seasonings: [part("broth", 200), part("curry_roux", 10), part("light_soy", 3), part("starch", 2)], instructions: ["カレー風味のだしにとろみをつけ、うどんにかける(はねに注意)。"] }),
+      createRecipe({ id: "nd-niku-udon", name: "肉うどん", category: "単品料理", cuisine: "和食", servingSize: 345, rotationKey: "うどん", tags: ["定番料理", "例外献立", "麺類"], ingredients: [part("udon", 240, { prep: "やわらかくゆで5cm程度に切る" }), part("pork_lean", 30), part("onion", 15), part("green_onion", 3)], seasonings: [part("broth", 220), part("light_soy", 5), part("mirin", 4), part("sugar", 1.5)], instructions: ["甘辛く煮た豚肉と玉ねぎをのせ、温かいだしをかける。"] }),
+      createRecipe({ id: "nd-wakame-udon", name: "わかめうどん", category: "単品料理", cuisine: "和食", servingSize: 345, rotationKey: "うどん", tags: ["定番料理", "例外献立", "麺類"], ingredients: [part("udon", 260, { prep: "やわらかくゆで5cm程度に切る" }), part("wakame", 6), part("aburaage", 8, { prep: "油抜きして短冊切り" }), part("green_onion", 3)], seasonings: [part("broth", 220), part("light_soy", 6), part("mirin", 3)], instructions: ["わかめと油揚げをのせ、温かいだしをかける。"] }),
+      createRecipe({ id: "nd-kenchin-udon", name: "けんちん風うどん", category: "単品料理", cuisine: "和食", servingSize: 350, rotationKey: "うどん", tags: ["定番料理", "例外献立", "麺類"], ingredients: [part("udon", 260, { prep: "やわらかくゆで5cm程度に切る" }), part("tofu", 30), part("daikon", 15), part("carrot", 10), part("satoimo", 15), part("aburaage", 4, { prep: "油抜きして短冊切り" })], seasonings: [part("broth", 210), part("light_soy", 5), part("miso", 3)], instructions: ["根菜と豆腐をだしで煮て、うどんと合わせる。"] })
+    ];
+  }
+  const EXPANDED_RECIPES = [...buildCuratedRecipeMaster(), ...buildCuratedSnacks(), ...buildWorldRecipes(), ...buildNoodleRecipes()];
   const GOALS = { energy: 550, protein: 22, fat: 18, carbs: 75, fiber: 6, salt: 3.0 };
 
   getAllFoods = function () { return [...EXPANDED_FOODS, ...(state.customFoods || [])]; };
@@ -3058,8 +3074,8 @@
     })));
     const simpleSnacks = [
       createRecipe({ id: "snack-simple-yogurt", name: "ヨーグルト", category: "おやつ", cuisine: "洋食", servingSize: 80, rotationKey: "乳製品", tags: ["おやつ", "乳製品", "安価"], notes: "市販の個食ヨーグルトを使用する。", ingredients: [part("yogurt", 80, { label: "ヨーグルト 1個", prep: "冷蔵保管する" })], seasonings: [], instructions: ["冷蔵保管し、提供前に人数分を配る。"] }),
-      createRecipe({ id: "snack-simple-jelly", name: "ゼリー", category: "おやつ", cuisine: "洋食", servingSize: 85, rotationKey: "ゼリー", tags: ["おやつ", "ゼリー", "安価"], notes: "市販のカップゼリーを使用する。", ingredients: [part("jelly_base", 85, { label: "市販ゼリー 1個", prep: "冷蔵保管する" })], seasonings: [], instructions: ["冷蔵保管し、提供前に人数分を配る。"] }),
-      createRecipe({ id: "snack-simple-pudding", name: "プリン", category: "おやつ", cuisine: "洋食", servingSize: 85, rotationKey: "プリン", tags: ["おやつ", "プリン", "安価"], notes: "市販の個食プリンを使用する。", ingredients: [part("pudding_base", 85, { label: "市販プリン 1個", prep: "冷蔵保管する" })], seasonings: [], instructions: ["冷蔵保管し、提供前に人数分を配る。"] }),
+      createRecipe({ id: "snack-simple-jelly", name: "カップゼリー", category: "おやつ", cuisine: "洋食", servingSize: 85, rotationKey: "ゼリー", tags: ["おやつ", "ゼリー", "安価"], notes: "市販のカップゼリーを使用する。", ingredients: [part("jelly_base", 85, { label: "市販ゼリー 1個", prep: "冷蔵保管する" })], seasonings: [], instructions: ["冷蔵保管し、提供前に人数分を配る。"] }),
+      createRecipe({ id: "snack-simple-pudding", name: "カッププリン", category: "おやつ", cuisine: "洋食", servingSize: 85, rotationKey: "プリン", tags: ["おやつ", "プリン", "安価"], notes: "市販の個食プリンを使用する。", ingredients: [part("pudding_base", 85, { label: "市販プリン 1個", prep: "冷蔵保管する" })], seasonings: [], instructions: ["冷蔵保管し、提供前に人数分を配る。"] }),
       createRecipe({ id: "snack-simple-castella", name: "カステラ", category: "おやつ", cuisine: "和食", servingSize: 70, rotationKey: "焼き菓子", tags: ["おやつ", "和菓子", "焼き菓子", "安価"], notes: "市販のカステラを食べやすい大きさで提供する。", ingredients: [part("bread", 70, { label: "市販カステラ 1切", prep: "乾燥しないよう保管する" })], seasonings: [], instructions: ["乾燥しないよう保管し、提供前に皿へ盛り付ける。"] }),
       createRecipe({ id: "snack-simple-dorayaki", name: "どら焼き", category: "おやつ", cuisine: "和食", servingSize: 74, rotationKey: "和菓子", tags: ["おやつ", "和菓子", "安価"], notes: "通常のあん入り市販どら焼きを使用する。", ingredients: [part("azuki_paste", 74, { label: "市販どら焼き 1個", prep: "個包装のまま、または皿にのせて提供できるよう準備する" })], seasonings: [], instructions: ["個包装のまま、または皿にのせて提供する。"] }),
       createRecipe({ id: "snack-simple-yokan", name: "水ようかん", category: "おやつ", cuisine: "和食", servingSize: 72, rotationKey: "和菓子", tags: ["おやつ", "和菓子", "やわらかい", "安価"], notes: "市販の水ようかんを冷やして提供する。", ingredients: [part("azuki_paste", 72, { label: "市販水ようかん 1個", prep: "冷蔵保管し、よく冷やす" })], seasonings: [], instructions: ["冷蔵保管し、提供前に人数分を配る。"] }),
@@ -3954,7 +3970,7 @@
         const menu = { date, mode: "basic", basic: { staple: staple.id, soup: soup.id, main: main.id, side1: side1.id, side2: side2.id, dessert: dessert.id }, exception: { singleDish: null, extraSoup: null, extraSide: null, extraDessert: null }, snack: snack.id, memo: `${targetCuisine}中心の自動献立`, generatedByAuto: true };
         candidates.push({ menu, score: scoreMenu(menu, context, targetCuisine) });
       }
-      for (let i = 0; i < 4; i += 1) {
+      for (let i = 0; i < 10; i += 1) {
         const singleDish = pickRecipeWithHistory(getCachedRecipePool({ category: "単品料理", cuisine: targetCuisine, minEnergy: 320, maxEnergy: 520 }), context, "main", date, { excludeMainRotation: context.lastMainRotationKey });
         const snack = pickRecipeWithHistory(filterPreferredSnackRecipes(getCachedRecipePool({ category: "おやつ", minEnergy: 40, maxEnergy: 160, excludeIds: [...context.usedSnackIds] })), context, "snack", date);
         if (!(singleDish && snack)) continue;
@@ -3970,7 +3986,7 @@
         }
         if (singleDish.nutrition.salt < 2.2) extraSoup = pickRecipeWithHistory(getCachedRecipePool({ category: "汁物", cuisine: exceptionCuisine, minEnergy: 15, maxEnergy: 70 }), context, "soup", date);
         const menu = { date, mode: "exception", basic: { staple: null, soup: null, main: null, side1: null, side2: null, dessert: null }, exception: { singleDish: singleDish.id, extraSoup: extraSoup?.id || null, extraSide: extraSide?.id || null, extraDessert: extraDessert?.id || null }, snack: snack.id, memo: `${targetCuisine}中心の例外献立`, generatedByAuto: true };
-        if (exceptionDays.includes(dayKey)) candidates.push({ menu, score: scoreMenu(menu, context, targetCuisine) - 8 });
+        if (exceptionDays.includes(dayKey)) candidates.push({ menu, score: scoreMenu(menu, context, targetCuisine) + 260 });
       }
       const best = candidates.filter(Boolean).sort((a, b) => b.score - a.score)[0];
       week[dayKey] = best ? best.menu : createEmptyWeekMenu(weekStart)[dayKey];
@@ -4957,7 +4973,7 @@
         }
         if (singleDish.nutrition.salt < 2.2) extraSoup = pickRecipeWithHistory(getCachedRecipePool({ category: "汁物", cuisine: exceptionCuisine, minEnergy: 15, maxEnergy: 70 }), context, "soup", date);
         const menu = { date, mode: "exception", basic: { staple: null, soup: null, main: null, side1: null, side2: null, dessert: null }, exception: { singleDish: singleDish.id, extraSoup: extraSoup?.id || null, extraSide: extraSide?.id || null, extraDessert: extraDessert?.id || null }, snack: snack.id, memo: `${targetCuisine}中心の例外献立`, generatedByAuto: true };
-        if (exceptionDays.includes(dayKey)) candidates.push({ menu, score: scoreMenu(menu, context, targetCuisine) - 8 });
+        if (exceptionDays.includes(dayKey)) candidates.push({ menu, score: scoreMenu(menu, context, targetCuisine) + 260 });
       }
       const best = candidates.filter(Boolean).sort((a, b) => b.score - a.score)[0];
       const dayUsedFallback = !best;
