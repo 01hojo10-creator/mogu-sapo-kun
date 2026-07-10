@@ -726,7 +726,20 @@
     food("tenkasu", "天かす", 620, 4.0, 47.0, 45.0, 1.5, 0.2, 25, 0.3, 0),
     food("sansai_mix", "山菜ミックス（水煮）", 20, 1.2, 0.1, 4.0, 2.5, 0.4, 25, 0.8, 0),
     food("green_onion", "青ねぎ", 29, 1.9, 0.3, 6.5, 3.2, 0.0, 80, 1.0, 32),
-    food("naganegi", "長ねぎ", 35, 1.4, 0.1, 8.3, 2.5, 0.0, 36, 0.3, 14)
+    food("naganegi", "長ねぎ", 35, 1.4, 0.1, 8.3, 2.5, 0.0, 36, 0.3, 14),
+    food("eggplant", "なす", 18, 1.1, 0.1, 5.1, 2.2, 0.0, 18, 0.3, 4),
+    food("green_beans", "さやいんげん", 23, 1.8, 0.1, 5.1, 2.4, 0.0, 48, 0.7, 8),
+    food("asparagus", "アスパラガス", 21, 2.6, 0.2, 3.9, 1.8, 0.0, 19, 0.7, 15),
+    food("satoimo", "里芋", 53, 1.5, 0.1, 13.1, 2.3, 0.0, 10, 0.5, 6),
+    food("hijiki", "ひじき（ゆで）", 11, 0.7, 0.3, 3.4, 3.7, 0.1, 96, 2.7, 0),
+    food("kiriboshi_daikon", "切り干し大根（乾）", 280, 9.7, 0.8, 69.7, 21.3, 0.5, 500, 3.1, 28),
+    food("koya_tofu", "高野豆腐（乾）", 496, 50.5, 34.1, 4.2, 2.5, 1.1, 630, 7.5, 0),
+    food("aburaage", "油揚げ", 377, 23.4, 34.4, 0.4, 1.3, 0.0, 310, 3.2, 0),
+    food("tuna_water", "ツナ（水煮缶）", 70, 16.0, 0.7, 0.2, 0.0, 0.5, 5, 0.6, 0),
+    food("harusame", "春雨（ゆで）", 76, 0.0, 0.1, 19.1, 0.8, 0.0, 3, 0.3, 0),
+    food("chingensai", "チンゲン菜", 9, 0.6, 0.1, 2.0, 1.2, 0.1, 100, 1.1, 24),
+    food("okra", "オクラ", 26, 2.1, 0.2, 6.6, 5.0, 0.0, 92, 0.5, 11),
+    food("daizu_boiled", "大豆（ゆで）", 163, 14.8, 9.8, 8.4, 8.5, 0.0, 79, 2.2, 0)
   ];
   const EXPANDED_FOOD_MAP = new Map(EXPANDED_FOODS.map((item) => [item.id, item]));
 
@@ -759,6 +772,11 @@
   }
   function normalizeParts(parts) {
     return (parts || []).map(normalizePart).filter(Boolean);
+  }
+  function composeFlavorName(flavorName, baseLabel) {
+    if (!flavorName) return baseLabel;
+    if (baseLabel.startsWith(flavorName)) return baseLabel;
+    return `${flavorName}${baseLabel}`;
   }
   function getFoodLabel(partItem) {
     const foodItem = EXPANDED_FOOD_MAP.get(partItem.foodId) || getFoodMap().get(partItem.foodId);
@@ -809,7 +827,11 @@
     shrimp: "背わたを除き小さめに切る", tofu: "2cm角に切り水切り", egg: "溶きほぐす",
     udon: "5cm程度の食べやすい長さに切る", chinese_noodles: "5cm程度の食べやすい長さに切る", pasta: "5cm程度の食べやすい長さに切る", soba_boiled: "5cm程度の食べやすい長さに切る",
     apple: "皮をむき薄いいちょう切り", peach: "皮を除き一口大", banana: "1cm厚の輪切り", mandarin: "薄皮を除く", orange: "薄皮を除き一口大", grape: "皮と種を除き半分に切る",
-    naganegi: "小口切りにしやわらかく煮る", green_onion: "小口切り", wakame: "細かく刻む", green_peas: "やわらかくゆで薄皮に注意"
+    naganegi: "小口切りにしやわらかく煮る", green_onion: "小口切り", wakame: "細かく刻む", green_peas: "やわらかくゆで薄皮に注意",
+    eggplant: "皮をむいて1cm厚の半月切りにし水にさらす", green_beans: "筋を取り2cm長さに切り下ゆで", asparagus: "根元の皮をむき2cm長さの斜め切り",
+    satoimo: "皮をむき一口大に切りぬめりを洗う", hijiki: "水戻しして食べやすく刻む", kiriboshi_daikon: "水戻しして2cm長さに切る",
+    koya_tofu: "ぬるま湯で戻して1cm厚に切る", aburaage: "油抜きして短冊切り", tuna_water: "缶汁を切りほぐす",
+    harusame: "ゆで戻して5cm程度に切る", chingensai: "2cm幅のそぎ切りにし下ゆで", okra: "板ずりして小口切りにし下ゆで", daizu_boiled: "やわらかくゆで直す"
   };
   const ANIMAL_FOOD_IDS = new Set(["white_fish", "salmon", "mackerel", "chicken_thigh", "chicken_breast", "pork_lean", "beef_mince", "pork_mince", "egg", "shrimp"]);
   const BREAD_FOOD_IDS = new Set(["bread", "roll_bread", "milk_bread"]);
@@ -1642,12 +1664,12 @@
     const recipes = [];
     fruitFlavors.forEach((flavor, flavorIndex) => {
       fruitBases.forEach((base, baseIndex) => {
-        recipes.push(createRecipe({ id: `plus-dessert-fruit-${flavor.key}-${base.key}`, name: `${flavor.name}${base.label}`, category: "デザート", cuisine: CUISINES[(flavorIndex + baseIndex) % CUISINES.length], servingSize: base.servingSize, rotationKey: base.rotationKey, tags: ["追加レシピ", "デザート", flavor.tag], description: `${flavor.name}を使った食べやすいデザート。`, ingredients: base.ingredients(flavor), seasonings: base.seasonings(flavor), instructions: base.instructions }));
+        recipes.push(createRecipe({ id: `plus-dessert-fruit-${flavor.key}-${base.key}`, name: composeFlavorName(flavor.name, base.label), category: "デザート", cuisine: CUISINES[(flavorIndex + baseIndex) % CUISINES.length], servingSize: base.servingSize, rotationKey: base.rotationKey, tags: ["追加レシピ", "デザート", flavor.tag], description: `${flavor.name}を使った食べやすいデザート。`, ingredients: base.ingredients(flavor), seasonings: base.seasonings(flavor), instructions: base.instructions }));
       });
     });
     softFlavors.forEach((flavor, flavorIndex) => {
       softBases.forEach((base, baseIndex) => {
-        recipes.push(createRecipe({ id: `plus-dessert-soft-${flavor.key}-${base.key}`, name: `${flavor.name}${base.label}`, category: "デザート", cuisine: CUISINES[(flavorIndex + baseIndex + 1) % CUISINES.length], servingSize: base.servingSize, rotationKey: base.rotationKey, tags: ["追加レシピ", "デザート", flavor.tag], description: `${flavor.name}を使ったやわらかいデザート。`, ingredients: base.ingredients(flavor), seasonings: base.seasonings(flavor), instructions: base.instructions }));
+        recipes.push(createRecipe({ id: `plus-dessert-soft-${flavor.key}-${base.key}`, name: composeFlavorName(flavor.name, base.label), category: "デザート", cuisine: CUISINES[(flavorIndex + baseIndex + 1) % CUISINES.length], servingSize: base.servingSize, rotationKey: base.rotationKey, tags: ["追加レシピ", "デザート", flavor.tag], description: `${flavor.name}を使ったやわらかいデザート。`, ingredients: base.ingredients(flavor), seasonings: base.seasonings(flavor), instructions: base.instructions }));
       });
     });
     [
@@ -1875,12 +1897,12 @@
     const recipes = [];
     fruitFlavors.forEach((flavor, flavorIndex) => {
       fruitBases.forEach((base, baseIndex) => {
-        recipes.push(createRecipe({ id: `plus-snack-fruit-${flavor.key}-${base.key}`, name: `${flavor.name}${base.label}`, category: "おやつ", cuisine: CUISINES[(flavorIndex + baseIndex) % CUISINES.length], servingSize: base.servingSize, rotationKey: base.rotationKey, tags: ["追加レシピ", "おやつ", "追加おやつ"], description: `${flavor.name}を使った食べやすいおやつ。`, ingredients: base.ingredients(flavor), seasonings: base.seasonings(flavor), instructions: base.instructions }));
+        recipes.push(createRecipe({ id: `plus-snack-fruit-${flavor.key}-${base.key}`, name: composeFlavorName(flavor.name, base.label), category: "おやつ", cuisine: CUISINES[(flavorIndex + baseIndex) % CUISINES.length], servingSize: base.servingSize, rotationKey: base.rotationKey, tags: ["追加レシピ", "おやつ", "追加おやつ"], description: `${flavor.name}を使った食べやすいおやつ。`, ingredients: base.ingredients(flavor), seasonings: base.seasonings(flavor), instructions: base.instructions }));
       });
     });
     softFlavors.forEach((flavor, flavorIndex) => {
       softBases.forEach((base, baseIndex) => {
-        recipes.push(createRecipe({ id: `plus-snack-soft-${flavor.key}-${base.key}`, name: `${flavor.name}${base.label}`, category: "おやつ", cuisine: CUISINES[(flavorIndex + baseIndex + 1) % CUISINES.length], servingSize: base.servingSize, rotationKey: base.rotationKey, tags: ["追加レシピ", "おやつ", "追加おやつ"], description: `${flavor.name}を使ったやわらかいおやつ。`, ingredients: base.ingredients(flavor), seasonings: base.seasonings(flavor), instructions: base.instructions }));
+        recipes.push(createRecipe({ id: `plus-snack-soft-${flavor.key}-${base.key}`, name: composeFlavorName(flavor.name, base.label), category: "おやつ", cuisine: CUISINES[(flavorIndex + baseIndex + 1) % CUISINES.length], servingSize: base.servingSize, rotationKey: base.rotationKey, tags: ["追加レシピ", "おやつ", "追加おやつ"], description: `${flavor.name}を使ったやわらかいおやつ。`, ingredients: base.ingredients(flavor), seasonings: base.seasonings(flavor), instructions: base.instructions }));
       });
     });
     return recipes;
@@ -1904,7 +1926,7 @@
     const recipes = [];
     flavors.forEach((flavor) => {
       cakeStyles.forEach((style) => {
-        recipes.push(createRecipe({ id: `birthday-cake-${flavor.key}-${style.key}`, name: `${flavor.name}${style.label}`, category: "おやつ", cuisine: "洋食", servingSize: style.servingSize, rotationKey: "誕生日ケーキ", tags: ["追加レシピ", "おやつ", "birthday-cake", "誕生日", "ケーキ"], description: `${flavor.name}を使ったお誕生日用ケーキ。`, notes: "誕生日提供向けのやわらかいケーキ。", ingredients: style.ingredients(flavor), seasonings: style.seasonings(flavor), instructions: style.instructions }));
+        recipes.push(createRecipe({ id: `birthday-cake-${flavor.key}-${style.key}`, name: composeFlavorName(flavor.name, style.label), category: "おやつ", cuisine: "洋食", servingSize: style.servingSize, rotationKey: "誕生日ケーキ", tags: ["追加レシピ", "おやつ", "birthday-cake", "誕生日", "ケーキ"], description: `${flavor.name}を使ったお誕生日用ケーキ。`, notes: "誕生日提供向けのやわらかいケーキ。", ingredients: style.ingredients(flavor), seasonings: style.seasonings(flavor), instructions: style.instructions }));
       });
     });
     return recipes;
@@ -1952,12 +1974,189 @@
     return recipes;
   }
 
-  const EXPANDED_RECIPES = buildRecipeMaster();
-  EXPANDED_RECIPES.push(
-    createRecipe({ id: "dessert-safe-mizuyokan", name: "やわらか水ようかん", category: "デザート", cuisine: "和食", servingSize: 70, rotationKey: "和菓子", tags: ["デザート", "やわらか", "和菓子", "安価"], description: "餅・団子の代わりに提供できる、飲み込みやすい和菓子です。", ingredients: [part("azuki_paste", 40)], seasonings: [part("sugar", 3), part("gelatin_powder", 1.5)], instructions: ["こしあんと砂糖を水で溶きのばし、ひと煮立ちさせる。", "ふやかしたゼラチンを加えて溶かし、型に流して冷やし固める。"] }),
-    createRecipe({ id: "dessert-safe-imoyokan", name: "やわらか芋ようかん", category: "デザート", cuisine: "和食", servingSize: 65, rotationKey: "和菓子", tags: ["デザート", "やわらか", "和菓子", "安価"], description: "さつまいもの自然な甘みの、なめらかな和菓子です。", ingredients: [part("sweet_potato", 55)], seasonings: [part("sugar", 5), part("gelatin_powder", 1)], instructions: ["さつまいもをやわらかく蒸してなめらかに裏ごしする。", "砂糖とゼラチンを加えて混ぜ、型に流して冷やし固める。"] }),
-    createRecipe({ id: "dessert-safe-milk-kuzu", name: "ミルクくずプリン", category: "デザート", cuisine: "和食", servingSize: 75, rotationKey: "和菓子", tags: ["デザート", "やわらか", "和菓子", "安価"], description: "とろりとした口あたりで、飲み込みやすいミルク菓子です。", ingredients: [part("milk", 60)], seasonings: [part("sugar", 5), part("starch", 5)], instructions: ["牛乳・砂糖・片栗粉を混ぜて弱火にかけ、とろみが出るまで練る。", "型に流して冷やし、なめらかに固める。"] })
-  );
+  function buildCuratedRecipeMaster() {
+    return [
+      createRecipe({ id: "st-gohan", name: "ごはん", category: "主食", cuisine: "和食", servingSize: 140, rotationKey: "米飯", tags: ["定番料理", "定番"], ingredients: [part("rice", 140)], seasonings: [], instructions: ["炊きたてを温かく盛り付ける。"] }),
+      createRecipe({ id: "st-nanhan", name: "軟飯", category: "主食", cuisine: "和食", servingSize: 150, rotationKey: "米飯", tags: ["定番料理", "やわらか"], ingredients: [part("soft_rice", 150)], seasonings: [], instructions: ["やわらかめに炊き、温かく盛り付ける。"] }),
+      createRecipe({ id: "st-zenkayu", name: "全粥", category: "主食", cuisine: "和食", servingSize: 150, rotationKey: "米飯", tags: ["定番料理", "やわらか"], ingredients: [part("soft_rice", 150, { prep: "全粥に炊き上げる" })], seasonings: [], instructions: ["米1:水5を目安に全粥に炊く。", "温かいうちに提供する。"] }),
+      createRecipe({ id: "st-wakame", name: "わかめごはん", category: "主食", cuisine: "和食", servingSize: 145, rotationKey: "混ぜごはん", tags: ["定番料理", "定番"], ingredients: [part("rice", 135), part("wakame", 8)], seasonings: [part("salt", 0.3)], instructions: ["戻したわかめを刻み、ごはんに混ぜ込む。"] }),
+      createRecipe({ id: "st-nameshi", name: "菜飯", category: "主食", cuisine: "和食", servingSize: 145, rotationKey: "混ぜごはん", tags: ["定番料理", "青菜"], ingredients: [part("rice", 135), part("komatsuna", 15)], seasonings: [part("salt", 0.3)], instructions: ["ゆでた青菜を細かく刻み、ごはんに混ぜる。"] }),
+      createRecipe({ id: "st-kinoko-taki", name: "きのこの炊き込みごはん", category: "主食", cuisine: "和食", servingSize: 150, rotationKey: "炊き込み", tags: ["定番料理", "きのこ"], ingredients: [part("rice", 130), part("mushrooms", 18), part("carrot", 8), part("aburaage", 3)], seasonings: [part("soy_sauce", 3), part("mirin", 2)], instructions: ["具材を調味料とともに米に加えて炊き込む。"] }),
+      createRecipe({ id: "st-gomoku-taki", name: "五目炊き込みごはん", category: "主食", cuisine: "和食", servingSize: 150, rotationKey: "炊き込み", tags: ["定番料理", "定番"], ingredients: [part("rice", 120), part("chicken_breast", 12), part("carrot", 8), part("burdock", 6), part("aburaage", 3)], seasonings: [part("soy_sauce", 3), part("mirin", 2)], instructions: ["具材を小さく刻み、調味料とともに炊き込む。"] }),
+      createRecipe({ id: "st-rollpan", name: "ロールパン", category: "主食", cuisine: "洋食", servingSize: 70, rotationKey: "パン", tags: ["定番料理", "定番"], ingredients: [part("roll_bread", 70)], seasonings: [], instructions: ["食べやすくほぐせるよう軽く切り込みを入れて提供する。"] }),
+      createRecipe({ id: "st-shokupan", name: "食パン", category: "主食", cuisine: "洋食", servingSize: 80, rotationKey: "パン", tags: ["定番料理", "定番"], ingredients: [part("bread", 80, { prep: "耳を落とし食べやすく切る" })], seasonings: [], instructions: ["必要に応じてジャム等を添えて提供する。"] }),
+      createRecipe({ id: "st-milkpan", name: "ミルクパン", category: "主食", cuisine: "洋食", servingSize: 75, rotationKey: "パン", tags: ["定番料理", "やわらか"], ingredients: [part("milk_bread", 75)], seasonings: [], instructions: ["やわらかいものを選び、食べやすく提供する。"] }),
+      createRecipe({ id: "st-corn-pilaf", name: "コーンピラフ", category: "主食", cuisine: "洋食", servingSize: 150, rotationKey: "洋風ごはん", tags: ["定番料理", "人気"], ingredients: [part("rice", 120), part("corn", 18), part("onion", 10)], seasonings: [part("consomme", 1.5), part("butter", 2)], instructions: ["具材をバターで炒め、ごはんと合わせて味を整える。"] }),
+      createRecipe({ id: "st-chicken-rice", name: "チキンライス", category: "主食", cuisine: "洋食", servingSize: 150, rotationKey: "洋風ごはん", tags: ["定番料理", "人気"], ingredients: [part("rice", 120), part("chicken_breast", 18), part("onion", 10)], seasonings: [part("ketchup", 7), part("consomme", 1)], instructions: ["具材を炒めてケチャップで調味し、ごはんと合わせる。"] }),
+      createRecipe({ id: "st-chuka-gayu", name: "中華粥", category: "主食", cuisine: "中華", servingSize: 160, rotationKey: "中華主食", tags: ["定番料理", "やわらか"], ingredients: [part("soft_rice", 145)], seasonings: [part("broth", 30), part("salt", 0.3), part("sesame_oil", 0.5)], instructions: ["だしを加えてやわらかく炊き、ごま油少量で香りをつける。"] }),
+      createRecipe({ id: "st-tamago-gayu", name: "たまご入り中華粥", category: "主食", cuisine: "中華", servingSize: 165, rotationKey: "中華主食", tags: ["定番料理", "やわらか"], ingredients: [part("soft_rice", 140), part("egg", 20)], seasonings: [part("broth", 30), part("salt", 0.3)], instructions: ["粥を炊き、溶き卵を回し入れてふんわり仕上げる。"] }),
+      createRecipe({ id: "st-yawaraka-chahan", name: "ふんわり卵チャーハン", category: "主食", cuisine: "中華", servingSize: 155, rotationKey: "中華主食", tags: ["定番料理", "人気"], ingredients: [part("rice", 115), part("egg", 20), part("green_peas", 5), part("naganegi", 5)], seasonings: [part("soy_sauce", 2), part("sesame_oil", 1)], instructions: ["やわらかめのごはんと卵を手早く炒め、しっとり仕上げる。"] }),
+      createRecipe({ id: "st-chuka-nameshi", name: "青菜の中華風混ぜごはん", category: "主食", cuisine: "中華", servingSize: 150, rotationKey: "中華主食", tags: ["定番料理", "青菜"], ingredients: [part("rice", 130), part("chingensai", 12)], seasonings: [part("sesame_oil", 1), part("salt", 0.3)], instructions: ["ゆでた青菜を刻み、ごま油少量とともにごはんへ混ぜる。"] }),
+      createRecipe({ id: "sp-tofu-miso", name: "豆腐とわかめの味噌汁", category: "汁物", cuisine: "和食", servingSize: 150, rotationKey: "味噌汁", tags: ["定番料理"], ingredients: [part("tofu", 30), part("wakame", 5)], seasonings: [part("broth", 125), part("miso", 7)], instructions: ["だしで具材を煮て、味噌を溶き入れる。"] }),
+      createRecipe({ id: "sp-daikon-miso", name: "大根と油揚げの味噌汁", category: "汁物", cuisine: "和食", servingSize: 150, rotationKey: "味噌汁", tags: ["定番料理"], ingredients: [part("daikon", 25), part("aburaage", 4)], seasonings: [part("broth", 125), part("miso", 7)], instructions: ["大根をやわらかく煮て、油揚げと味噌を加える。"] }),
+      createRecipe({ id: "sp-cabbage-miso", name: "キャベツと玉ねぎの味噌汁", category: "汁物", cuisine: "和食", servingSize: 150, rotationKey: "味噌汁", tags: ["定番料理"], ingredients: [part("cabbage", 25), part("onion", 12)], seasonings: [part("broth", 125), part("miso", 7)], instructions: ["野菜をやわらかく煮て、味噌を溶き入れる。"] }),
+      createRecipe({ id: "sp-jaga-miso", name: "じゃがいもの味噌汁", category: "汁物", cuisine: "和食", servingSize: 150, rotationKey: "味噌汁", tags: ["定番料理"], ingredients: [part("potato", 30), part("wakame", 3)], seasonings: [part("broth", 125), part("miso", 7)], instructions: ["じゃがいもをやわらかく煮て、味噌を溶き入れる。"] }),
+      createRecipe({ id: "sp-nasu-miso", name: "なすの味噌汁", category: "汁物", cuisine: "和食", servingSize: 150, rotationKey: "味噌汁", tags: ["定番料理"], ingredients: [part("eggplant", 30)], seasonings: [part("broth", 125), part("miso", 7)], instructions: ["なすをやわらかく煮て、味噌を溶き入れる。"] }),
+      createRecipe({ id: "sp-tonjiru", name: "豚汁", category: "汁物", cuisine: "和食", servingSize: 160, rotationKey: "豚汁", tags: ["定番料理"], ingredients: [part("pork_lean", 18), part("daikon", 18), part("carrot", 10), part("satoimo", 12)], seasonings: [part("broth", 115), part("miso", 7)], instructions: ["豚肉と根菜をだしでやわらかく煮る。", "味噌を溶き入れて仕上げる。"] }),
+      createRecipe({ id: "sp-kakitama", name: "かき玉のすまし汁", category: "汁物", cuisine: "和食", servingSize: 150, rotationKey: "すまし汁", tags: ["定番料理"], ingredients: [part("egg", 22), part("green_onion", 3)], seasonings: [part("broth", 125), part("light_soy", 3), part("starch", 1.5)], instructions: ["だしを調味して軽くとろみをつけ、溶き卵を流し入れる。"] }),
+      createRecipe({ id: "sp-enoki-sumashi", name: "えのきと豆腐のすまし汁", category: "汁物", cuisine: "和食", servingSize: 150, rotationKey: "すまし汁", tags: ["定番料理"], ingredients: [part("mushrooms", 15), part("tofu", 20)], seasonings: [part("broth", 125), part("light_soy", 3)], instructions: ["だしで具材を煮て、うすくちしょうゆで味を整える。"] }),
+      createRecipe({ id: "sp-satoimo-sumashi", name: "里芋のすまし汁", category: "汁物", cuisine: "和食", servingSize: 150, rotationKey: "すまし汁", tags: ["定番料理"], ingredients: [part("satoimo", 25), part("green_onion", 3)], seasonings: [part("broth", 125), part("light_soy", 3)], instructions: ["里芋をやわらかく煮て、味を整える。"] }),
+      createRecipe({ id: "sp-yasai-consomme", name: "野菜コンソメスープ", category: "汁物", cuisine: "洋食", servingSize: 150, rotationKey: "コンソメ", tags: ["定番料理"], ingredients: [part("cabbage", 20), part("carrot", 10), part("onion", 10)], seasonings: [part("broth", 120), part("consomme", 2.5)], instructions: ["野菜をやわらかく煮て、コンソメで味を整える。"] }),
+      createRecipe({ id: "sp-onion-soup", name: "玉ねぎのスープ", category: "汁物", cuisine: "洋食", servingSize: 150, rotationKey: "コンソメ", tags: ["定番料理"], ingredients: [part("onion", 30)], seasonings: [part("broth", 120), part("consomme", 2.5), part("butter", 1)], instructions: ["玉ねぎを甘みが出るまでよく煮る。", "コンソメで味を整える。"] }),
+      createRecipe({ id: "sp-pumpkin-potage", name: "かぼちゃのポタージュ", category: "汁物", cuisine: "洋食", servingSize: 150, rotationKey: "ポタージュ", tags: ["定番料理"], ingredients: [part("pumpkin", 40)], seasonings: [part("milk", 60), part("consomme", 1.5), part("butter", 1.5)], instructions: ["かぼちゃをやわらかく煮てつぶす。", "牛乳でのばし、なめらかに仕上げる。"] }),
+      createRecipe({ id: "sp-corn-potage", name: "コーンポタージュ", category: "汁物", cuisine: "洋食", servingSize: 150, rotationKey: "ポタージュ", tags: ["定番料理"], ingredients: [part("corn", 30)], seasonings: [part("milk", 60), part("consomme", 1.5), part("flour", 2), part("butter", 1.5)], instructions: ["コーンを煮て裏ごしし、牛乳でのばす。", "とろみをつけて仕上げる。"] }),
+      createRecipe({ id: "sp-minestrone", name: "ミネストローネ", category: "汁物", cuisine: "洋食", servingSize: 150, rotationKey: "トマトスープ", tags: ["定番料理"], ingredients: [part("tomato", 25), part("onion", 10), part("carrot", 8), part("cabbage", 10)], seasonings: [part("broth", 110), part("consomme", 2), part("tomato_sauce", 8)], instructions: ["野菜を小さく切ってやわらかく煮込む。", "トマト味に整える。"] }),
+      createRecipe({ id: "sp-broccoli-milk", name: "ブロッコリーのミルクスープ", category: "汁物", cuisine: "洋食", servingSize: 150, rotationKey: "ミルクスープ", tags: ["定番料理"], ingredients: [part("broccoli", 22), part("onion", 8)], seasonings: [part("milk", 55), part("broth", 60), part("consomme", 1.5)], instructions: ["野菜をやわらかく煮て、牛乳を加えて温める。"] }),
+      createRecipe({ id: "sp-tamago-chuka", name: "中華風たまごスープ", category: "汁物", cuisine: "中華", servingSize: 150, rotationKey: "中華スープ", tags: ["定番料理"], ingredients: [part("egg", 20), part("green_onion", 3)], seasonings: [part("broth", 125), part("soy_sauce", 2), part("sesame_oil", 0.5), part("starch", 1.5)], instructions: ["スープに軽くとろみをつけ、溶き卵を流し入れる。"] }),
+      createRecipe({ id: "sp-wakame-chuka", name: "わかめの中華スープ", category: "汁物", cuisine: "中華", servingSize: 150, rotationKey: "中華スープ", tags: ["定番料理"], ingredients: [part("wakame", 6), part("bean_sprouts", 25), part("tofu", 15)], seasonings: [part("broth", 120), part("soy_sauce", 2), part("sesame_oil", 1)], instructions: ["スープで具材を煮て、香りづけにごま油を落とす。"] }),
+      createRecipe({ id: "sp-hakusai-harusame", name: "白菜と春雨のスープ", category: "汁物", cuisine: "中華", servingSize: 155, rotationKey: "中華スープ", tags: ["定番料理"], ingredients: [part("chinese_cabbage", 25), part("harusame", 12)], seasonings: [part("broth", 120), part("soy_sauce", 2), part("salt", 0.2)], instructions: ["白菜をやわらかく煮て、戻した春雨を加える。"] }),
+      createRecipe({ id: "sp-chuka-corn", name: "中華コーンスープ", category: "汁物", cuisine: "中華", servingSize: 150, rotationKey: "中華スープ", tags: ["定番料理"], ingredients: [part("corn", 25), part("egg", 12)], seasonings: [part("broth", 120), part("salt", 0.3), part("starch", 2)], instructions: ["コーンを煮てとろみをつけ、溶き卵を流し入れる。"] }),
+      createRecipe({ id: "sp-chingensai", name: "チンゲン菜と豆腐のスープ", category: "汁物", cuisine: "中華", servingSize: 150, rotationKey: "中華スープ", tags: ["定番料理"], ingredients: [part("chingensai", 25), part("mushrooms", 8), part("tofu", 15)], seasonings: [part("broth", 125), part("soy_sauce", 2), part("sesame_oil", 0.5)], instructions: ["チンゲン菜をやわらかく煮て、味を整える。"] }),
+      createRecipe({ id: "sp-tofu-chuka", name: "豆腐の中華スープ", category: "汁物", cuisine: "中華", servingSize: 150, rotationKey: "中華スープ", tags: ["定番料理"], ingredients: [part("tofu", 30), part("green_onion", 3)], seasonings: [part("broth", 125), part("soy_sauce", 2), part("sesame_oil", 0.5)], instructions: ["豆腐をくずさないように温め、味を整える。"] }),
+      createRecipe({ id: "mn-saba-miso", name: "鯖の味噌煮", category: "主菜", cuisine: "和食", servingSize: 110, rotationKey: "魚", tags: ["定番料理"], ingredients: [part("mackerel", 80), part("naganegi", 10)], seasonings: [part("miso", 8), part("sugar", 3), part("mirin", 4), part("broth", 20)], instructions: ["調味料を煮立て、鯖を入れて落としぶたをし弱火で煮含める。"] }),
+      createRecipe({ id: "mn-shiromi-nitsuke", name: "白身魚の煮付け", category: "主菜", cuisine: "和食", servingSize: 130, rotationKey: "魚", tags: ["定番料理"], ingredients: [part("white_fish", 105), part("naganegi", 10)], seasonings: [part("soy_sauce", 6), part("mirin", 5), part("sugar", 3), part("broth", 20), part("starch", 1.5)], instructions: ["調味料を煮立て、白身魚を弱火でやわらかく煮含める。", "煮汁に軽くとろみをつけてかける。"] }),
+      createRecipe({ id: "mn-sake-shioyaki", name: "鮭の塩焼き（大根おろし添え）", category: "主菜", cuisine: "和食", servingSize: 140, rotationKey: "魚", tags: ["定番料理"], ingredients: [part("salmon", 95), part("daikon", 35, { prep: "すりおろして軽く水気を切る" }), part("potato", 40, { prep: "付け合わせにやわらかくゆでる" })], seasonings: [part("salt", 0.4), part("butter", 1)], instructions: ["鮭に薄く塩をふり、焦がさないよう弱めの火で焼く。", "大根おろしと付け合わせを添える。"] }),
+      createRecipe({ id: "mn-sake-teri", name: "鮭の照り焼き", category: "主菜", cuisine: "和食", servingSize: 125, rotationKey: "魚", tags: ["定番料理"], ingredients: [part("salmon", 95), part("green_beans", 15)], seasonings: [part("soy_sauce", 5), part("mirin", 6), part("sugar", 2)], instructions: ["鮭を弱火でやわらかく焼き、合わせ調味料を絡めて照りよく仕上げる。"] }),
+      createRecipe({ id: "mn-shiromi-oroshi", name: "白身魚のおろし煮", category: "主菜", cuisine: "和食", servingSize: 145, rotationKey: "魚", tags: ["定番料理"], ingredients: [part("white_fish", 105), part("daikon", 35, { prep: "すりおろす" }), part("starch", 5, { prep: "薄くまぶす" })], seasonings: [part("broth", 30), part("light_soy", 4), part("mirin", 4)], instructions: ["白身魚に片栗粉を薄くまぶして焼き、おろし入りのだしで煮る。"] }),
+      createRecipe({ id: "mn-shiromi-ankake", name: "白身魚の野菜あんかけ", category: "主菜", cuisine: "和食", servingSize: 150, rotationKey: "魚", tags: ["定番料理"], ingredients: [part("white_fish", 105), part("carrot", 12), part("mushrooms", 10), part("green_beans", 8)], seasonings: [part("broth", 30), part("light_soy", 4), part("mirin", 4), part("starch", 3), part("sesame_oil", 1)], instructions: ["白身魚を蒸すか煮て火を通す。", "野菜のあんを作り、上からかける。"] }),
+      createRecipe({ id: "mn-nikujaga", name: "肉じゃが", category: "主菜", cuisine: "和食", servingSize: 180, rotationKey: "豚", tags: ["定番料理"], ingredients: [part("pork_lean", 50), part("potato", 70), part("onion", 25), part("carrot", 15), part("green_peas", 5)], seasonings: [part("broth", 40), part("soy_sauce", 6), part("sugar", 3), part("mirin", 4)], instructions: ["豚肉と野菜をだしで煮て、調味料を加えて弱火で煮含める。"] }),
+      createRecipe({ id: "mn-shogayaki", name: "豚肉のやわらか生姜焼き", category: "主菜", cuisine: "和食", servingSize: 125, rotationKey: "豚", tags: ["定番料理"], ingredients: [part("pork_lean", 80), part("onion", 25), part("cabbage", 20, { prep: "やわらかくゆでて添える" })], seasonings: [part("soy_sauce", 5), part("mirin", 4), part("sugar", 1.5)], instructions: ["豚肉と玉ねぎをしょうが風味のたれで炒め煮にし、やわらかく仕上げる。"] }),
+      createRecipe({ id: "mn-buta-misoyaki", name: "豚肉の味噌焼き", category: "主菜", cuisine: "和食", servingSize: 115, rotationKey: "豚", tags: ["定番料理"], ingredients: [part("pork_lean", 80), part("bell_pepper", 12)], seasonings: [part("miso", 6), part("mirin", 4), part("sugar", 2)], instructions: ["豚肉に味噌だれを絡め、焦がさないよう弱火で焼く。"] }),
+      createRecipe({ id: "mn-jibuni", name: "鶏肉の治部煮", category: "主菜", cuisine: "和食", servingSize: 145, rotationKey: "鶏", tags: ["定番料理"], ingredients: [part("chicken_thigh", 70), part("carrot", 15), part("mushrooms", 12), part("starch", 4, { prep: "鶏肉に薄くまぶす" })], seasonings: [part("broth", 40), part("soy_sauce", 5), part("mirin", 4), part("sugar", 1.5)], instructions: ["鶏肉に粉をまぶし、野菜とともにだしで煮てとろみを出す。"] }),
+      createRecipe({ id: "mn-tori-teriyaki", name: "鶏の照り焼き", category: "主菜", cuisine: "和食", servingSize: 120, rotationKey: "鶏", tags: ["定番料理"], ingredients: [part("chicken_thigh", 85), part("green_beans", 12)], seasonings: [part("soy_sauce", 5), part("mirin", 5), part("sugar", 2)], instructions: ["鶏肉を弱火で蒸し焼きにし、たれを絡めて照りよく仕上げる。"] }),
+      createRecipe({ id: "mn-chikuzenni", name: "筑前煮", category: "主菜", cuisine: "和食", servingSize: 165, rotationKey: "鶏", tags: ["定番料理"], ingredients: [part("chicken_thigh", 55), part("lotus_root", 20), part("carrot", 20), part("burdock", 12), part("satoimo", 25), part("green_beans", 5)], seasonings: [part("broth", 40), part("soy_sauce", 6), part("mirin", 4), part("sugar", 2)], instructions: ["鶏肉と根菜を炒めてからだしで煮て、調味料で煮含める。"] }),
+      createRecipe({ id: "mn-tsukune", name: "鶏つくねの照り煮", category: "主菜", cuisine: "和食", servingSize: 130, rotationKey: "ひき肉", tags: ["定番料理"], ingredients: [part("chicken_breast", 70), part("tofu", 25), part("onion", 12), part("egg", 8), part("starch", 3)], seasonings: [part("soy_sauce", 5), part("mirin", 4), part("sugar", 2), part("broth", 25)], instructions: ["材料を練ってつくねに丸め、たれで照りよく煮る。"] }),
+      createRecipe({ id: "mn-nikudofu", name: "肉豆腐", category: "主菜", cuisine: "和食", servingSize: 180, rotationKey: "豆腐", tags: ["定番料理"], ingredients: [part("tofu", 110), part("pork_lean", 35), part("onion", 25), part("naganegi", 8)], seasonings: [part("broth", 40), part("soy_sauce", 6), part("sugar", 3), part("mirin", 3)], instructions: ["豆腐と豚肉、野菜をだしで煮て、味を含ませる。"] }),
+      createRecipe({ id: "mn-tofu-hamburg", name: "豆腐ハンバーグ（和風あん）", category: "主菜", cuisine: "和食", servingSize: 140, rotationKey: "豆腐", tags: ["定番料理"], ingredients: [part("tofu", 70), part("chicken_breast", 55), part("onion", 15), part("egg", 10), part("starch", 3)], seasonings: [part("broth", 25), part("soy_sauce", 4), part("mirin", 3), part("starch", 1.5)], instructions: ["材料を練って小判形にまとめ、蒸し焼きにする。", "和風あんをかけて仕上げる。"] }),
+      createRecipe({ id: "mn-tamagotoji", name: "高野豆腐と卵の炊き合わせ", category: "主菜", cuisine: "和食", servingSize: 150, rotationKey: "卵", tags: ["定番料理"], ingredients: [part("koya_tofu", 12), part("egg", 40), part("carrot", 12), part("green_peas", 5)], seasonings: [part("broth", 60), part("light_soy", 4), part("mirin", 4), part("sugar", 2)], instructions: ["戻した高野豆腐をだしで煮含め、卵でとじる。"] }),
+      createRecipe({ id: "mn-hamburg", name: "煮込みハンバーグ", category: "主菜", cuisine: "洋食", servingSize: 145, rotationKey: "ひき肉", tags: ["定番料理"], ingredients: [part("beef_mince", 65), part("onion", 20), part("egg", 8), part("flour", 4)], seasonings: [part("ketchup", 8), part("tomato_sauce", 12), part("consomme", 1)], instructions: ["ハンバーグを成形して焼き、トマトソースでやわらかく煮込む。"] }),
+      createRecipe({ id: "mn-rollcabbage", name: "ロールキャベツ", category: "主菜", cuisine: "洋食", servingSize: 180, rotationKey: "ひき肉", tags: ["定番料理"], ingredients: [part("cabbage", 70, { prep: "芯をそいでやわらかくゆでる" }), part("pork_mince", 50), part("onion", 15), part("egg", 6)], seasonings: [part("broth", 60), part("consomme", 2), part("tomato_sauce", 8)], instructions: ["肉だねをキャベツで包み、スープでやわらかく煮込む。"] }),
+      createRecipe({ id: "mn-shiromi-muniel", name: "白身魚のムニエル", category: "主菜", cuisine: "洋食", servingSize: 135, rotationKey: "魚", tags: ["定番料理"], ingredients: [part("white_fish", 95), part("flour", 4), part("broccoli", 15, { prep: "小房に分けてやわらかくゆでる" })], seasonings: [part("butter", 4), part("salt", 0.3), part("pepper", 0.05)], instructions: ["白身魚に粉をまぶし、バターで両面をやわらかく焼く。"] }),
+      createRecipe({ id: "mn-sake-muniel", name: "鮭のムニエル", category: "主菜", cuisine: "洋食", servingSize: 130, rotationKey: "魚", tags: ["定番料理"], ingredients: [part("salmon", 90), part("flour", 4), part("asparagus", 15)], seasonings: [part("butter", 4), part("salt", 0.3), part("pepper", 0.05)], instructions: ["鮭に粉をまぶし、バターで両面をやわらかく焼く。"] }),
+      createRecipe({ id: "mn-sake-cream", name: "鮭のクリーム煮", category: "主菜", cuisine: "洋食", servingSize: 150, rotationKey: "魚", tags: ["定番料理"], ingredients: [part("salmon", 80), part("onion", 15), part("broccoli", 12)], seasonings: [part("milk", 50), part("butter", 3), part("flour", 4), part("consomme", 1)], instructions: ["鮭と野菜を軽く煮て、クリームソースでやわらかく煮込む。"] }),
+      createRecipe({ id: "mn-chicken-tomato", name: "チキンのトマト煮", category: "主菜", cuisine: "洋食", servingSize: 150, rotationKey: "鶏", tags: ["定番料理"], ingredients: [part("chicken_thigh", 75), part("onion", 20), part("tomato", 20)], seasonings: [part("tomato_sauce", 15), part("consomme", 1.5), part("salt", 0.2)], instructions: ["鶏肉と野菜をトマトソースでやわらかく煮込む。"] }),
+      createRecipe({ id: "mn-cream-stew", name: "クリームシチュー", category: "主菜", cuisine: "洋食", servingSize: 190, rotationKey: "鶏", tags: ["定番料理"], ingredients: [part("chicken_thigh", 55), part("potato", 40), part("carrot", 15), part("onion", 20)], seasonings: [part("milk", 55), part("butter", 3), part("flour", 5), part("consomme", 1.5)], instructions: ["鶏肉と野菜をやわらかく煮て、ホワイトソースで煮込む。"] }),
+      createRecipe({ id: "mn-chicken-cream", name: "鶏肉のクリーム煮", category: "主菜", cuisine: "洋食", servingSize: 150, rotationKey: "鶏", tags: ["定番料理"], ingredients: [part("chicken_breast", 70), part("onion", 15), part("mushrooms", 10)], seasonings: [part("milk", 50), part("butter", 3), part("flour", 4), part("consomme", 1)], instructions: ["鶏むね肉をそぎ切りにし、クリームソースでしっとり煮る。"] }),
+      createRecipe({ id: "mn-porkchap", name: "ポークチャップ", category: "主菜", cuisine: "洋食", servingSize: 135, rotationKey: "豚", tags: ["定番料理"], ingredients: [part("pork_lean", 80), part("onion", 25)], seasonings: [part("ketchup", 10), part("consomme", 1), part("sugar", 1)], instructions: ["豚肉と玉ねぎを炒め、ケチャップソースで煮絡める。"] }),
+      createRecipe({ id: "mn-piccata", name: "豚肉のピカタ", category: "主菜", cuisine: "洋食", servingSize: 125, rotationKey: "豚", tags: ["定番料理"], ingredients: [part("pork_lean", 75), part("egg", 15), part("flour", 3), part("tomato", 15, { prep: "湯むきして添える" })], seasonings: [part("salt", 0.3), part("butter", 3)], instructions: ["豚肉に粉と卵液をまとわせ、バターでやわらかく焼く。"] }),
+      createRecipe({ id: "mn-shiromi-cheese", name: "白身魚のチーズ焼き", category: "主菜", cuisine: "洋食", servingSize: 135, rotationKey: "魚", tags: ["定番料理"], ingredients: [part("white_fish", 95), part("tomato", 15), part("cheese", 13)], seasonings: [part("consomme", 0.8), part("pepper", 0.05), part("butter", 1)], instructions: ["白身魚にトマトとチーズをのせ、やわらかく焼き上げる。"] }),
+      createRecipe({ id: "mn-omelet", name: "野菜あんかけオムレツ", category: "主菜", cuisine: "洋食", servingSize: 140, rotationKey: "卵", tags: ["定番料理"], ingredients: [part("egg", 75), part("onion", 12), part("carrot", 8), part("mushrooms", 8)], seasonings: [part("broth", 25), part("consomme", 1), part("starch", 2), part("butter", 3)], instructions: ["卵をふんわり焼いてオムレツにする。", "野菜あんをかけて仕上げる。"] }),
+      createRecipe({ id: "mn-mabo-tofu", name: "麻婆豆腐", category: "主菜", cuisine: "中華", servingSize: 180, rotationKey: "豆腐", tags: ["定番料理"], ingredients: [part("tofu", 130), part("pork_mince", 30), part("naganegi", 8)], seasonings: [part("miso", 4), part("soy_sauce", 3), part("broth", 30), part("starch", 2.5), part("sesame_oil", 1)], instructions: ["豆腐とひき肉を煮て調味し、とろみをつけて仕上げる。"] }),
+      createRecipe({ id: "mn-subuta", name: "揚げない酢豚風", category: "主菜", cuisine: "中華", servingSize: 160, rotationKey: "豚", tags: ["定番料理"], ingredients: [part("pork_lean", 65), part("onion", 20), part("bell_pepper", 12), part("carrot", 12)], seasonings: [part("ketchup", 6), part("vinegar", 4), part("sugar", 3), part("soy_sauce", 2), part("starch", 2)], instructions: ["豚肉と野菜をやわらかく加熱し、甘酢あんを絡める。"] }),
+      createRecipe({ id: "mn-hoikoro", name: "回鍋肉風やわらか味噌炒め", category: "主菜", cuisine: "中華", servingSize: 140, rotationKey: "豚", tags: ["定番料理"], ingredients: [part("pork_lean", 60), part("cabbage", 40), part("bell_pepper", 10)], seasonings: [part("miso", 5), part("sugar", 2), part("soy_sauce", 2), part("sesame_oil", 1)], instructions: ["キャベツを下ゆでし、豚肉とともに味噌だれで手早く炒める。"] }),
+      createRecipe({ id: "mn-chuka-umani", name: "豚肉と野菜の中華旨煮", category: "主菜", cuisine: "中華", servingSize: 155, rotationKey: "豚", tags: ["定番料理"], ingredients: [part("pork_lean", 65), part("chinese_cabbage", 30), part("carrot", 12), part("mushrooms", 10)], seasonings: [part("broth", 30), part("oyster_sauce", 4), part("soy_sauce", 2), part("starch", 2), part("sesame_oil", 0.5)], instructions: ["豚肉と野菜を煮て、オイスター味のあんでまとめる。"] }),
+      createRecipe({ id: "mn-toriyasai-an", name: "鶏肉と野菜の中華あん", category: "主菜", cuisine: "中華", servingSize: 150, rotationKey: "鶏", tags: ["定番料理"], ingredients: [part("chicken_thigh", 70), part("chinese_cabbage", 25), part("carrot", 12), part("green_peas", 5)], seasonings: [part("broth", 30), part("soy_sauce", 3), part("oyster_sauce", 2), part("starch", 2)], instructions: ["鶏肉と野菜をやわらかく煮て、中華あんでまとめる。"] }),
+      createRecipe({ id: "mn-bang-bang", name: "蒸し鶏のごまだれ", category: "主菜", cuisine: "中華", servingSize: 125, rotationKey: "鶏", tags: ["定番料理"], ingredients: [part("chicken_breast", 75), part("cucumber", 15, { prep: "薄切りにして塩もみ" }), part("tomato", 15)], seasonings: [part("sesame", 5), part("soy_sauce", 3), part("vinegar", 2), part("sugar", 1.5), part("sesame_oil", 0.5)], instructions: ["鶏むね肉をしっとり蒸してそぎ切りにする。", "ごまだれをかけ、野菜を添える。"] }),
+      createRecipe({ id: "mn-nikudango", name: "肉団子の甘酢あん", category: "主菜", cuisine: "中華", servingSize: 140, rotationKey: "ひき肉", tags: ["定番料理"], ingredients: [part("pork_mince", 60), part("onion", 15), part("egg", 6), part("starch", 4)], seasonings: [part("ketchup", 6), part("vinegar", 3), part("sugar", 3), part("soy_sauce", 2), part("starch", 1.5)], instructions: ["肉団子を蒸すか煮て火を通し、甘酢あんを絡める。"] }),
+      createRecipe({ id: "mn-kanitama", name: "かに玉風たまごあんかけ", category: "主菜", cuisine: "中華", servingSize: 150, rotationKey: "卵", tags: ["定番料理"], ingredients: [part("egg", 70), part("shrimp", 15), part("green_peas", 5), part("naganegi", 5)], seasonings: [part("broth", 25), part("soy_sauce", 2), part("vinegar", 1.5), part("sugar", 1.5), part("starch", 2), part("sesame_oil", 1)], instructions: ["具入りの卵をふんわり焼き、甘酢あんをかける。"] }),
+      createRecipe({ id: "mn-ebi-chili", name: "えびのチリソース煮（マイルド）", category: "主菜", cuisine: "中華", servingSize: 140, rotationKey: "えび", tags: ["定番料理"], ingredients: [part("shrimp", 85), part("onion", 15), part("egg", 15)], seasonings: [part("ketchup", 8), part("sugar", 2.5), part("soy_sauce", 2), part("starch", 3), part("sesame_oil", 1.5)], instructions: ["えびをやわらかく煮て、辛みを抑えたチリソースを絡める。"] }),
+      createRecipe({ id: "mn-happosai", name: "八宝菜", category: "主菜", cuisine: "中華", servingSize: 165, rotationKey: "豚", tags: ["定番料理"], ingredients: [part("pork_lean", 50), part("shrimp", 15), part("chinese_cabbage", 35), part("carrot", 12), part("mushrooms", 10), part("green_peas", 5)], seasonings: [part("broth", 30), part("soy_sauce", 3), part("oyster_sauce", 2), part("starch", 2), part("sesame_oil", 1)], instructions: ["肉と野菜を順に加熱し、あんでまとめて仕上げる。"] }),
+      createRecipe({ id: "mn-shiromi-mushi", name: "白身魚のねぎ生姜蒸し", category: "主菜", cuisine: "中華", servingSize: 135, rotationKey: "魚", tags: ["定番料理"], ingredients: [part("white_fish", 105), part("naganegi", 10), part("chingensai", 15)], seasonings: [part("soy_sauce", 4), part("sesame_oil", 2), part("broth", 15), part("starch", 1)], instructions: ["白身魚に薬味をのせて蒸し、熱いたれをかける。"] }),
+      createRecipe({ id: "mn-chinjao", name: "チンジャオロース風やわらか炒め", category: "主菜", cuisine: "中華", servingSize: 135, rotationKey: "豚", tags: ["定番料理"], ingredients: [part("pork_lean", 65), part("bell_pepper", 20), part("bean_sprouts", 15), part("starch", 2)], seasonings: [part("oyster_sauce", 4), part("soy_sauce", 2), part("sesame_oil", 1)], instructions: ["細切りの豚肉と野菜を下ゆでし、オイスター味で手早く炒める。"] }),
+      createRecipe({ id: "sd-horenso-goma", name: "ほうれん草の胡麻和え", category: "副菜", cuisine: "和食", servingSize: 55, rotationKey: "青菜", tags: ["定番料理", "副菜区分:和え物"], ingredients: [part("spinach", 55)], seasonings: [part("sesame", 4), part("soy_sauce", 2), part("sugar", 1)], instructions: ["ほうれん草をゆでて水気を絞り、胡麻だれで和える。"] }),
+      createRecipe({ id: "sd-komatsuna-ohitashi", name: "小松菜と油揚げの煮浸し", category: "副菜", cuisine: "和食", servingSize: 58, rotationKey: "青菜", tags: ["定番料理", "副菜区分:煮物"], ingredients: [part("komatsuna", 50), part("aburaage", 4)], seasonings: [part("broth", 15), part("light_soy", 2)], instructions: ["小松菜をやわらかくゆで、だし醤油を含ませる。"] }),
+      createRecipe({ id: "sd-shiraae", name: "白和え", category: "副菜", cuisine: "和食", servingSize: 65, rotationKey: "豆腐和え", tags: ["定番料理", "副菜区分:和え物"], ingredients: [part("tofu", 35), part("spinach", 25), part("carrot", 8)], seasonings: [part("sesame", 3), part("sugar", 1.5), part("light_soy", 1.5)], instructions: ["豆腐をつぶして和え衣を作り、ゆで野菜を和える。"] }),
+      createRecipe({ id: "sd-ingen-goma", name: "いんげんの胡麻和え", category: "副菜", cuisine: "和食", servingSize: 50, rotationKey: "いんげん", tags: ["定番料理", "副菜区分:和え物"], ingredients: [part("green_beans", 45)], seasonings: [part("sesame", 4), part("soy_sauce", 2), part("sugar", 1)], instructions: ["いんげんをやわらかくゆで、胡麻だれで和える。"] }),
+      createRecipe({ id: "sd-okra-ohitashi", name: "オクラのごま浸し", category: "副菜", cuisine: "和食", servingSize: 45, rotationKey: "オクラ", tags: ["定番料理", "副菜区分:和え物"], ingredients: [part("okra", 40)], seasonings: [part("broth", 10), part("light_soy", 2), part("sesame", 2)], instructions: ["オクラを下ゆでして刻み、だし醤油で和える。"] }),
+      createRecipe({ id: "sd-asuparaohitashi", name: "アスパラのマヨネーズ和え", category: "副菜", cuisine: "洋食", servingSize: 45, rotationKey: "アスパラ", tags: ["定番料理", "副菜区分:サラダ・漬物"], ingredients: [part("asparagus", 45)], seasonings: [part("mayonnaise", 4)], instructions: ["アスパラをやわらかくゆで、だし醤油を含ませる。"] }),
+      createRecipe({ id: "sd-hijiki", name: "ひじきの煮物", category: "副菜", cuisine: "和食", servingSize: 55, rotationKey: "ひじき", tags: ["定番料理", "副菜区分:煮物"], ingredients: [part("hijiki", 30), part("carrot", 10), part("aburaage", 4), part("daizu_boiled", 8)], seasonings: [part("broth", 25), part("soy_sauce", 3), part("sugar", 1.5), part("mirin", 2)], instructions: ["ひじきと具材をだしで煮て、味を含ませる。"] }),
+      createRecipe({ id: "sd-kiriboshi", name: "切り干し大根の煮物", category: "副菜", cuisine: "和食", servingSize: 55, rotationKey: "切り干し大根", tags: ["定番料理", "副菜区分:煮物"], ingredients: [part("kiriboshi_daikon", 8), part("carrot", 10), part("aburaage", 4)], seasonings: [part("broth", 30), part("soy_sauce", 3), part("sugar", 1.5), part("mirin", 2)], instructions: ["戻した切り干し大根をだしで煮て、味を含ませる。"] }),
+      createRecipe({ id: "sd-kabocha-nimono", name: "かぼちゃの煮物", category: "副菜", cuisine: "和食", servingSize: 70, rotationKey: "かぼちゃ", tags: ["定番料理", "副菜区分:煮物"], ingredients: [part("pumpkin", 65)], seasonings: [part("broth", 20), part("soy_sauce", 2), part("sugar", 2), part("mirin", 2)], instructions: ["かぼちゃを面取りし、だしでやわらかく煮含める。"] }),
+      createRecipe({ id: "sd-satoimo-nikorogashi", name: "里芋の煮ころがし", category: "副菜", cuisine: "和食", servingSize: 65, rotationKey: "里芋", tags: ["定番料理", "副菜区分:煮物"], ingredients: [part("satoimo", 60)], seasonings: [part("broth", 25), part("soy_sauce", 3), part("sugar", 1.5), part("mirin", 2)], instructions: ["里芋をだしでやわらかく煮て、煮汁をからめる。"] }),
+      createRecipe({ id: "sd-gomoku-mame", name: "五目豆", category: "副菜", cuisine: "和食", servingSize: 50, rotationKey: "豆", tags: ["定番料理", "副菜区分:煮物"], ingredients: [part("daizu_boiled", 25), part("carrot", 10), part("burdock", 8), part("mushrooms", 5)], seasonings: [part("broth", 20), part("soy_sauce", 2.5), part("sugar", 1.5)], instructions: ["大豆と野菜を小さく切り、だしでやわらかく煮含める。"] }),
+      createRecipe({ id: "sd-kinpira", name: "やわらかきんぴらごぼう", category: "副菜", cuisine: "和食", servingSize: 50, rotationKey: "ごぼう", tags: ["定番料理", "副菜区分:炒め物"], ingredients: [part("burdock", 30), part("carrot", 12)], seasonings: [part("soy_sauce", 2.5), part("mirin", 2), part("sugar", 1), part("sesame_oil", 1), part("sesame", 1)], instructions: ["ごぼうを下ゆでしてやわらかくし、甘辛く炒め煮にする。"] }),
+      createRecipe({ id: "sd-renkon-nimono", name: "れんこんのやわらか煮", category: "副菜", cuisine: "和食", servingSize: 50, rotationKey: "れんこん", tags: ["定番料理", "副菜区分:煮物"], ingredients: [part("lotus_root", 45), part("carrot", 8)], seasonings: [part("broth", 20), part("soy_sauce", 2.5), part("mirin", 2)], instructions: ["れんこんを薄切りにし、だしでやわらかく煮含める。"] }),
+      createRecipe({ id: "sd-chawanmushi", name: "茶碗蒸し", category: "副菜", cuisine: "和食", servingSize: 85, rotationKey: "茶碗蒸し", tags: ["定番料理", "副菜区分:豆腐・卵"], ingredients: [part("egg", 30), part("chicken_breast", 8), part("mushrooms", 5), part("green_onion", 2)], seasonings: [part("broth", 70), part("light_soy", 1.5), part("mirin", 1)], instructions: ["卵液をこして具材と器に入れ、すが立たないよう弱火で蒸す。"] }),
+      createRecipe({ id: "sd-nasu-nibitashi", name: "なすの煮浸し", category: "副菜", cuisine: "和食", servingSize: 55, rotationKey: "なす", tags: ["定番料理", "副菜区分:煮物"], ingredients: [part("eggplant", 55)], seasonings: [part("broth", 25), part("light_soy", 2.5), part("mirin", 2), part("sesame_oil", 1)], instructions: ["なすをやわらかく煮て、だしを含ませて冷ます。"] }),
+      createRecipe({ id: "sd-daikon-soboro", name: "大根のそぼろあん", category: "副菜", cuisine: "和食", servingSize: 65, rotationKey: "大根", tags: ["定番料理", "副菜区分:煮物"], ingredients: [part("daikon", 65), part("chicken_breast", 12)], seasonings: [part("broth", 25), part("light_soy", 2.5), part("mirin", 2), part("starch", 1.5)], instructions: ["大根をやわらかく煮て、そぼろあんをかける。"] }),
+      createRecipe({ id: "sd-koyadofu", name: "高野豆腐の含め煮", category: "副菜", cuisine: "和食", servingSize: 55, rotationKey: "高野豆腐", tags: ["定番料理", "副菜区分:煮物"], ingredients: [part("koya_tofu", 8), part("carrot", 10), part("green_peas", 4)], seasonings: [part("broth", 50), part("light_soy", 2.5), part("mirin", 2), part("sugar", 1.5)], instructions: ["戻した高野豆腐をだしでふっくら煮含める。"] }),
+      createRecipe({ id: "sd-jaga-soboro", name: "じゃがいものそぼろ煮", category: "副菜", cuisine: "和食", servingSize: 70, rotationKey: "じゃがいも", tags: ["定番料理", "副菜区分:煮物"], ingredients: [part("potato", 60), part("chicken_breast", 12)], seasonings: [part("broth", 25), part("soy_sauce", 3), part("mirin", 2), part("starch", 1)], instructions: ["じゃがいもをやわらかく煮て、そぼろあんをからめる。"] }),
+      createRecipe({ id: "sd-satsumaimo-lemon", name: "さつまいものレモン煮", category: "副菜", cuisine: "和食", servingSize: 60, rotationKey: "さつまいも", tags: ["定番料理", "副菜区分:煮物"], ingredients: [part("sweet_potato", 50)], seasonings: [part("sugar", 3), part("broth", 15), part("vinegar", 1)], instructions: ["さつまいもを輪切りにし、レモン風味の甘煮にする。"] }),
+      createRecipe({ id: "sd-sunomono", name: "きゅうりとわかめの酢の物", category: "副菜", cuisine: "和食", servingSize: 50, rotationKey: "酢の物", tags: ["定番料理", "副菜区分:酢の物"], ingredients: [part("cucumber", 40), part("wakame", 5), part("harusame", 8)], seasonings: [part("vinegar", 4), part("sugar", 2.5), part("light_soy", 1)], instructions: ["きゅうりを塩もみし、わかめとともに甘酢で和える。"] }),
+      createRecipe({ id: "sd-namasu", name: "大根と人参のなます", category: "副菜", cuisine: "和食", servingSize: 50, rotationKey: "酢の物", tags: ["定番料理", "副菜区分:酢の物"], ingredients: [part("daikon", 40), part("carrot", 10)], seasonings: [part("vinegar", 4), part("sugar", 2.5), part("salt", 0.2)], instructions: ["せん切りの大根と人参を塩もみし、甘酢で和える。"] }),
+      createRecipe({ id: "sd-tosazu", name: "トマトの土佐酢和え", category: "副菜", cuisine: "和食", servingSize: 45, rotationKey: "トマト", tags: ["定番料理", "副菜区分:酢の物"], ingredients: [part("tomato", 55)], seasonings: [part("vinegar", 3), part("light_soy", 1.5), part("sugar", 2.5), part("broth", 5), part("sesame", 1)], instructions: ["湯むきしたトマトを食べやすく切り、土佐酢で和える。"] }),
+      createRecipe({ id: "sd-asazuke", name: "キャベツの浅漬け風", category: "副菜", cuisine: "和食", servingSize: 45, rotationKey: "漬物", tags: ["定番料理", "副菜区分:サラダ・漬物"], ingredients: [part("cabbage", 45), part("cucumber", 12), part("carrot", 6)], seasonings: [part("salt", 0.4), part("vinegar", 1), part("sesame", 1.5)], instructions: ["キャベツを塩もみしてしんなりさせ、軽く酢をなじませる。"] }),
+      createRecipe({ id: "sd-tofu-ankake", name: "豆腐の野菜あんかけ", category: "副菜", cuisine: "和食", servingSize: 70, rotationKey: "豆腐", tags: ["定番料理", "副菜区分:豆腐・卵"], ingredients: [part("tofu", 60), part("carrot", 8), part("mushrooms", 6)], seasonings: [part("broth", 25), part("light_soy", 2.5), part("starch", 1.5)], instructions: ["温めた豆腐に野菜あんをかける。"] }),
+      createRecipe({ id: "sd-tamago-yaki", name: "だし巻き風たまご焼き", category: "副菜", cuisine: "和食", servingSize: 55, rotationKey: "卵", tags: ["定番料理", "副菜区分:豆腐・卵"], ingredients: [part("egg", 40)], seasonings: [part("broth", 12), part("light_soy", 1), part("mirin", 1), part("sugar", 0.5)], instructions: ["だし入りの卵液をやわらかく焼き上げる。"] }),
+      createRecipe({ id: "sd-potato-salad", name: "ポテトサラダ", category: "副菜", cuisine: "洋食", servingSize: 75, rotationKey: "ポテト", tags: ["定番料理", "副菜区分:サラダ・漬物"], ingredients: [part("potato", 55), part("cucumber", 10), part("carrot", 8)], seasonings: [part("mayonnaise", 6), part("salt", 0.2)], instructions: ["じゃがいもをゆでてつぶし、野菜とマヨネーズで和える。"] }),
+      createRecipe({ id: "sd-coleslaw", name: "コールスローサラダ", category: "副菜", cuisine: "洋食", servingSize: 65, rotationKey: "キャベツ", tags: ["定番料理", "副菜区分:サラダ・漬物"], ingredients: [part("cabbage", 40), part("corn", 10), part("carrot", 8)], seasonings: [part("mayonnaise", 5), part("vinegar", 2), part("sugar", 1)], instructions: ["せん切り野菜を塩もみし、ドレッシングで和える。"] }),
+      createRecipe({ id: "sd-kabocha-salad", name: "かぼちゃのサラダ", category: "副菜", cuisine: "洋食", servingSize: 65, rotationKey: "かぼちゃ", tags: ["定番料理", "副菜区分:サラダ・漬物"], ingredients: [part("pumpkin", 55), part("cucumber", 8)], seasonings: [part("mayonnaise", 5)], instructions: ["かぼちゃをやわらかくゆでてつぶし、マヨネーズで和える。"] }),
+      createRecipe({ id: "sd-macaroni-salad", name: "マカロニサラダ", category: "副菜", cuisine: "洋食", servingSize: 70, rotationKey: "マカロニ", tags: ["定番料理", "副菜区分:サラダ・漬物"], ingredients: [part("pasta", 30, { prep: "マカロニをやわらかくゆで5cm程度に切る" }), part("cucumber", 10), part("carrot", 8), part("tuna_water", 8)], seasonings: [part("mayonnaise", 6)], instructions: ["やわらかくゆでたマカロニと野菜、ツナをマヨネーズで和える。"] }),
+      createRecipe({ id: "sd-broccoli-salad", name: "ブロッコリーとコーンのサラダ", category: "副菜", cuisine: "洋食", servingSize: 60, rotationKey: "ブロッコリー", tags: ["定番料理", "副菜区分:サラダ・漬物"], ingredients: [part("broccoli", 45), part("corn", 10)], seasonings: [part("mayonnaise", 5)], instructions: ["ブロッコリーをやわらかくゆで、コーンとともに和える。"] }),
+      createRecipe({ id: "sd-tomato-salad", name: "トマトのイタリアンサラダ", category: "副菜", cuisine: "洋食", servingSize: 50, rotationKey: "トマト", tags: ["定番料理", "副菜区分:サラダ・漬物"], ingredients: [part("tomato", 55), part("onion", 8)], seasonings: [part("vinegar", 2.5), part("sesame_oil", 1.5), part("salt", 0.2)], instructions: ["湯むきしたトマトを切り、ドレッシングをかけて冷やす。"] }),
+      createRecipe({ id: "sd-carrot-glace", name: "にんじんのグラッセ", category: "副菜", cuisine: "洋食", servingSize: 50, rotationKey: "にんじん", tags: ["定番料理", "副菜区分:炒め物"], ingredients: [part("carrot", 50)], seasonings: [part("butter", 2.5), part("sugar", 1.5), part("salt", 0.1)], instructions: ["にんじんをやわらかくゆで、バターと砂糖で艶よく仕上げる。"] }),
+      createRecipe({ id: "sd-german-potato", name: "ジャーマンポテト風やわらか炒め", category: "副菜", cuisine: "洋食", servingSize: 70, rotationKey: "じゃがいも", tags: ["定番料理", "副菜区分:炒め物"], ingredients: [part("potato", 60), part("onion", 12)], seasonings: [part("butter", 3), part("consomme", 1), part("pepper", 0.05)], instructions: ["じゃがいもをやわらかくゆで、玉ねぎとともにバターで炒める。"] }),
+      createRecipe({ id: "sd-ratatouille", name: "ラタトゥイユ", category: "副菜", cuisine: "洋食", servingSize: 55, rotationKey: "なす", tags: ["定番料理", "副菜区分:煮物"], ingredients: [part("eggplant", 35), part("tomato", 25), part("onion", 12), part("bell_pepper", 8)], seasonings: [part("tomato_sauce", 10), part("consomme", 1), part("sesame_oil", 1)], instructions: ["野菜を小さめに切り、トマトでやわらかく煮込む。"] }),
+      createRecipe({ id: "sd-asupara-saute", name: "アスパラのソテー", category: "副菜", cuisine: "洋食", servingSize: 45, rotationKey: "アスパラ", tags: ["定番料理", "副菜区分:炒め物"], ingredients: [part("asparagus", 40), part("corn", 8)], seasonings: [part("butter", 2.5), part("salt", 0.2)], instructions: ["アスパラを下ゆでし、バターで手早く炒める。"] }),
+      createRecipe({ id: "sd-horenso-saute", name: "ほうれん草のソテー", category: "副菜", cuisine: "洋食", servingSize: 50, rotationKey: "青菜", tags: ["定番料理", "副菜区分:炒め物"], ingredients: [part("spinach", 50), part("corn", 8)], seasonings: [part("butter", 2.5), part("salt", 0.2)], instructions: ["ほうれん草を下ゆでし、バターで手早く炒める。"] }),
+      createRecipe({ id: "sd-corn-saute", name: "コーンのバターソテー", category: "副菜", cuisine: "洋食", servingSize: 45, rotationKey: "コーン", tags: ["定番料理", "副菜区分:炒め物"], ingredients: [part("corn", 40)], seasonings: [part("butter", 2.5), part("consomme", 0.8)], instructions: ["コーンをバターで炒め、コンソメで味を整える。"] }),
+      createRecipe({ id: "sd-daikon-consomme", name: "大根のコンソメ煮", category: "副菜", cuisine: "洋食", servingSize: 50, rotationKey: "大根", tags: ["定番料理", "副菜区分:煮物"], ingredients: [part("daikon", 60), part("carrot", 8)], seasonings: [part("broth", 30), part("consomme", 1.5), part("butter", 1.5)], instructions: ["大根をやわらかくなるまでコンソメで煮含め、バター少量でこくを出す。"] }),
+      createRecipe({ id: "sd-onsai-salad", name: "温野菜サラダ", category: "副菜", cuisine: "洋食", servingSize: 65, rotationKey: "温野菜", tags: ["定番料理", "副菜区分:サラダ・漬物"], ingredients: [part("broccoli", 25), part("carrot", 15), part("potato", 25)], seasonings: [part("mayonnaise", 5)], instructions: ["野菜をやわらかく蒸し、食べやすく切って盛り合わせる。"] }),
+      createRecipe({ id: "sd-pumpkin-cheese", name: "かぼちゃのチーズ焼き", category: "副菜", cuisine: "洋食", servingSize: 65, rotationKey: "かぼちゃ", tags: ["定番料理", "副菜区分:焼き物"], ingredients: [part("pumpkin", 50), part("cheese", 8)], seasonings: [part("consomme", 0.5)], instructions: ["ゆでたかぼちゃにチーズをのせ、やわらかく焼く。"] }),
+      createRecipe({ id: "sd-scramble", name: "彩りスクランブルエッグ", category: "副菜", cuisine: "洋食", servingSize: 60, rotationKey: "卵", tags: ["定番料理", "副菜区分:豆腐・卵"], ingredients: [part("egg", 35), part("milk", 8), part("corn", 8)], seasonings: [part("butter", 2), part("salt", 0.2)], instructions: ["卵液を弱火でやわらかいスクランブルにする。"] }),
+      createRecipe({ id: "sd-moyashi-namul", name: "もやしのナムル", category: "副菜", cuisine: "中華", servingSize: 50, rotationKey: "もやし", tags: ["定番料理", "副菜区分:和え物"], ingredients: [part("bean_sprouts", 50), part("carrot", 8)], seasonings: [part("sesame_oil", 1.5), part("soy_sauce", 2), part("sesame", 1)], instructions: ["もやしをやわらかくゆで、ごま油だれで和える。"] }),
+      createRecipe({ id: "sd-chingensai-ae", name: "チンゲン菜の中華和え", category: "副菜", cuisine: "中華", servingSize: 50, rotationKey: "チンゲン菜", tags: ["定番料理", "副菜区分:和え物"], ingredients: [part("chingensai", 55)], seasonings: [part("sesame_oil", 1.5), part("soy_sauce", 2), part("sesame", 1)], instructions: ["チンゲン菜をやわらかくゆで、中華だれで和える。"] }),
+      createRecipe({ id: "sd-kyuri-chuka", name: "きゅうりの中華和え", category: "副菜", cuisine: "中華", servingSize: 45, rotationKey: "きゅうり", tags: ["定番料理", "副菜区分:和え物"], ingredients: [part("cucumber", 50)], seasonings: [part("sesame_oil", 1.5), part("soy_sauce", 2), part("vinegar", 1.5), part("sugar", 0.5)], instructions: ["きゅうりを塩もみし、中華だれで和える。"] }),
+      createRecipe({ id: "sd-harusame-salad", name: "春雨の中華サラダ", category: "副菜", cuisine: "中華", servingSize: 60, rotationKey: "春雨", tags: ["定番料理", "副菜区分:酢の物"], ingredients: [part("harusame", 25), part("cucumber", 12), part("carrot", 8), part("egg", 8, { prep: "薄焼きにして細切り" })], seasonings: [part("vinegar", 3), part("soy_sauce", 2), part("sesame_oil", 1), part("sugar", 1.5)], instructions: ["戻した春雨と野菜、錦糸卵を甘酢だれで和える。"] }),
+      createRecipe({ id: "sd-bansansu", name: "バンサンスー", category: "副菜", cuisine: "中華", servingSize: 55, rotationKey: "春雨", tags: ["定番料理", "副菜区分:酢の物"], ingredients: [part("harusame", 20), part("cucumber", 12), part("chicken_breast", 10, { prep: "蒸してほぐす" })], seasonings: [part("vinegar", 3), part("soy_sauce", 2), part("sesame_oil", 1), part("sugar", 1)], instructions: ["春雨と細切り野菜、蒸し鶏を甘酢で和える。"] }),
+      createRecipe({ id: "sd-chingensai-cream", name: "チンゲン菜のクリーム煮", category: "副菜", cuisine: "中華", servingSize: 60, rotationKey: "チンゲン菜", tags: ["定番料理", "副菜区分:煮物"], ingredients: [part("chingensai", 50), part("mushrooms", 8)], seasonings: [part("milk", 30), part("broth", 15), part("starch", 1.5), part("salt", 0.2)], instructions: ["チンゲン菜を下ゆでし、ミルクあんでやさしく煮る。"] }),
+      createRecipe({ id: "sd-hakusai-umani", name: "白菜の中華旨煮", category: "副菜", cuisine: "中華", servingSize: 60, rotationKey: "白菜", tags: ["定番料理", "副菜区分:煮物"], ingredients: [part("chinese_cabbage", 60), part("carrot", 8)], seasonings: [part("broth", 25), part("oyster_sauce", 2), part("soy_sauce", 1), part("starch", 1.5)], instructions: ["白菜をやわらかく煮て、あんでまとめる。"] }),
+      createRecipe({ id: "sd-nasu-chuka", name: "なすの中華炒め", category: "副菜", cuisine: "中華", servingSize: 55, rotationKey: "なす", tags: ["定番料理", "副菜区分:炒め物"], ingredients: [part("eggplant", 50), part("bell_pepper", 8)], seasonings: [part("soy_sauce", 2), part("miso", 2), part("sugar", 1), part("sesame_oil", 1.5)], instructions: ["なすを下ゆでし、味噌だれで手早く炒める。"] }),
+      createRecipe({ id: "sd-tomato-tamago", name: "トマトとたまごの中華炒め", category: "副菜", cuisine: "中華", servingSize: 65, rotationKey: "トマト", tags: ["定番料理", "副菜区分:炒め物"], ingredients: [part("tomato", 40), part("egg", 25)], seasonings: [part("sesame_oil", 1.5), part("salt", 0.2), part("sugar", 0.5)], instructions: ["卵をふんわり炒め、トマトと合わせて手早く仕上げる。"] }),
+      createRecipe({ id: "sd-daikon-chuka", name: "大根の中華煮", category: "副菜", cuisine: "中華", servingSize: 55, rotationKey: "大根", tags: ["定番料理", "副菜区分:煮物"], ingredients: [part("daikon", 60), part("chicken_breast", 8)], seasonings: [part("broth", 25), part("oyster_sauce", 2), part("starch", 1.5)], instructions: ["大根をやわらかく煮て、中華あんをからめる。"] }),
+      createRecipe({ id: "sd-wakame-chuka-ae", name: "わかめときゅうりの中華風", category: "副菜", cuisine: "中華", servingSize: 45, rotationKey: "わかめ", tags: ["定番料理", "副菜区分:酢の物"], ingredients: [part("wakame", 6), part("cucumber", 30), part("bean_sprouts", 10)], seasonings: [part("vinegar", 3), part("soy_sauce", 1.5), part("sesame_oil", 1), part("sugar", 1)], instructions: ["具材を下ごしらえし、中華風甘酢で和える。"] }),
+      createRecipe({ id: "sd-tofu-chuka-mushi", name: "豆腐の中華あんかけ蒸し", category: "副菜", cuisine: "中華", servingSize: 70, rotationKey: "豆腐", tags: ["定番料理", "副菜区分:豆腐・卵"], ingredients: [part("tofu", 60), part("green_onion", 3), part("mushrooms", 5)], seasonings: [part("broth", 20), part("oyster_sauce", 2), part("starch", 1.5), part("sesame_oil", 0.5)], instructions: ["豆腐を温め、きのこ入りの中華あんをかける。"] }),
+      createRecipe({ id: "ds-apple-compote", name: "りんごのコンポート", category: "デザート", cuisine: "和食", servingSize: 70, rotationKey: "コンポート", tags: ["定番料理", "生フルーツ系", "果物:りんご", "安価"], ingredients: [part("apple", 65)], seasonings: [part("sugar", 3)], instructions: ["りんごを薄切りにし、砂糖でやわらかく煮て冷やす。"] }),
+      createRecipe({ id: "ds-peach-can", name: "白桃（缶）", category: "デザート", cuisine: "洋食", servingSize: 70, rotationKey: "果物", tags: ["定番料理", "生フルーツ系", "果物:白桃"], ingredients: [part("peach", 85, { prep: "缶詰を食べやすく切る" })], seasonings: [part("sugar", 1.5)], instructions: ["食べやすい大きさに切って器に盛る。"] }),
+      createRecipe({ id: "ds-mandarin-can", name: "みかん（缶）", category: "デザート", cuisine: "和食", servingSize: 70, rotationKey: "果物", tags: ["定番料理", "生フルーツ系", "果物:みかん", "安価"], ingredients: [part("mandarin", 80, { prep: "缶詰の薄皮なしを使用" })], seasonings: [part("sugar", 1)], instructions: ["汁気を軽く切って器に盛る。"] }),
+      createRecipe({ id: "ds-banana", name: "バナナ", category: "デザート", cuisine: "洋食", servingSize: 70, rotationKey: "果物", tags: ["定番料理", "生フルーツ系", "果物:バナナ", "安価"], ingredients: [part("banana", 70)], seasonings: [], instructions: ["提供直前に輪切りにして変色を防ぐ。"] }),
+      createRecipe({ id: "ds-orange", name: "オレンジ", category: "デザート", cuisine: "洋食", servingSize: 80, rotationKey: "果物", tags: ["定番料理", "生フルーツ系", "果物:オレンジ", "安価"], ingredients: [part("orange", 80, { prep: "薄皮を除き一口大に切る" })], seasonings: [], instructions: ["薄皮を除いて食べやすく切り分ける。"] }),
+      createRecipe({ id: "ds-fruit-punch", name: "フルーツポンチ", category: "デザート", cuisine: "洋食", servingSize: 80, rotationKey: "果物", tags: ["定番料理", "生フルーツ系", "安価"], ingredients: [part("banana", 25), part("mandarin", 25), part("apple", 20)], seasonings: [part("sugar", 3)], instructions: ["果物を小さめに切り、シロップで和えて冷やす。"] }),
+      createRecipe({ id: "ds-apple-jelly", name: "りんごゼリー", category: "デザート", cuisine: "和食", servingSize: 75, rotationKey: "ゼリー", tags: ["定番料理", "ゼリー系", "果物:りんご", "安価"], ingredients: [part("apple", 50)], seasonings: [part("sugar", 4), part("gelatin_powder", 1.5)], instructions: ["りんご果汁と果肉をゼラチンで固めて冷やす。"] }),
+      createRecipe({ id: "ds-grape-jelly", name: "ぶどうゼリー", category: "デザート", cuisine: "洋食", servingSize: 75, rotationKey: "ゼリー", tags: ["定番料理", "ゼリー系", "果物:ぶどう"], ingredients: [part("grape", 50)], seasonings: [part("sugar", 4), part("gelatin_powder", 1.5)], instructions: ["ぶどう果汁をゼラチンで固めて冷やす。"] }),
+      createRecipe({ id: "ds-orange-jelly", name: "オレンジゼリー", category: "デザート", cuisine: "洋食", servingSize: 75, rotationKey: "ゼリー", tags: ["定番料理", "ゼリー系", "果物:オレンジ", "安価"], ingredients: [part("orange", 50)], seasonings: [part("sugar", 4), part("gelatin_powder", 1.5)], instructions: ["オレンジ果汁をゼラチンで固めて冷やす。"] }),
+      createRecipe({ id: "ds-peach-jelly", name: "白桃ゼリー", category: "デザート", cuisine: "和食", servingSize: 75, rotationKey: "ゼリー", tags: ["定番料理", "ゼリー系", "果物:白桃"], ingredients: [part("peach", 50)], seasonings: [part("sugar", 4), part("gelatin_powder", 1.5)], instructions: ["白桃をきざんでゼリー液に加え、冷やし固める。"] }),
+      createRecipe({ id: "ds-milk-kanten", name: "みかん入り牛乳寒天", category: "デザート", cuisine: "和食", servingSize: 80, rotationKey: "寒天", tags: ["定番料理", "ゼリー系", "果物:みかん", "安価"], ingredients: [part("milk", 50), part("mandarin", 20)], seasonings: [part("sugar", 4), part("gelatin_powder", 1.5)], instructions: ["牛乳寒天液を作り、みかんを加えて冷やし固める。"] }),
+      createRecipe({ id: "ds-mizuyokan", name: "水ようかん", category: "デザート", cuisine: "和食", servingSize: 70, rotationKey: "和菓子", tags: ["定番料理", "和菓子系", "安価"], ingredients: [part("azuki_paste", 40)], seasonings: [part("sugar", 2), part("gelatin_powder", 1.5)], instructions: ["こしあんをのばしてゼラチンで固め、なめらかに冷やす。"] }),
+      createRecipe({ id: "ds-imoyokan", name: "芋ようかん", category: "デザート", cuisine: "和食", servingSize: 65, rotationKey: "和菓子", tags: ["定番料理", "和菓子系", "安価"], ingredients: [part("sweet_potato", 55)], seasonings: [part("sugar", 4), part("gelatin_powder", 1)], instructions: ["さつまいもを裏ごしし、砂糖と合わせて固める。"] }),
+      createRecipe({ id: "ds-purin", name: "プリン", category: "デザート", cuisine: "洋食", servingSize: 80, rotationKey: "プリン", tags: ["定番料理", "プリン系"], ingredients: [part("milk", 55), part("egg", 18)], seasonings: [part("sugar", 7)], instructions: ["卵液をこして容器に入れ、すが立たないよう弱火で蒸す。"] }),
+      createRecipe({ id: "ds-milk-purin", name: "ミルクプリン", category: "デザート", cuisine: "洋食", servingSize: 80, rotationKey: "プリン", tags: ["定番料理", "プリン系", "安価"], ingredients: [part("milk", 65)], seasonings: [part("sugar", 6), part("gelatin_powder", 1.5)], instructions: ["牛乳と砂糖を温め、ゼラチンで冷やし固める。"] }),
+      createRecipe({ id: "ds-kabocha-purin", name: "かぼちゃプリン", category: "デザート", cuisine: "洋食", servingSize: 80, rotationKey: "プリン", tags: ["定番料理", "プリン系"], ingredients: [part("pumpkin", 30), part("milk", 40), part("egg", 12)], seasonings: [part("sugar", 6)], instructions: ["かぼちゃを裏ごしして卵液と合わせ、なめらかに蒸す。"] }),
+      createRecipe({ id: "ds-yogurt-fruit", name: "フルーツヨーグルト", category: "デザート", cuisine: "洋食", servingSize: 85, rotationKey: "ヨーグルト", tags: ["定番料理", "ヨーグルト系", "安価"], ingredients: [part("yogurt", 60), part("banana", 15), part("mandarin", 10)], seasonings: [part("sugar", 2)], instructions: ["果物を小さく切り、ヨーグルトで和えて冷やす。"] }),
+      createRecipe({ id: "ds-yogurt-peach", name: "白桃のヨーグルトかけ", category: "デザート", cuisine: "洋食", servingSize: 80, rotationKey: "ヨーグルト", tags: ["定番料理", "ヨーグルト系", "果物:白桃"], ingredients: [part("peach", 45), part("yogurt", 35)], seasonings: [part("sugar", 1.5)], instructions: ["白桃を切り、ヨーグルトをかけて冷やして提供する。"] }),
+      createRecipe({ id: "ds-milk-babaroa", name: "ミルクババロア", category: "デザート", cuisine: "洋食", servingSize: 80, rotationKey: "ババロア", tags: ["定番料理", "プリン系"], ingredients: [part("milk", 55), part("egg", 8)], seasonings: [part("sugar", 6), part("gelatin_powder", 1.5)], instructions: ["ミルクベースをゼラチンで冷やし固め、ふんわり仕上げる。"] }),
+      createRecipe({ id: "ds-milk-kuzu", name: "ミルクくずプリン", category: "デザート", cuisine: "和食", servingSize: 75, rotationKey: "和菓子", tags: ["定番料理", "和菓子系", "安価"], ingredients: [part("milk", 60)], seasonings: [part("sugar", 5), part("starch", 5)], instructions: ["牛乳と片栗粉を練ってとろみを出し、冷やして固める。"] }),
+      createRecipe({ id: "ds-sweet-potato-cha", name: "スイートポテト茶巾", category: "デザート", cuisine: "和食", servingSize: 65, rotationKey: "和菓子", tags: ["定番料理", "和菓子系", "安価"], ingredients: [part("sweet_potato", 45), part("milk", 8), part("butter", 1.5)], seasonings: [part("sugar", 4)], instructions: ["さつまいもを裏ごしし、茶巾に絞ってやわらかく仕上げる。"] }),
+      createRecipe({ id: "ds-apple-yaki", name: "焼きりんご風コンポート", category: "デザート", cuisine: "洋食", servingSize: 70, rotationKey: "コンポート", tags: ["定番料理", "生フルーツ系", "果物:りんご", "安価"], ingredients: [part("apple", 60), part("butter", 1.5)], seasonings: [part("sugar", 3)], instructions: ["りんごをバターと砂糖でやわらかく蒸し煮にする。"] }),
+      createRecipe({ id: "sg-curry", name: "やわらかチキンカレー", category: "単品料理", cuisine: "洋食", servingSize: 330, rotationKey: "カレー", tags: ["定番料理", "例外献立"], ingredients: [part("rice", 150), part("chicken_thigh", 55), part("potato", 40), part("onion", 30), part("carrot", 15)], seasonings: [part("curry_roux", 16), part("broth", 60)], instructions: ["具材をやわらかく煮込み、ルウを溶かしてごはんに添える。"] }),
+      createRecipe({ id: "sg-hayashi", name: "ハヤシライス", category: "単品料理", cuisine: "洋食", servingSize: 320, rotationKey: "カレー", tags: ["定番料理", "例外献立"], ingredients: [part("rice", 150), part("beef_mince", 45), part("onion", 30), part("mushrooms", 12)], seasonings: [part("tomato_sauce", 25), part("ketchup", 8), part("consomme", 1.5), part("flour", 3), part("butter", 2)], instructions: ["ひき肉と玉ねぎを炒めてトマトソースで煮込み、ごはんに添える。"] }),
+      createRecipe({ id: "sg-oyakodon", name: "親子丼", category: "単品料理", cuisine: "和食", servingSize: 310, rotationKey: "丼", tags: ["定番料理", "例外献立"], ingredients: [part("rice", 145), part("chicken_thigh", 50), part("egg", 35), part("onion", 25)], seasonings: [part("broth", 35), part("soy_sauce", 4), part("mirin", 4), part("sugar", 1)], instructions: ["鶏肉と玉ねぎをだしで煮て、卵でとじてごはんにのせる。"] }),
+      createRecipe({ id: "sg-gyudon", name: "牛そぼろのやわらか丼", category: "単品料理", cuisine: "和食", servingSize: 300, rotationKey: "丼", tags: ["定番料理", "例外献立"], ingredients: [part("rice", 145), part("beef_mince", 50), part("onion", 25), part("green_peas", 5)], seasonings: [part("broth", 25), part("soy_sauce", 4), part("mirin", 3), part("sugar", 2)], instructions: ["牛ひき肉と玉ねぎを甘辛く煮て、ごはんにのせる。"] }),
+      createRecipe({ id: "sg-chukadon", name: "中華丼", category: "単品料理", cuisine: "中華", servingSize: 320, rotationKey: "丼", tags: ["定番料理", "例外献立"], ingredients: [part("rice", 145), part("pork_lean", 40), part("chinese_cabbage", 30), part("carrot", 12), part("mushrooms", 10)], seasonings: [part("broth", 35), part("soy_sauce", 3), part("oyster_sauce", 2), part("starch", 2.5)], instructions: ["肉と野菜をやわらかく煮てあんにし、ごはんにかける。"] }),
+      createRecipe({ id: "sg-mabodon", name: "麻婆丼", category: "単品料理", cuisine: "中華", servingSize: 310, rotationKey: "丼", tags: ["定番料理", "例外献立"], ingredients: [part("rice", 145), part("tofu", 80), part("pork_mince", 25), part("naganegi", 8)], seasonings: [part("miso", 4), part("soy_sauce", 3), part("broth", 25), part("starch", 2.5)], instructions: ["麻婆豆腐を作り、ごはんにのせて提供する。"] }),
+      createRecipe({ id: "sg-tenshinhan", name: "天津飯風たまごあんかけごはん", category: "単品料理", cuisine: "中華", servingSize: 310, rotationKey: "丼", tags: ["定番料理", "例外献立"], ingredients: [part("rice", 145), part("egg", 50), part("shrimp", 12), part("green_peas", 5)], seasonings: [part("broth", 30), part("soy_sauce", 3), part("vinegar", 1.5), part("sugar", 1.5), part("starch", 2.5)], instructions: ["ふんわり焼いた卵をごはんにのせ、甘酢あんをかける。"] }),
+      createRecipe({ id: "sg-kitsune-udon", name: "きつねうどん", category: "単品料理", cuisine: "和食", servingSize: 330, rotationKey: "うどん", tags: ["定番料理", "例外献立"], ingredients: [part("udon", 240, { prep: "やわらかくゆで、5cm程度に切る" }), part("aburaage", 18, { prep: "油抜きして甘く煮る" }), part("green_onion", 5)], seasonings: [part("broth", 220), part("light_soy", 6), part("mirin", 4), part("sugar", 1)], instructions: ["甘く煮た油揚げをのせ、温かいだしをかける。"] }),
+      createRecipe({ id: "sg-nabeyaki-udon", name: "鍋焼き風たまごうどん", category: "単品料理", cuisine: "和食", servingSize: 330, rotationKey: "うどん", tags: ["定番料理", "例外献立"], ingredients: [part("udon", 230, { prep: "やわらかくゆで、5cm程度に切る" }), part("egg", 35), part("chicken_thigh", 25), part("komatsuna", 12)], seasonings: [part("broth", 220), part("light_soy", 6), part("mirin", 4)], instructions: ["具材をだしで煮て、卵を落としてやわらかく火を通す。"] }),
+      createRecipe({ id: "sg-sansai-soba", name: "山菜そば", category: "単品料理", cuisine: "和食", servingSize: 320, rotationKey: "そば", tags: ["定番料理", "例外献立"], ingredients: [part("soba_boiled", 220, { prep: "やや短めにしてやわらかく仕上げる" }), part("sansai_mix", 30), part("carrot", 10), part("aburaage", 6)], seasonings: [part("broth", 220), part("light_soy", 6), part("mirin", 4)], instructions: ["そばをやわらかくゆで、山菜をのせて温かいだしをかける。"] }),
+      createRecipe({ id: "sg-ankake-yakisoba", name: "五目あんかけ焼きそば", category: "単品料理", cuisine: "中華", servingSize: 320, rotationKey: "焼きそば", tags: ["定番料理", "例外献立"], ingredients: [part("chinese_noodles", 160, { prep: "やわらかく蒸して食べやすく切る" }), part("pork_lean", 30), part("chinese_cabbage", 25), part("carrot", 10), part("mushrooms", 8)], seasonings: [part("broth", 40), part("soy_sauce", 3), part("oyster_sauce", 2), part("starch", 2.5), part("sesame_oil", 1)], instructions: ["やわらかい麺に、具だくさんの中華あんをかける。"] }),
+      createRecipe({ id: "sg-sake-zosui", name: "鮭雑炊", category: "単品料理", cuisine: "和食", servingSize: 300, rotationKey: "雑炊", tags: ["定番料理", "例外献立"], ingredients: [part("soft_rice", 180), part("salmon", 50), part("egg", 30), part("komatsuna", 10)], seasonings: [part("broth", 80), part("light_soy", 3)], instructions: ["だしでごはんを煮て、ほぐした鮭と卵でとじる。"] }),
+      createRecipe({ id: "sg-napolitan", name: "やわらかナポリタン", category: "単品料理", cuisine: "洋食", servingSize: 300, rotationKey: "パスタ", tags: ["定番料理", "例外献立"], ingredients: [part("pasta", 170, { prep: "やわらかくゆで5cm程度に切る" }), part("chicken_breast", 30), part("onion", 18), part("bell_pepper", 10)], seasonings: [part("ketchup", 14), part("tomato_sauce", 10), part("consomme", 1), part("butter", 2)], instructions: ["やわらかくゆでたパスタを具材とケチャップで炒め合わせる。"] }),
+      createRecipe({ id: "sg-cream-pasta", name: "クリームパスタ", category: "単品料理", cuisine: "洋食", servingSize: 300, rotationKey: "パスタ", tags: ["定番料理", "例外献立"], ingredients: [part("pasta", 170, { prep: "やわらかくゆで5cm程度に切る" }), part("chicken_breast", 30), part("broccoli", 15), part("onion", 12)], seasonings: [part("milk", 50), part("butter", 3), part("flour", 4), part("consomme", 1)], instructions: ["クリームソースを作り、やわらかいパスタと絡める。"] })
+    ];
+  }
+  function buildCuratedSnacks() {
+    return [
+      createRecipe({ id: "sn-kabocha-mushipan", name: "かぼちゃ蒸しパン", category: "おやつ", cuisine: "和食", servingSize: 70, rotationKey: "蒸しパン", tags: ["定番料理", "おやつ", "手作り", "やわらかい"], ingredients: [part("flour", 20), part("milk", 12), part("egg", 8), part("pumpkin", 18)], seasonings: [part("sugar", 6), part("baking_powder", 1)], instructions: ["かぼちゃを裏ごしして生地に混ぜる。", "型に流してふんわり蒸し上げる。"] }),
+      createRecipe({ id: "sn-imo-mushipan", name: "さつまいも蒸しパン", category: "おやつ", cuisine: "和食", servingSize: 72, rotationKey: "蒸しパン", tags: ["定番料理", "おやつ", "手作り", "やわらかい"], ingredients: [part("flour", 20), part("milk", 12), part("egg", 8), part("sweet_potato", 20)], seasonings: [part("sugar", 5), part("baking_powder", 1)], instructions: ["さつまいもを小さな角切りにして生地に混ぜる。", "型に流してふんわり蒸し上げる。"] }),
+      createRecipe({ id: "sn-banana-cake", name: "バナナ蒸しケーキ", category: "おやつ", cuisine: "洋食", servingSize: 68, rotationKey: "蒸しケーキ", tags: ["定番料理", "おやつ", "手作り", "やわらかい"], ingredients: [part("flour", 18), part("egg", 10), part("milk", 10), part("banana", 20)], seasonings: [part("sugar", 6), part("baking_powder", 1)], instructions: ["つぶしたバナナを生地に混ぜる。", "しっとりやわらかく蒸し上げる。"] }),
+      createRecipe({ id: "sn-apple-yogurt", name: "りんごヨーグルトあえ", category: "おやつ", cuisine: "洋食", servingSize: 80, rotationKey: "ヨーグルト", tags: ["定番料理", "おやつ", "手作り"], ingredients: [part("yogurt", 55), part("apple", 25)], seasonings: [part("sugar", 2)], instructions: ["りんごを薄いいちょう切りにしてやわらかく煮る。", "ヨーグルトと合わせて冷やす。"] }),
+      createRecipe({ id: "sn-mix-jelly", name: "フルーツミックスゼリー", category: "おやつ", cuisine: "洋食", servingSize: 65, rotationKey: "ゼリー", tags: ["定番料理", "おやつ", "手作り"], ingredients: [part("banana", 15), part("mandarin", 15), part("apple", 10)], seasonings: [part("sugar", 5), part("gelatin_powder", 1.5)], instructions: ["果物を小さく切ってゼリー液に入れる。", "冷やし固めて提供する。"] }),
+      createRecipe({ id: "sn-mini-yokan", name: "ミニ水ようかん", category: "おやつ", cuisine: "和食", servingSize: 55, rotationKey: "和菓子", tags: ["定番料理", "おやつ", "手作り", "やわらかい"], ingredients: [part("azuki_paste", 30)], seasonings: [part("sugar", 2), part("gelatin_powder", 1)], instructions: ["こしあんをのばしてゼラチンで固める。", "小さめに切り分けて冷やす。"] }),
+      createRecipe({ id: "sn-sweet-potato", name: "スイートポテト風茶巾", category: "おやつ", cuisine: "洋食", servingSize: 60, rotationKey: "スイートポテト", tags: ["定番料理", "おやつ", "手作り", "やわらかい"], ingredients: [part("sweet_potato", 40), part("milk", 6), part("egg", 4)], seasonings: [part("sugar", 4), part("butter", 2)], instructions: ["さつまいもを裏ごしして材料と練り合わせる。", "茶巾に絞ってやわらかく仕上げる。"] }),
+      createRecipe({ id: "sn-milk-kanten", name: "ミルク寒天", category: "おやつ", cuisine: "和食", servingSize: 65, rotationKey: "寒天", tags: ["定番料理", "おやつ", "手作り", "やわらかい"], ingredients: [part("milk", 55)], seasonings: [part("sugar", 5), part("gelatin_powder", 1.5)], instructions: ["牛乳と砂糖を温めてゼラチンを溶かす。", "冷やしてなめらかに固める。"] })
+    ];
+  }
+  const EXPANDED_RECIPES = [...buildCuratedRecipeMaster(), ...buildCuratedSnacks()];
   const GOALS = { energy: 550, protein: 22, fat: 18, carbs: 75, fiber: 6, salt: 3.0 };
 
   getAllFoods = function () { return [...EXPANDED_FOODS, ...(state.customFoods || [])]; };
@@ -2253,6 +2452,7 @@
   function isPreferredSnackRecipe(recipe) {
     if (!recipe || recipe.category !== "おやつ") return false;
     if (recipe.id === BIRTHDAY_SNACK_ID) return true;
+    if (recipe.tags.includes("birthday-cake") || recipe.tags.includes("誕生日")) return false;
     if (recipe.tags.includes("生フルーツ") || recipe.tags.includes("果物")) return false;
     return true;
   }
@@ -2273,6 +2473,13 @@
   }
   function scoreRecipePreference(recipe, context, role) {
     let score = (context.recipeUseCount.get(recipe.id) || 0) * 20;
+    if (context.featureCount) {
+      getRecipeFeatureKeys(recipe.name).forEach((key) => {
+        const prior = context.featureCount.get(key) || 0;
+        if (prior === 1) score += 60;
+        if (prior >= 2) score += 60 + (prior - 1) * 240;
+      });
+    }
     if (role === "main") {
       score += (context.mainRotationCount.get(recipe.rotationKey) || 0) * 40;
       if (recipe.rotationKey === context.lastMainRotationKey) score += 120;
@@ -2327,6 +2534,38 @@
     const stripped = name.replace(/(の)?(お)?(すまし汁|吸い物|味噌汁|みそ汁|ポタージュ|スープ|汁)$/u, "");
     return stripped || name;
   }
+  const FEATURE_GROUPS = [
+    ["きのこ", ["きのこ", "しいたけ", "しめじ", "えのき", "まいたけ", "マッシュルーム"]],
+    ["トマト", ["トマト"]], ["かぼちゃ", ["かぼちゃ"]], ["じゃがいも", ["じゃがいも", "ポテト"]],
+    ["さつまいも", ["さつまいも"]], ["大根", ["大根"]], ["白菜", ["白菜"]],
+    ["キャベツ", ["キャベツ", "コールスロー"]], ["もやし", ["もやし"]],
+    ["ほうれん草", ["ほうれん草"]], ["青菜", ["小松菜", "青菜"]], ["ブロッコリー", ["ブロッコリー"]],
+    ["にんじん", ["にんじん"]], ["コーン", ["コーン", "とうもろこし"]], ["きゅうり", ["きゅうり"]],
+    ["豆腐", ["豆腐"]], ["卵", ["卵", "たまご", "かき玉", "オムレツ", "親子"]],
+    ["えび", ["えび", "海老"]], ["わかめ", ["わかめ"]], ["ごぼう", ["ごぼう"]], ["れんこん", ["れんこん"]],
+    ["なす", ["なす"]], ["バナナ", ["バナナ"]], ["りんご", ["りんご"]], ["みかん", ["みかん"]],
+    ["ぶどう", ["ぶどう"]], ["白桃", ["白桃"]], ["オレンジ", ["オレンジ"]],
+    ["レモン", ["レモン"]], ["カレー", ["カレー"]], ["生姜", ["しょうが", "生姜"]]
+  ];
+  function getRecipeFeatureKeys(name) {
+    if (!name) return [];
+    const keys = [];
+    FEATURE_GROUPS.forEach(([key, patterns]) => {
+      if (patterns.some((pattern) => name.includes(pattern))) keys.push(key);
+    });
+    return keys;
+  }
+  function getMenuAllRecipeIds(menu) {
+    return getMenuRecipeIds(menu).concat(menu.snack ? [menu.snack] : []);
+  }
+  function collectMenuFeatureKeys(menu, map = getRecipeMap()) {
+    const keys = [];
+    getMenuAllRecipeIds(menu).forEach((id) => {
+      const recipe = map.get(id);
+      if (recipe) keys.push(...getRecipeFeatureKeys(recipe.name));
+    });
+    return keys;
+  }
   function getMenuSoupIds(menu) {
     return (menu.mode === "basic" ? [menu.basic.soup] : [menu.exception.extraSoup]).filter(Boolean);
   }
@@ -2376,6 +2615,16 @@
       const base = getSoupBaseToken(map.get(id)?.name);
       if (base && hasSimilarToken(context.usedSoupBases, base)) score -= 420;
     });
+    {
+      const withinDay = new Map();
+      collectMenuFeatureKeys(menu, map).forEach((key) => withinDay.set(key, (withinDay.get(key) || 0) + 1));
+      withinDay.forEach((count, key) => {
+        if (count >= 2) score -= (count - 1) * 200;
+        const prior = context.featureCount?.get(key) || 0;
+        if (prior === 1) score -= 90;
+        if (prior >= 2) score -= 90 + (prior - 1) * 320;
+      });
+    }
     score -= applyCuisineConsistencyPenalty(menu, getPreferredCuisine(menu, targetCuisine), map);
     (menu.mode === "basic" ? [menu.basic.side1, menu.basic.side2] : [menu.exception.extraSide]).filter(Boolean).map((id) => map.get(id)).filter(Boolean).forEach((side) => {
       score -= (context.sideRotationCount.get(side.rotationKey) || 0) * 28;
@@ -2458,6 +2707,11 @@
       const base = getSoupBaseToken(map.get(id)?.name);
       if (base) context.usedSoupBases?.add(base);
     });
+    if (context.featureCount) {
+      collectMenuFeatureKeys(menu, map).forEach((key) => {
+        context.featureCount.set(key, (context.featureCount.get(key) || 0) + 1);
+      });
+    }
   }
   function buildBasicCandidate(cuisine, context, date) {
     const staple = pickRecipe(filterRecipesLocal({ category: "主食", cuisine, minEnergy: 100, maxEnergy: 230 }), context, "staple");
@@ -2486,7 +2740,7 @@
   }
   function generateAutoWeek(weekStart) {
     const week = createEmptyWeekMenu(weekStart);
-    const context = { cuisineCounts: { 和食: 0, 洋食: 0, 中華: 0 }, recipeUseCount: new Map(), mainRotationCount: new Map(), sideRotationCount: new Map(), dessertRotationCount: new Map(), dessertFruitCount: new Map(), dessertBaseCount: new Map(), lastMainId: null, lastMainRotationKey: null, lastDessertRotationKey: null, lastDessertFruitTag: null, lastDessertBaseTag: null, lastSideRotationKeys: new Set(), freshFruitDessertCount: 0, usedSideIds: new Set(), usedSideNames: new Set(), usedSnackIds: new Set(), usedRecipeIds: new Set(), usedNames: new Set(), usedStapleIds: new Set(), usedMainMethods: new Set(), usedSoupBases: new Set() };
+    const context = { cuisineCounts: { 和食: 0, 洋食: 0, 中華: 0 }, recipeUseCount: new Map(), mainRotationCount: new Map(), sideRotationCount: new Map(), dessertRotationCount: new Map(), dessertFruitCount: new Map(), dessertBaseCount: new Map(), lastMainId: null, lastMainRotationKey: null, lastDessertRotationKey: null, lastDessertFruitTag: null, lastDessertBaseTag: null, lastSideRotationKeys: new Set(), freshFruitDessertCount: 0, usedSideIds: new Set(), usedSideNames: new Set(), usedSnackIds: new Set(), usedRecipeIds: new Set(), usedNames: new Set(), usedStapleIds: new Set(), usedMainMethods: new Set(), usedSoupBases: new Set(), featureCount: new Map() };
     const exceptionDays = [...WEEKDAY_KEYS].sort(() => Math.random() - 0.5).slice(0, 1);
     WEEKDAY_KEYS.forEach((dayKey, index) => {
       const targetCuisine = chooseTargetCuisine(context.cuisineCounts, index);
@@ -2559,7 +2813,7 @@
       { label: "構成", pass: evaluation.structurePass, detail: evaluation.structurePass ? "必要な構成がそろっています。" : "必要な構成が不足しています。" },
       { label: "エネルギー", pass: evaluation.energyPass, detail: `${formatNumber(evaluation.totals.energy, 0)} kcal / 目安 ${energyMin}〜${energyMax} kcal` },
       { label: "塩分", pass: evaluation.saltPass, detail: `${formatNumber(evaluation.totals.salt, 1)} g / 上限 ${formatNumber(goalSalt, 1)} g` },
-      { label: "安全", pass: riskRecipes.length === 0, detail: riskRecipes.length === 0 ? "窒息リスクの高い料理はありません。" : `要注意: ${riskRecipes.map((recipe) => recipe.name).join("、")}（食形態に応じて代替を検討）` }
+      { label: "安全", pass: riskRecipes.length === 0, detail: riskRecipes.length === 0 ? "特に注意が必要な料理の該当なし。※どの食事にも窒息リスクはあります。一口量・姿勢・見守りを徹底してください。" : `要注意: ${riskRecipes.map((recipe) => recipe.name).join("、")}（食形態に応じて代替を検討）。他の料理も一口量・姿勢・見守りを徹底してください。` }
     ];
     return cards.map((card) => `<article class="check-card ${card.pass ? "pass" : "fail"}"><span>${card.label}</span><strong>${card.pass ? "適合" : "要調整"}</strong><p class="muted">${card.detail}</p></article>`).join("");
   };
@@ -2774,7 +3028,7 @@
       createRecipe({ id: "snack-simple-waffle", name: "ワッフル", category: "おやつ", cuisine: "洋食", servingSize: 70, rotationKey: "焼き菓子", tags: ["おやつ", "洋菓子", "焼き菓子"], notes: "市販のワッフルを食べやすい状態で提供する。", ingredients: [part("bread", 70, { label: "市販ワッフル 1個", prep: "食べやすい大きさを確認する" })], seasonings: [], instructions: ["個包装のまま、または皿にのせて提供する。"] }),
       createRecipe({ id: "snack-simple-minicake", name: "ミニケーキ", category: "おやつ", cuisine: "洋食", servingSize: 70, rotationKey: "洋菓子", tags: ["おやつ", "洋菓子"], notes: "市販のミニケーキを人数分配りやすい形で使用する。", ingredients: [part("bread", 70, { label: "市販ミニケーキ 1個", prep: "個包装または皿で提供できるよう準備する" })], seasonings: [], instructions: ["個包装のまま、または皿にのせて提供する。"] })
     ];
-    return [...simpleSnacks, ...buildAdditionalSnackRecipes(), ...buildBirthdayCakeRecipes()];
+    return [...simpleSnacks, ...buildBirthdayCakeRecipes()];
   }
 
   const SPECIAL_MENU_RECIPES = [
@@ -3617,7 +3871,7 @@
       const basePool = recipePools[opts.category]?.[cuisineKey] || [];
       return basePool.filter((recipe) => !excludes.has(recipe.id) && recipe.nutrition.energy >= (opts.minEnergy || 0) && recipe.nutrition.energy <= (opts.maxEnergy || 9999));
     };
-    const context = { cuisineCounts: { 和食: 0, 洋食: 0, 中華: 0 }, recipeUseCount: new Map(), mainRotationCount: new Map(), sideRotationCount: new Map(), dessertRotationCount: new Map(), dessertFruitCount: new Map(), dessertBaseCount: new Map(), lastMainId: null, lastMainRotationKey: null, lastDessertRotationKey: null, lastDessertFruitTag: null, lastDessertBaseTag: null, lastSideRotationKeys: new Set(), freshFruitDessertCount: 0, usedSideIds: new Set(), usedSideNames: new Set(), usedSnackIds: new Set(), usedRecipeIds: new Set(), usedNames: new Set(), usedStapleIds: new Set(), usedMainMethods: new Set(), usedSoupBases: new Set() };
+    const context = { cuisineCounts: { 和食: 0, 洋食: 0, 中華: 0 }, recipeUseCount: new Map(), mainRotationCount: new Map(), sideRotationCount: new Map(), dessertRotationCount: new Map(), dessertFruitCount: new Map(), dessertBaseCount: new Map(), lastMainId: null, lastMainRotationKey: null, lastDessertRotationKey: null, lastDessertFruitTag: null, lastDessertBaseTag: null, lastSideRotationKeys: new Set(), freshFruitDessertCount: 0, usedSideIds: new Set(), usedSideNames: new Set(), usedSnackIds: new Set(), usedRecipeIds: new Set(), usedNames: new Set(), usedStapleIds: new Set(), usedMainMethods: new Set(), usedSoupBases: new Set(), featureCount: new Map() };
     const usedSoupIds = new Set();
     const usedMainIds = new Set();
     const exceptionDays = [...WEEKDAY_KEYS].sort(() => Math.random() - 0.5).slice(0, 1);
@@ -4323,19 +4577,71 @@
     nextDayMenu.snack = pickWeeklyEditorShuffleRecipe(byCategory("おやつ"), dayMenu.snack, [], excludeNames);
     return nextDayMenu;
   }
-  function scoreWeeklyEditorShuffledDayMenu(dayMenu) {
-    const evaluation = evaluateDayMenu(dayMenu);
-    return getIntraDayOverlapPenalty(dayMenu)
-      + (evaluation.structurePass ? 0 : 999999)
-      + Math.abs(evaluation.totals.energy - 550) * 0.35
-      + Math.max(0, evaluation.totals.salt - 3.0) * 120;
+  function buildShuffleWeekContext(draftWeek, skipDayKey) {
+    const map = getRecipeMap();
+    const weekContext = { mainMethods: new Set(), soupBases: new Set(), stapleIds: new Set(), featureCount: new Map() };
+    WEEKDAY_KEYS.forEach((otherKey) => {
+      if (otherKey === skipDayKey) return;
+      const otherMenu = draftWeek?.[otherKey];
+      if (!otherMenu) return;
+      if (otherMenu.mode === "basic" && otherMenu.basic?.staple) weekContext.stapleIds.add(otherMenu.basic.staple);
+      const primaryId = otherMenu.mode === "basic" ? otherMenu.basic?.main : otherMenu.exception?.singleDish;
+      const primary = map.get(primaryId);
+      if (primary) {
+        const method = getMainMethodToken(primary.name);
+        if (method) weekContext.mainMethods.add(method);
+      }
+      getMenuSoupIds(otherMenu).forEach((id) => {
+        const base = getSoupBaseToken(map.get(id)?.name);
+        if (base) weekContext.soupBases.add(base);
+      });
+      collectMenuFeatureKeys(otherMenu, map).forEach((key) => {
+        weekContext.featureCount.set(key, (weekContext.featureCount.get(key) || 0) + 1);
+      });
+    });
+    return weekContext;
   }
-  function buildWeeklyEditorShuffledDayMenu(dayMenu, excludeNames = null) {
+  function scoreWeeklyEditorShuffledDayMenu(dayMenu, weekContext = null) {
+    const evaluation = evaluateDayMenu(dayMenu);
+    const goalEnergy = Number(state.goals.energy) || 550;
+    const goalSalt = Number(state.goals.salt) || 3.0;
+    const energyDeviation = Math.abs(evaluation.totals.energy - goalEnergy);
+    const outOfBand = Math.max(0, energyDeviation - goalEnergy * 0.1);
+    let score = getIntraDayOverlapPenalty(dayMenu)
+      + (evaluation.structurePass ? 0 : 999999)
+      + energyDeviation * 0.35
+      + outOfBand * 6
+      + Math.max(0, evaluation.totals.salt - goalSalt) * 200;
+    const map = getRecipeMap();
+    if (weekContext) {
+      if (dayMenu.mode === "basic" && dayMenu.basic?.staple && weekContext.stapleIds.has(dayMenu.basic.staple)) score += 420;
+      const primaryId = dayMenu.mode === "basic" ? dayMenu.basic?.main : dayMenu.exception?.singleDish;
+      const primary = map.get(primaryId);
+      if (primary) {
+        const method = getMainMethodToken(primary.name);
+        if (method && hasSimilarToken(weekContext.mainMethods, method)) score += 430;
+      }
+      getMenuSoupIds(dayMenu).forEach((id) => {
+        const base = getSoupBaseToken(map.get(id)?.name);
+        if (base && hasSimilarToken(weekContext.soupBases, base)) score += 420;
+      });
+    }
+    const withinDay = new Map();
+    collectMenuFeatureKeys(dayMenu, map).forEach((key) => withinDay.set(key, (withinDay.get(key) || 0) + 1));
+    withinDay.forEach((count, key) => {
+      if (count >= 2) score += (count - 1) * 200;
+      const prior = weekContext?.featureCount?.get(key) || 0;
+      if (prior === 1) score += 90;
+      if (prior >= 2) score += 90 + (prior - 1) * 320;
+    });
+    return score;
+  }
+  function buildWeeklyEditorShuffledDayMenu(dayMenu, excludeNames = null, weekContext = null) {
     let bestMenu = null;
     let bestScore = Number.POSITIVE_INFINITY;
-    for (let attempt = 0; attempt < 12; attempt += 1) {
+    for (let attempt = 0; attempt < 24; attempt += 1) {
       const candidate = buildWeeklyEditorShuffledDayMenuCandidate(dayMenu, excludeNames);
-      const score = scoreWeeklyEditorShuffledDayMenu(candidate);
+      const score = scoreWeeklyEditorShuffledDayMenu(candidate, weekContext);
       if (score < bestScore) {
         bestScore = score;
         bestMenu = candidate;
@@ -4461,7 +4767,7 @@
       const basePool = recipePools[opts.category]?.[cuisineKey] || [];
       return basePool.filter((recipe) => !excludes.has(recipe.id) && recipe.nutrition.energy >= (opts.minEnergy || 0) && recipe.nutrition.energy <= (opts.maxEnergy || 9999));
     };
-    const context = { cuisineCounts: { 和食: 0, 洋食: 0, 中華: 0 }, recipeUseCount: new Map(), mainRotationCount: new Map(), sideRotationCount: new Map(), dessertRotationCount: new Map(), dessertFruitCount: new Map(), dessertBaseCount: new Map(), lastMainId: null, lastMainRotationKey: null, lastDessertRotationKey: null, lastDessertFruitTag: null, lastDessertBaseTag: null, lastSideRotationKeys: new Set(), freshFruitDessertCount: 0, usedSideIds: new Set(), usedSideNames: new Set(), usedSnackIds: new Set(), usedRecipeIds: new Set(), usedNames: new Set(), usedStapleIds: new Set(), usedMainMethods: new Set(), usedSoupBases: new Set() };
+    const context = { cuisineCounts: { 和食: 0, 洋食: 0, 中華: 0 }, recipeUseCount: new Map(), mainRotationCount: new Map(), sideRotationCount: new Map(), dessertRotationCount: new Map(), dessertFruitCount: new Map(), dessertBaseCount: new Map(), lastMainId: null, lastMainRotationKey: null, lastDessertRotationKey: null, lastDessertFruitTag: null, lastDessertBaseTag: null, lastSideRotationKeys: new Set(), freshFruitDessertCount: 0, usedSideIds: new Set(), usedSideNames: new Set(), usedSnackIds: new Set(), usedRecipeIds: new Set(), usedNames: new Set(), usedStapleIds: new Set(), usedMainMethods: new Set(), usedSoupBases: new Set(), featureCount: new Map() };
     const usedSoupIds = new Set();
     const usedMainIds = new Set();
     const exceptionDays = [...WEEKDAY_KEYS].sort(() => Math.random() - 0.5).slice(0, 1);
@@ -4789,7 +5095,8 @@
             if (recipe) excludeNames.add(recipe.name);
           });
         });
-        const nextDayMenu = buildWeeklyEditorShuffledDayMenu(currentDayMenu, excludeNames);
+        const weekContext = buildShuffleWeekContext(draftWeek, dayKey);
+        const nextDayMenu = buildWeeklyEditorShuffledDayMenu(currentDayMenu, excludeNames, weekContext);
         applyWeeklyEditorShuffledDayMenu(dayKey, nextDayMenu);
       });
     });
