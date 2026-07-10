@@ -581,6 +581,15 @@
     .backup-import-label { display:inline-flex; align-items:center; cursor:pointer; }
     #order-view.view.is-active { display:grid; gap:18px; }
     @media (max-width: 900px) { .haccp-grid { grid-template-columns:minmax(0,1fr); } .goals-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+    .kitchen-day-table th:nth-child(1), .kitchen-day-table td:nth-child(1) { width:8%; }
+    .kitchen-day-table th:nth-child(2), .kitchen-day-table td:nth-child(2) { width:13%; }
+    .kitchen-day-table th:nth-child(3), .kitchen-day-table td:nth-child(3) { width:6%; }
+    .kitchen-day-table th:nth-child(4), .kitchen-day-table td:nth-child(4) { width:16%; }
+    .kitchen-day-table th:nth-child(5), .kitchen-day-table td:nth-child(5) { width:13%; }
+    .kitchen-day-table th:nth-child(6), .kitchen-day-table td:nth-child(6) { width:18%; }
+    .kitchen-day-table th:nth-child(7), .kitchen-day-table td:nth-child(7) { width:16%; }
+    .kitchen-day-table th:nth-child(8), .kitchen-day-table td:nth-child(8) { width:10%; }
+    .kitchen-day-table td:nth-child(8) { white-space:nowrap; }
     .weekly-editor-check { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin-top:10px; }
     .weekly-editor-check .check-card { padding:8px 10px; }
     .weekly-editor-check .check-card p { font-size:0.78rem; margin:2px 0 0; }
