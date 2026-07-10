@@ -1909,19 +1909,12 @@
   }
   function buildBirthdayCakeRecipes() {
     const flavors = [
-      { key: "apple", name: "りんご", foodId: "apple" },
-      { key: "banana", name: "バナナ", foodId: "banana" },
-      { key: "mandarin", name: "みかん", foodId: "mandarin" },
-      { key: "orange", name: "オレンジ", foodId: "orange" },
       { key: "peach", name: "白桃", foodId: "peach" },
-      { key: "grape", name: "ぶどう", foodId: "grape" }
+      { key: "mandarin", name: "みかん", foodId: "mandarin" }
     ];
     const cakeStyles = [
       { key: "short", label: "のバースデーショートケーキ", servingSize: 88, ingredients: (flavor) => [part("flour", 22), part("egg", 14), part("milk", 16), part(flavor.foodId, 18)], seasonings: () => [part("sugar", 8), part("baking_powder", 1.5)], instructions: ["生地を焼いてやわらかく仕上げる。", "果物を添えて提供する。"] },
-      { key: "roll", label: "のバースデーロールケーキ", servingSize: 86, ingredients: (flavor) => [part("flour", 20), part("egg", 14), part("milk", 14), part(flavor.foodId, 18)], seasonings: () => [part("sugar", 8), part("baking_powder", 1.5)], instructions: ["生地をやわらかく焼く。", "果物を合わせて巻き、食べやすく切る。"] },
-      { key: "mousse", label: "のバースデームースケーキ", servingSize: 84, ingredients: (flavor) => [part("yogurt", 38), part("milk", 18), part(flavor.foodId, 22)], seasonings: () => [part("sugar", 5), part("gelatin_powder", 1.5)], instructions: ["材料をなめらかに混ぜる。", "冷やし固めてケーキ仕立てにする。"] },
-      { key: "milk", label: "のバースデーミルクケーキ", servingSize: 86, ingredients: (flavor) => [part("flour", 20), part("egg", 12), part("milk", 18), part(flavor.foodId, 16)], seasonings: () => [part("sugar", 8), part("baking_powder", 1.5)], instructions: ["生地をやわらかく焼く。", "果物を添えて食べやすく仕上げる。"] },
-      { key: "fruit", label: "のバースデーフルーツケーキ", servingSize: 88, ingredients: (flavor) => [part("flour", 22), part("egg", 12), part("milk", 14), part(flavor.foodId, 20)], seasonings: () => [part("sugar", 8), part("baking_powder", 1.5)], instructions: ["生地に果物を合わせて焼く。", "冷まして提供する。"] }
+      { key: "mousse", label: "のバースデームースケーキ", servingSize: 84, ingredients: (flavor) => [part("yogurt", 38), part("milk", 18), part(flavor.foodId, 22)], seasonings: () => [part("sugar", 5), part("gelatin_powder", 1.5)], instructions: ["材料をなめらかに混ぜる。", "冷やし固めてケーキ仕立てにする。"] }
     ];
     const recipes = [];
     flavors.forEach((flavor) => {
